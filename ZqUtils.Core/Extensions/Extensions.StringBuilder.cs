@@ -59,7 +59,7 @@ namespace ZqUtils.Core.Extensions
                 @this.Append(sqlKeywordOfWhere);
                 hasWhere = true;
             }
-            if (!string.IsNullOrEmpty(appendSql))
+            if (!appendSql.IsNullOrEmpty())
             {
                 @this.Append(appendSql);
             }
@@ -98,7 +98,7 @@ namespace ZqUtils.Core.Extensions
                 @this.Append(sqlKeywordOfWhere);
                 hasWhere = true;
             }
-            if (!string.IsNullOrEmpty(appendSql))
+            if (!appendSql.IsNullOrEmpty())
             {
                 @this.Append(appendSql);
             }
@@ -141,7 +141,7 @@ namespace ZqUtils.Core.Extensions
                     @this.Append(sqlKeywordOfWhere);
                     hasWhere = true;
                 }
-                if (!string.IsNullOrEmpty(appendSql))
+                if (!appendSql.IsNullOrEmpty())
                 {
                     @this.Append(appendSql);
                 }
@@ -187,7 +187,7 @@ namespace ZqUtils.Core.Extensions
                     @this.Append(sqlKeywordOfWhere);
                     hasWhere = true;
                 }
-                if (!string.IsNullOrEmpty(appendSql))
+                if (!appendSql.IsNullOrEmpty())
                 {
                     @this.Append(appendSql);
                 }
