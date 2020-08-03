@@ -45,7 +45,7 @@ namespace ZqUtils.Core.Extensions
         public static bool AppendWhereOrAnd(
             this StringBuilder @this,
             bool hasWhere,
-            string appendSql = null,
+            string appendSql,
             string sqlKeywordOfAnd = " AND ",
             string sqlKeywordOfWhere = " WHERE ",
             StringBuilder appendStringBuilder = null)
@@ -84,7 +84,7 @@ namespace ZqUtils.Core.Extensions
         public static StringBuilder AppendWhereOrAnd(
             this StringBuilder @this,
             ref bool hasWhere,
-            string appendSql = null,
+            string appendSql,
             string sqlKeywordOfAnd = " AND ",
             string sqlKeywordOfWhere = " WHERE ",
             StringBuilder appendStringBuilder = null)
@@ -125,7 +125,7 @@ namespace ZqUtils.Core.Extensions
             this StringBuilder @this,
             bool condition,
             ref bool hasWhere,
-            string appendSql = null,
+            string appendSql,
             string sqlKeywordOfAnd = " AND ",
             string sqlKeywordOfWhere = " WHERE ",
             StringBuilder appendStringBuilder = null)
@@ -159,9 +159,9 @@ namespace ZqUtils.Core.Extensions
         /// </summary>
         /// <param name="this">当前sql拼接对象</param>
         /// <param name="condition">自定义条件，当条件满足时才进行拼接</param>
-        /// <param name="callback">当自定义条件满足时，执行完拼接后回调委托</param>
         /// <param name="hasWhere">是否有where</param>
         /// <param name="appendSql">拼接sql字符串</param>
+        /// <param name="callback">当自定义条件满足时，执行完拼接后回调委托</param>
         /// <param name="sqlKeywordOfAnd">sql关键字and</param>
         /// <param name="sqlKeywordOfWhere">sql关键字where</param>
         /// <param name="appendStringBuilder">拼接StringBuilder对象</param>
@@ -169,9 +169,9 @@ namespace ZqUtils.Core.Extensions
         public static StringBuilder AppendWhereOrAndIf(
             this StringBuilder @this,
             bool condition,
-            Action callback,
             ref bool hasWhere,
-            string appendSql = null,
+            string appendSql,
+            Action callback,
             string sqlKeywordOfAnd = " AND ",
             string sqlKeywordOfWhere = " WHERE ",
             StringBuilder appendStringBuilder = null)
