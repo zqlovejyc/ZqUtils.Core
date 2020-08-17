@@ -1523,7 +1523,7 @@ namespace ZqUtils.Core.Extensions
         }
         #endregion
 
-        #region 正则判断是否包含目标字符串
+        #region 正则判断是否包含/不包含目标字符串
         /// <summary>
         /// 正则判断是否包含目标字符串
         /// </summary>
@@ -1534,6 +1534,29 @@ namespace ZqUtils.Core.Extensions
         public static bool Contains(this string @this, string value, RegexOptions options)
         {
             return Regex.IsMatch(@this, value, options);
+        }
+
+        /// <summary>
+        /// 正则判断是否不包含目标字符串
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="value">目标字符串，例如：判断是否包含ASC或DESC为@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)"</param>
+        /// <param name="options">匹配模式</param>
+        /// <returns></returns>
+        public static bool NotContains(this string @this, string value, RegexOptions options)
+        {
+            return !@this.Contains(value, options);
+        }
+
+        /// <summary>
+        /// 判断是否不包含目标字符串
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="value">目标字符串</param>
+        /// <returns></returns>
+        public static bool NotContains(this string @this, string value)
+        {
+            return !@this.Contains(value);
         }
         #endregion
 
