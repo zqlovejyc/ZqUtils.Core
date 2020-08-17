@@ -174,6 +174,34 @@ namespace ZqUtils.Core.Console
     {
         public static async Task Main(string[] args)
         {
+            #region Kafka
+            //var kafka = new KafkaHelper(new KafkaConfig(new Dictionary<string, string> 
+            //{
+            //    ["group.id"] = "test-consumer-group"
+            //}) 
+            //{ 
+            //    Servers = "localhost:9092"
+            //});
+
+            //var messages = new List<Message<Null, string>>();
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    messages.Add(new Message<Null, string> { Value = "Hello Kafka!" + (i + 1) });
+            //}
+            //var r = kafka.Publish("test-topic", messages);
+            //SysConsole.WriteLine(r);
+
+            //var r = kafka.Publish("test-topic", new Message<Null, string> { Value = "Hello Kafka!" });
+            //SysConsole.WriteLine(r);
+
+            //kafka.Subscribe<Ignore, string>("test-topic", receiveHandler: x =>
+            //{
+            //    SysConsole.WriteLine(x.Message.Value);
+            //});
+
+            //SysConsole.ReadLine();
+            #endregion
+
             #region ToDateTime
             //解析自定义格式的日期字符串
             var str = "Mon Mar 16 13:08:45 2020";
