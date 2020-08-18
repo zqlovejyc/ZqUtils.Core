@@ -37,7 +37,7 @@ namespace ZqUtils.Core.Helpers
         private static IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
-        /// Startup中配置IHttpContextAccessor
+        /// 使用HttpContext，Startup中配置IHttpContextAccessor
         /// </summary>
         /// <param name="app"></param>
         /// <example>

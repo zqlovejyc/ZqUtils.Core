@@ -151,7 +151,7 @@ namespace ZqUtils.Core.Helpers
 
         #region UseHttpClientFactory
         /// <summary>
-        /// Startup中配置IHttpContextAccessor
+        /// 使用HttpClient工厂模式
         /// </summary>
         /// <param name="app"></param>
         /// <example>
@@ -174,7 +174,7 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
-        /// Startup中配置IHttpContextAccessor
+        /// 使用HttpClient工厂模式
         /// </summary>
         /// <param name="provider"></param>
         /// <example>
