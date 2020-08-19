@@ -53,7 +53,11 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 构造函数
         /// </summary>
-        public KafkaHelper() { }
+        public KafkaHelper()
+        {
+            this.ProducerConfig = ConfigHelper.Get<ProducerConfig>("KafkaConfig:ProducerConfig");
+            this.ConsumerConfig = ConfigHelper.Get<ConsumerConfig>("KafkaConfig:ConsumerConfig");
+        }
 
         /// <summary>
         /// 构造函数

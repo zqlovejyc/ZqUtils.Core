@@ -175,13 +175,18 @@ namespace ZqUtils.Core.Console
         public static async Task Main(string[] args)
         {
             #region Kafka
-            //var kafka = new KafkaHelper(new KafkaConfig(new Dictionary<string, string> 
+            ////读取配置文件
+            //var kafka = new KafkaHelper();
+
+            //var kafka = new KafkaHelper(new KafkaConfig(new Dictionary<string, string>
             //{
             //    ["group.id"] = "test-consumer-group"
-            //}) 
-            //{ 
+            //})
+            //{
             //    Servers = "localhost:9092"
             //});
+
+
 
             //var messages = new List<Message<Null, string>>();
             //for (int i = 0; i < 100; i++)
