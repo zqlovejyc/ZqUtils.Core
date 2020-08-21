@@ -114,7 +114,7 @@ namespace ZqUtils.Core.Extensions
         /// <param name="dayOfWeek">周的开始日期：Sunday或者Monday</param>
         /// <param name="lastYear">如果当年第一天不是一周的开始，是否倒推上一年日期</param>
         /// <returns></returns>
-        public static DateTime ToDateTime(string @this, DayOfWeek dayOfWeek = DayOfWeek.Sunday, bool lastYear = false)
+        public static DateTime ToDateTime(this string @this, DayOfWeek dayOfWeek = DayOfWeek.Sunday, bool lastYear = false)
         {
             //年份
             string year = null;
