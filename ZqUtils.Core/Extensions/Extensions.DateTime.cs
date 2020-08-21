@@ -165,6 +165,17 @@ namespace ZqUtils.Core.Extensions
             var gc = new GregorianCalendar(calendarTypes);
             return gc.GetWeekOfYear(@this, weekRule, dayOfWeek);
         }
+
+        /// <summary>
+        /// 获取指定时间是当年的第几周
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="ci">示例：new CultureInfo("zh-CN")</param>
+        /// <returns></returns>
+        public static int WeekOfYear(this DateTime @this, CultureInfo ci)
+        {
+            return ci.Calendar.GetWeekOfYear(@this, ci.DateTimeFormat.CalendarWeekRule, ci.DateTimeFormat.FirstDayOfWeek);
+        }
         #endregion
 
         #region Format DateTime
