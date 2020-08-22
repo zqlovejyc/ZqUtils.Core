@@ -207,6 +207,33 @@ namespace ZqUtils.Core.Helpers
             var sched = await GetSchedulerAsync(schedName);
             await sched.StartDelayed(dely);
         }
+
+        /// <summary>
+        /// 关闭调度器
+        /// </summary>
+        /// <param name="schedName"></param>
+        /// <returns></returns>
+        public static async Task ShutdownAsync(string schedName = null)
+        {
+            var sched = await GetSchedulerAsync(schedName);
+
+            if (!sched.IsShutdown)
+                await sched.Shutdown();
+        }
+
+        /// <summary>
+        /// 关闭调度器
+        /// </summary>
+        /// <param name="waitForJobsToComplete">是否等待Job执行完成</param>
+        /// <param name="schedName"></param>
+        /// <returns></returns>
+        public static async Task ShutdownAsync(bool waitForJobsToComplete, string schedName = null)
+        {
+            var sched = await GetSchedulerAsync(schedName);
+
+            if (!sched.IsShutdown)
+                await sched.Shutdown(waitForJobsToComplete);
+        }
         #endregion
 
         #region Job
@@ -694,8 +721,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static async Task ShutdownAllAsync(string schedName = null)
         {
-            var sched = await GetSchedulerAsync(schedName);
-            await sched.Shutdown();
+            await ShutdownAsync(schedName);
         }
         #endregion
 

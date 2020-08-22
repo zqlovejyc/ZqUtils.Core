@@ -78,8 +78,9 @@ namespace ZqUtils.Core.Extensions
         /// 使用Ioc作业调度工厂
         /// </summary>
         /// <param name="this"></param>
+        /// <param name="waitForJobsToComplete">是否等待Job执行完成</param>
         /// <returns></returns>
-        public static IScheduler UseIocJobFactory(this IApplicationBuilder @this)
+        public static IScheduler UseIocJobFactory(this IApplicationBuilder @this, bool? waitForJobsToComplete = null)
         {
             //获取IScheduler
             var scheduler = QuartzHelper.GetSchedulerAsync().GetAwaiter().GetResult();
@@ -94,7 +95,12 @@ namespace ZqUtils.Core.Extensions
             lifetime.ApplicationStopping.Register(() =>
             {
                 if (!scheduler.IsShutdown)
-                    scheduler.Shutdown().Wait();
+                {
+                    if (waitForJobsToComplete != null)
+                        scheduler.Shutdown(waitForJobsToComplete.Value).Wait();
+                    else
+                        scheduler.Shutdown().Wait();
+                }
             });
 
             //启动Scheduler
@@ -110,8 +116,9 @@ namespace ZqUtils.Core.Extensions
         /// 使用Ioc作业调度工厂
         /// </summary>
         /// <param name="this"></param>
+        /// <param name="waitForJobsToComplete">是否等待Job执行完成</param>
         /// <returns></returns>
-        public static IScheduler UseIocJobFactory(this IServiceProvider @this)
+        public static IScheduler UseIocJobFactory(this IServiceProvider @this, bool? waitForJobsToComplete = null)
         {
             //获取IScheduler
             var scheduler = QuartzHelper.GetSchedulerAsync().GetAwaiter().GetResult();
@@ -126,7 +133,12 @@ namespace ZqUtils.Core.Extensions
             lifetime.ApplicationStopping.Register(() =>
             {
                 if (!scheduler.IsShutdown)
-                    scheduler.Shutdown().Wait();
+                {
+                    if (waitForJobsToComplete != null)
+                        scheduler.Shutdown(waitForJobsToComplete.Value).Wait();
+                    else
+                        scheduler.Shutdown().Wait();
+                }
             });
 
             //启动Scheduler
