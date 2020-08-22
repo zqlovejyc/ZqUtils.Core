@@ -18,6 +18,7 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Quartz;
 using Quartz.Simpl;
 using Quartz.Spi;
@@ -86,6 +87,22 @@ namespace ZqUtils.Core.Extensions
             //设置JobFactory
             scheduler.JobFactory = @this.ApplicationServices.GetRequiredService<IJobFactory>();
 
+            //应用程序生命周期
+            var lifetime = @this.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
+
+            //应用程序终止时，关闭Scheduler
+            lifetime.ApplicationStopping.Register(() =>
+            {
+                if (!scheduler.IsShutdown)
+                    scheduler.Shutdown().Wait();
+            });
+
+            //启动Scheduler
+            if (!scheduler.IsShutdown && !scheduler.IsStarted)
+            {
+                scheduler.Start().Wait();
+            }
+
             return scheduler;
         }
 
@@ -101,6 +118,22 @@ namespace ZqUtils.Core.Extensions
 
             //设置JobFactory
             scheduler.JobFactory = @this.GetRequiredService<IJobFactory>();
+
+            //应用程序生命周期
+            var lifetime = @this.GetRequiredService<IHostApplicationLifetime>();
+
+            //应用程序终止时，关闭Scheduler
+            lifetime.ApplicationStopping.Register(() =>
+            {
+                if (!scheduler.IsShutdown)
+                    scheduler.Shutdown().Wait();
+            });
+
+            //启动Scheduler
+            if (!scheduler.IsShutdown && !scheduler.IsStarted)
+            {
+                scheduler.Start().Wait();
+            }
 
             return scheduler;
         }
