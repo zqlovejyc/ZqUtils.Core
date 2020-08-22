@@ -43,12 +43,12 @@ namespace ZqUtils.Core.Extensions
         /// </summary>
         /// <param name="this"></param>
         /// <param name="filter">Assembly过滤器</param>
-        /// <param name="lifetime">生命周期，默认：单例</param>
+        /// <param name="lifetime">生命周期</param>
         /// <returns></returns>
         public static IServiceCollection AddJobAndJobFactory(
             this IServiceCollection @this,
             Func<string, bool> filter = null,
-            ServiceLifetime lifetime = ServiceLifetime.Singleton)
+            ServiceLifetime lifetime = ServiceLifetime.Transient)
         {
             //扫描程序集
             var assemblies = PathHelper.GetAssemblies(filter: filter).ToList();
@@ -64,7 +64,7 @@ namespace ZqUtils.Core.Extensions
                     .AddClasses(classes => classes.AssignableTo<IJobFactory>())
                         .AsImplementedInterfaces()
                         .AsSelf()
-                        .WithLifetime(lifetime)
+                        .WithSingletonLifetime()
                     .AddClasses(classes => classes.AssignableTo<IJob>())
                         .AsImplementedInterfaces()
                         .AsSelf()
