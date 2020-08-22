@@ -3,23 +3,19 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.3.4</Version>
+    <Version>1.0.3.5</Version>
     <PackageId>Zq.Utils.Core</PackageId>
     <Authors>张强</Authors>
     <Description>.NET Standard2.0版本工具类</Description>
     <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
-    <PackageReleaseNotes>1.优化IsNum和IsFloat扩展方法，添加对负数的支持；
-2.优化ReadToken；
-3.重载StringBuilder的AppendWhereOrAnd扩展方法，新增AppendWhereOrAndIf；
-4.重命名WhereIF扩展方法为WhereIf；重载WhereIf方法，添加回调委托参数；
-5.重载List的AppendIf扩展方法；
-6.string新增部分扩展方法；
-7.修改NLog日志配置，单个文件最大50M，按天存档，最多存档30天；
-8.新增KafkaHelper工具类；</PackageReleaseNotes>
-    <AssemblyVersion>1.0.3.4</AssemblyVersion>
-    <FileVersion>1.0.3.4</FileVersion>
+    <PackageReleaseNotes>1.优化KafkaHelper无参构造函数，读取配置信息初始化生产者和消费者连接配置；
+2.新增WeekOfYear扩展方法；
+3.新增年周转换为年月日扩展方法ToDateTime；
+4.优化AddJobAndJobFactory扩展方法生命周期；</PackageReleaseNotes>
+    <AssemblyVersion>1.0.3.5</AssemblyVersion>
+    <FileVersion>1.0.3.5</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Utils.png</PackageIcon>
