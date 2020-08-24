@@ -17,10 +17,13 @@
 #endregion
 
 using DnsClient;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using ZqUtils.Core.Extensions;
 /****************************
 * [Author] 张强
 * [Date] 2018-08-24
@@ -33,48 +36,76 @@ namespace ZqUtils.Core.Helpers
     /// </summary>
     public class DnsHelper
     {
-        #region GetIpAddressAsync
         /// <summary>
         /// 获取本地的IP地址
         /// </summary>
-        /// <param name="ipv4">是否ipv4</param>
-        /// <param name="hostNameOrAddress">主机名称或者地址</param>
+        /// <param name="ipv4">是否ipv4，否则ipv6，默认：ipv4</param>
+        /// <param name="wifi">是否无线网卡，默认：有线网卡</param>
         /// <returns></returns>
-        public static async Task<string> GetIpAddressAsync(bool ipv4 = true, string hostNameOrAddress = null)
+        public static string GetIpAddress(bool ipv4 = true, bool wifi = false)
         {
-            var client = new LookupClient();
-            var hostEntry = await client.GetHostEntryAsync(hostNameOrAddress ?? Dns.GetHostName());
-            IPAddress ipAddress = null;
-            if (ipv4)
-            {
-                ipAddress = hostEntry
-                                .AddressList
-                                .Where(ip => !IPAddress.IsLoopback(ip) && ip.AddressFamily == AddressFamily.InterNetwork)
-                                .FirstOrDefault();
-            }
-            else
-            {
-                ipAddress = hostEntry
-                                .AddressList
-                                .Where(ip => !IPAddress.IsLoopback(ip) && ip.AddressFamily == AddressFamily.InterNetworkV6)
-                                .FirstOrDefault();
-            }
-            return ipAddress?.ToString();
+            return NetworkInterface
+                        .GetAllNetworkInterfaces()
+                        .Where(x => (wifi ?
+                            x.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ://WIFI
+                            x.NetworkInterfaceType == NetworkInterfaceType.Ethernet) && //有线网
+                            x.OperationalStatus == OperationalStatus.Up)
+                        .Select(p => p.GetIPProperties())
+                        .SelectMany(p => p.UnicastAddresses)
+                        .Where(p => (ipv4 ?
+                            p.Address.AddressFamily == AddressFamily.InterNetwork :
+                            p.Address.AddressFamily == AddressFamily.InterNetworkV6) &&
+                            !IPAddress.IsLoopback(p.Address))
+                        .FirstOrDefault()?
+                        .Address
+                        .ToString();
         }
 
         /// <summary>
         /// 根据域名获取对应的IP地址
         /// </summary>
-        /// <param name="domain">域名</param>
+        /// <param name="domain">域名，如：baidu.com</param>
         /// <param name="type">请求类型</param>
         /// <returns></returns>
-        public static async Task<string> GetIpAddressAsync(string domain, QueryType type = QueryType.ANY)
+        public static async Task<List<string>> GetIpAddressAsync(string domain, QueryType type = QueryType.ANY)
         {
             var lookup = new LookupClient();
             var result = await lookup.QueryAsync(domain, type);
-            var record = result.Answers.ARecords().FirstOrDefault();
-            return record?.Address?.ToString();
+            return result.Answers
+                         .ARecords()?
+                         .Select(x => x.Address?.ToString())
+                         .ToList();
         }
-        #endregion
+
+        /// <summary>
+        /// 获取远程客户端IP地址，
+        /// 注意ConfigureServices里面必须要注入：services.TryAddSingleton&lt;IHttpContextAccessor, HttpContextAccessor&gt;();
+        /// 如果Jexus反代AspNetCore的话，从http头“X-Forwarded-For”可以得到客户端IP地址；
+        /// 如果是使用Jexus的AppHost驱动Asp.Net Core应用，可以从HTTP头“X-Real-IP”或“X-Original-For”等头域中得到客户端IP
+        /// </summary>
+        /// <returns></returns>
+        public static string GetClientRemoteIpAddress()
+        {
+            string res;
+            var ip = HttpContextHelper.Current.Connection.RemoteIpAddress;
+            //判断是否为回环地址
+            if (ip.IsNotNull() && !IPAddress.IsLoopback(ip))
+            {
+                res = ip.ToString();
+            }
+            else
+            {
+                //Jexus反向代理Asp.Net Core
+                res = HttpContextHelper.Current.Request.Headers["X-Forwarded-For"];
+                if (res.IsNullOrEmpty() || IPAddress.IsLoopback(IPAddress.Parse(res)))
+                {
+                    //使用Jexus的AppHost驱动Asp.Net Core应用
+                    res = HttpContextHelper.Current.Request.Headers["X-Real-IP"];
+                    if (res.IsNullOrEmpty())
+                        res = HttpContextHelper.Current.Request.Headers["X-Original-For"];
+                }
+            }
+            return res;
+        }
     }
 }
