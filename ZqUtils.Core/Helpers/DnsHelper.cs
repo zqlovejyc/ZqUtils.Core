@@ -78,10 +78,14 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
-        /// 获取远程客户端IP地址，
-        /// 注意ConfigureServices里面必须要注入：services.TryAddSingleton&lt;IHttpContextAccessor, HttpContextAccessor&gt;();
-        /// 如果Jexus反代AspNetCore的话，从http头“X-Forwarded-For”可以得到客户端IP地址；
-        /// 如果是使用Jexus的AppHost驱动Asp.Net Core应用，可以从HTTP头“X-Real-IP”或“X-Original-For”等头域中得到客户端IP
+        /// <list type="bullet">
+        ///     <item>获取远程客户端IP地址</item>
+        /// </list>
+        /// <list type="number">
+        ///     <item>注意ConfigureServices里面必须要注入：services.TryAddSingleton&lt;IHttpContextAccessor, HttpContextAccessor&gt;();</item>
+        ///     <item>如果Jexus反代AspNetCore的话，从http头“X-Forwarded-For”可以得到客户端IP地址；</item>
+        ///     <item>如果是使用Jexus的AppHost驱动Asp.Net Core应用，可以从HTTP头“X-Real-IP”或“X-Original-For”等头域中得到客户端IP</item>
+        /// </list>
         /// </summary>
         /// <returns></returns>
         public static string GetClientRemoteIpAddress()
