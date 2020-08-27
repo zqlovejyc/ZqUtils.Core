@@ -24,6 +24,7 @@ using Scrutor;
 using System;
 using System.Linq;
 using System.Reflection;
+using ZqUtils.Core.Attributes;
 using ZqUtils.Core.Helpers;
 using RedisClient = CSRedis.CSRedisClient;
 /****************************
@@ -369,6 +370,52 @@ namespace ZqUtils.Core.Extensions
                             .AsImplementedInterfaces()
                             .AsSelf()
                             .WithLifetime(lifeTime));
+        }
+
+        /// <summary>
+        /// 扫描程序集自动注入DependsOn特性的服务
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="assemblyFilter"></param>
+        /// <param name="lifeTime"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddDependsOnFromAssembly(
+            this IServiceCollection @this,
+            Func<string, bool> assemblyFilter = null,
+            ServiceLifetime lifeTime = ServiceLifetime.Transient)
+        {
+            var types = PathHelper.GetTypesFromAssembly(filter: assemblyFilter);
+            if (types.IsNotNullOrEmpty())
+            {
+                var dependsOnTypes = types.Where(x => x.ContainsAttribute<DependsOnAttribute>()).Distinct();
+                if (dependsOnTypes.IsNotNullOrEmpty())
+                {
+                    foreach (var type in dependsOnTypes)
+                    {
+                        var dependsOns = type.GetCustomAttributes(typeof(DependsOnAttribute), false).Select(x => (DependsOnAttribute)x);
+                        var dependedTypes = dependsOns.Select(x => x.DependedType).Distinct();
+                        foreach (var dependedType in dependedTypes)
+                        {
+                            switch (lifeTime)
+                            {
+                                case ServiceLifetime.Singleton:
+                                    @this.AddSingleton(dependedType, type);
+                                    break;
+                                case ServiceLifetime.Scoped:
+                                    @this.AddScoped(dependedType, type);
+                                    break;
+                                case ServiceLifetime.Transient:
+                                    @this.AddTransient(dependedType, type);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return @this;
         }
         #endregion
 
