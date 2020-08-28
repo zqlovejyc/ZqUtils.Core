@@ -52,7 +52,7 @@ namespace ZqUtils.Core.Extensions
             ServiceLifetime lifetime = ServiceLifetime.Transient)
         {
             //扫描程序集
-            var assemblies = PathHelper.GetAssemblies(filter: filter).ToList();
+            var assemblies = AssemblyHelper.GetAssemblies(filter: filter).ToList();
 
             //判断是否包含ZqUtils.Core.dll
             var assembly = Assembly.Load("ZqUtils.Core");

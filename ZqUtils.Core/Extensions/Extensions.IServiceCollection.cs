@@ -306,7 +306,7 @@ namespace ZqUtils.Core.Extensions
             ServiceLifetime lifeTime = ServiceLifetime.Transient)
         {
             //扫描程序集获取指定条件下的类型集合
-            var types = PathHelper.GetTypesFromAssembly(filter: assemblyFilter);
+            var types = AssemblyHelper.GetTypesFromAssembly(filter: assemblyFilter);
 
             //获取基接口所有继承者
             var inherits = types.Where(x => baseType.IsAssignableFrom(x) && x != baseType).Distinct();
@@ -363,7 +363,7 @@ namespace ZqUtils.Core.Extensions
             ServiceLifetime lifeTime = ServiceLifetime.Transient)
         {
             //获取程序集
-            var assemblies = PathHelper.GetAssemblies(filter: assemblyFilter);
+            var assemblies = AssemblyHelper.GetAssemblies(filter: assemblyFilter);
 
             //扫描程序集注入接口及实现类
             return @this.Scan(scan => scan
@@ -386,7 +386,7 @@ namespace ZqUtils.Core.Extensions
             Func<string, bool> assemblyFilter = null,
             ServiceLifetime lifeTime = ServiceLifetime.Transient)
         {
-            var types = PathHelper.GetTypesFromAssembly(filter: assemblyFilter);
+            var types = AssemblyHelper.GetTypesFromAssembly(filter: assemblyFilter);
             if (types.IsNotNullOrEmpty())
             {
                 var dependsOnTypes = types.Where(x => x.Has<DependsOnAttribute>()).Distinct();
