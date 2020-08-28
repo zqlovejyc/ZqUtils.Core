@@ -389,13 +389,12 @@ namespace ZqUtils.Core.Extensions
             var types = PathHelper.GetTypesFromAssembly(filter: assemblyFilter);
             if (types.IsNotNullOrEmpty())
             {
-                var dependsOnTypes = types.Where(x => x.ContainsAttribute<DependsOnAttribute>()).Distinct();
+                var dependsOnTypes = types.Where(x => x.Has<DependsOnAttribute>()).Distinct();
                 if (dependsOnTypes.IsNotNullOrEmpty())
                 {
                     foreach (var type in dependsOnTypes)
                     {
-                        var dependsOns = type.GetCustomAttributes(typeof(DependsOnAttribute), false).Select(x => (DependsOnAttribute)x);
-                        var dependedTypes = dependsOns.Select(x => x.DependedType).Distinct();
+                        var dependedTypes = type.GetCustomAttributes<DependsOnAttribute>(false).Select(x => x.DependedType).Distinct();
                         foreach (var dependedType in dependedTypes)
                         {
                             switch (lifeTime)

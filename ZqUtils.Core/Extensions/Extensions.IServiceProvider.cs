@@ -44,16 +44,11 @@ namespace ZqUtils.Core.Extensions
             var services = @this.GetServices<T>();
             if (services.IsNotNullOrEmpty())
             {
-                return services.Where(o => o
-                                    .GetType()
-                                    .GetAttributes<DependsOnAttribute>()
-                                    .Select(x => x as DependsOnAttribute)
-                                    .Where(x =>
-                                        x.IsNotNull() &&
-                                        x.DependedType == typeof(T) &&
-                                        x.Name == name)
-                                    .Any()
-                                ).FirstOrDefault();
+                return services
+                        .Where(o => o.GetType().HasAttribute<DependsOnAttribute>(x =>
+                            x.DependedType == typeof(T) &&
+                            x.Name == name))
+                        .FirstOrDefault();
             }
 
             return default;
