@@ -192,8 +192,8 @@ namespace ZqUtils.Core.Console
             //{
             //    messages.Add(new Message<Null, string> { Value = "Hello Kafka!" + (i + 1) });
             //}
-            //var r = kafka.Publish("test-topic", messages);
-            //SysConsole.WriteLine(r);
+            //kafka.Publish("test-topic", messages);
+            //SysConsole.WriteLine("发送完成");
 
             //var r = kafka.Publish("test-topic", new Message<Null, string> { Value = "Hello Kafka!" });
             //SysConsole.WriteLine(r);
