@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.ObjectPool;
 using Quartz;
@@ -186,8 +187,6 @@ namespace ZqUtils.Core.Console
             //    Servers = "localhost:9092"
             //});
 
-
-
             //var messages = new List<Message<Null, string>>();
             //for (int i = 0; i < 100; i++)
             //{
@@ -202,7 +201,8 @@ namespace ZqUtils.Core.Console
             //kafka.Subscribe<Ignore, string>("test-topic", receiveHandler: x =>
             //{
             //    SysConsole.WriteLine(x.Message.Value);
-            //});
+            //    return true;
+            //}, commit: true);
 
             //SysConsole.ReadLine();
             #endregion
