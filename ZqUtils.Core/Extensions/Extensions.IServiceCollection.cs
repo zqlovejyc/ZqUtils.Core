@@ -19,7 +19,11 @@
 using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
+using Confluent.Kafka;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
+using RabbitMQ.Client;
 using Scrutor;
 using System;
 using System.Linq;
@@ -34,8 +38,6 @@ using RedisClient = CSRedis.CSRedisClient;
 * **************************/
 namespace ZqUtils.Core.Extensions
 {
-    using Microsoft.Extensions.Configuration;
-
     /// <summary>
     /// IServiceCollection扩展类
     /// </summary>
@@ -424,7 +426,7 @@ namespace ZqUtils.Core.Extensions
         /// 初始化CSRedisCore，之后程序中可以直接使用RedisHelper的静态方法
         /// </summary>
         /// <param name="this"></param>
-        /// <param name="configuration"></param>
+        /// <param name="configuration">json配置</param>
         /// <returns></returns>
         public static IServiceCollection AddCsRedis(this IServiceCollection @this, IConfiguration configuration)
         {
@@ -447,19 +449,6 @@ namespace ZqUtils.Core.Extensions
         }
         #endregion
 
-        #region AddRabbitMq
-        /// <summary>
-        /// 注入RabbitMq，单例模式
-        /// </summary>
-        /// <param name="this"></param>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddRabbitMq(this IServiceCollection @this, IConfiguration configuration)
-        {
-            return @this.AddSingleton(new RabbitMqHelper(configuration.GetSection("RabbitMq").Get<MqConfig>()));
-        }
-        #endregion
-
         #region AddMongoDb
         /// <summary>
         /// 注入MongoDb，单例模式
@@ -469,6 +458,101 @@ namespace ZqUtils.Core.Extensions
         public static IServiceCollection AddMongoDb(this IServiceCollection @this)
         {
             return @this.AddSingleton(new MongodbHelper());
+        }
+
+        /// <summary>
+        /// 注入MongoDb，单例模式
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="databaseName">数据库</param>
+        /// <param name="settings">MongoClientSettings配置</param>
+        /// <returns></returns>
+        public static IServiceCollection AddMongoDb(this IServiceCollection @this, string databaseName, MongoClientSettings settings)
+        {
+            return @this.AddSingleton(new MongodbHelper(databaseName, settings));
+        }
+
+        /// <summary>
+        /// 注入MongoDb，单例模式
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="databaseName">数据库</param>
+        /// <param name="connectionString">链接字符串</param>
+        /// <param name="isMongoClientSettings">是否为MongoClientSettings连接字符串，默认：false</param>
+        /// <returns></returns>
+        public static IServiceCollection AddMongoDb(this IServiceCollection @this, string databaseName, string connectionString, bool isMongoClientSettings = false)
+        {
+            return @this.AddSingleton(new MongodbHelper(databaseName, connectionString, isMongoClientSettings));
+        }
+        #endregion
+
+        #region AddRabbitMq
+        /// <summary>
+        /// 注入RabbitMq，单例模式
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="factory">连接工厂配置</param>
+        /// <returns></returns>
+        public static IServiceCollection AddRabbitMq(this IServiceCollection @this, ConnectionFactory factory)
+        {
+            return @this.AddSingleton(new RabbitMqHelper(factory));
+        }
+
+        /// <summary>
+        /// 注入RabbitMq，单例模式
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="config">连接配置</param>
+        /// <returns></returns>
+        public static IServiceCollection AddRabbitMq(this IServiceCollection @this, MqConfig config)
+        {
+            return @this.AddSingleton(new RabbitMqHelper(config));
+        }
+
+        /// <summary>
+        /// 注入RabbitMq，单例模式
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="configuration">json配置</param>
+        /// <returns></returns>
+        public static IServiceCollection AddRabbitMq(this IServiceCollection @this, IConfiguration configuration)
+        {
+            return @this.AddSingleton(new RabbitMqHelper(configuration.GetSection("RabbitMq").Get<MqConfig>()));
+        }
+        #endregion
+
+        #region AddKafka
+        /// <summary>
+        /// 注入Kafka，单例模式
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddKafka(this IServiceCollection @this)
+        {
+            return @this.AddSingleton(new KafkaHelper());
+        }
+
+        /// <summary>
+        /// 注入Kafka，单例模式
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="config">连接配置</param>
+        /// <returns></returns>
+        public static IServiceCollection AddKafka(this IServiceCollection @this, KafkaConfig config)
+        {
+            return @this.AddSingleton(new KafkaHelper(config));
+        }
+
+        /// <summary>
+        /// 注入Kafka，单例模式
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="producerConfig">生产者连接配置</param>
+        /// <param name="consumerConfig">消费者连接配置</param>
+        /// <returns></returns>
+        public static IServiceCollection AddKafka(this IServiceCollection @this, ProducerConfig producerConfig, ConsumerConfig consumerConfig)
+        {
+            return @this.AddSingleton(new KafkaHelper(producerConfig, consumerConfig));
         }
         #endregion
     }
