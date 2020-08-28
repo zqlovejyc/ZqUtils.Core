@@ -303,7 +303,7 @@ namespace ZqUtils.Core.Extensions
             Type baseType,
             Func<string, bool> assemblyFilter = null,
             Func<Type, bool> typeFilter = null,
-            string lifeTime = "Transient")
+            ServiceLifetime lifeTime = ServiceLifetime.Transient)
         {
             //扫描程序集获取指定条件下的类型集合
             var types = PathHelper.GetTypesFromAssembly(filter: assemblyFilter);
@@ -325,15 +325,15 @@ namespace ZqUtils.Core.Extensions
                     {
                         foreach (var serviceType in serviceTypes)
                         {
-                            switch (lifeTime.ToLower())
+                            switch (lifeTime)
                             {
-                                case "singleton":
+                                case ServiceLifetime.Singleton:
                                     @this.AddSingleton(serviceType, implementationType);
                                     break;
-                                case "transient":
+                                case ServiceLifetime.Transient:
                                     @this.AddTransient(serviceType, implementationType);
                                     break;
-                                case "scoped":
+                                case ServiceLifetime.Scoped:
                                     @this.AddScoped(serviceType, implementationType);
                                     break;
                                 default:
@@ -451,108 +451,272 @@ namespace ZqUtils.Core.Extensions
 
         #region AddMongoDb
         /// <summary>
-        /// 注入MongoDb，单例模式
+        /// 注入MongoDb
         /// </summary>
         /// <param name="this"></param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
         /// <returns></returns>
-        public static IServiceCollection AddMongoDb(this IServiceCollection @this)
+        public static IServiceCollection AddMongoDb(
+            this IServiceCollection @this,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
-            return @this.AddSingleton(new MongodbHelper());
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new MongodbHelper());
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new MongodbHelper());
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new MongodbHelper());
+                    break;
+                default:
+                    break;
+            }
+            return @this;
         }
 
         /// <summary>
-        /// 注入MongoDb，单例模式
+        /// 注入MongoDb
         /// </summary>
         /// <param name="this"></param>
         /// <param name="databaseName">数据库</param>
         /// <param name="settings">MongoClientSettings配置</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
         /// <returns></returns>
-        public static IServiceCollection AddMongoDb(this IServiceCollection @this, string databaseName, MongoClientSettings settings)
+        public static IServiceCollection AddMongoDb(
+            this IServiceCollection @this,
+            string databaseName,
+            MongoClientSettings settings,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
-            return @this.AddSingleton(new MongodbHelper(databaseName, settings));
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new MongodbHelper(databaseName, settings));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new MongodbHelper(databaseName, settings));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new MongodbHelper(databaseName, settings));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
         }
 
         /// <summary>
-        /// 注入MongoDb，单例模式
+        /// 注入MongoDb
         /// </summary>
         /// <param name="this"></param>
         /// <param name="databaseName">数据库</param>
         /// <param name="connectionString">链接字符串</param>
         /// <param name="isMongoClientSettings">是否为MongoClientSettings连接字符串，默认：false</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
         /// <returns></returns>
-        public static IServiceCollection AddMongoDb(this IServiceCollection @this, string databaseName, string connectionString, bool isMongoClientSettings = false)
+        public static IServiceCollection AddMongoDb(
+            this IServiceCollection @this,
+            string databaseName,
+            string connectionString,
+            bool isMongoClientSettings = false,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
-            return @this.AddSingleton(new MongodbHelper(databaseName, connectionString, isMongoClientSettings));
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new MongodbHelper(databaseName, connectionString, isMongoClientSettings));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new MongodbHelper(databaseName, connectionString, isMongoClientSettings));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new MongodbHelper(databaseName, connectionString, isMongoClientSettings));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
         }
         #endregion
 
         #region AddRabbitMq
         /// <summary>
-        /// 注入RabbitMq，单例模式
+        /// 注入RabbitMq
         /// </summary>
         /// <param name="this"></param>
         /// <param name="factory">连接工厂配置</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
         /// <returns></returns>
-        public static IServiceCollection AddRabbitMq(this IServiceCollection @this, ConnectionFactory factory)
+        public static IServiceCollection AddRabbitMq(
+            this IServiceCollection @this,
+            ConnectionFactory factory,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
-            return @this.AddSingleton(new RabbitMqHelper(factory));
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new RabbitMqHelper(factory));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new RabbitMqHelper(factory));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new RabbitMqHelper(factory));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
         }
 
         /// <summary>
-        /// 注入RabbitMq，单例模式
+        /// 注入RabbitMq
         /// </summary>
         /// <param name="this"></param>
         /// <param name="config">连接配置</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
         /// <returns></returns>
-        public static IServiceCollection AddRabbitMq(this IServiceCollection @this, MqConfig config)
+        public static IServiceCollection AddRabbitMq(
+            this IServiceCollection @this,
+            MqConfig config,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
-            return @this.AddSingleton(new RabbitMqHelper(config));
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new RabbitMqHelper(config));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new RabbitMqHelper(config));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new RabbitMqHelper(config));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
         }
 
         /// <summary>
-        /// 注入RabbitMq，单例模式
+        /// 注入RabbitMq
         /// </summary>
         /// <param name="this"></param>
         /// <param name="configuration">json配置</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
         /// <returns></returns>
-        public static IServiceCollection AddRabbitMq(this IServiceCollection @this, IConfiguration configuration)
+        public static IServiceCollection AddRabbitMq(
+            this IServiceCollection @this,
+            IConfiguration configuration,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
-            return @this.AddSingleton(new RabbitMqHelper(configuration.GetSection("RabbitMq").Get<MqConfig>()));
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new RabbitMqHelper(configuration.GetSection("RabbitMq").Get<MqConfig>()));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new RabbitMqHelper(configuration.GetSection("RabbitMq").Get<MqConfig>()));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new RabbitMqHelper(configuration.GetSection("RabbitMq").Get<MqConfig>()));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
         }
         #endregion
 
         #region AddKafka
         /// <summary>
-        /// 注入Kafka，单例模式
+        /// 注入Kafka
         /// </summary>
         /// <param name="this"></param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
         /// <returns></returns>
-        public static IServiceCollection AddKafka(this IServiceCollection @this)
+        public static IServiceCollection AddKafka(
+            this IServiceCollection @this,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
-            return @this.AddSingleton(new KafkaHelper());
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new KafkaHelper());
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new KafkaHelper());
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new KafkaHelper());
+                    break;
+                default:
+                    break;
+            }
+            return @this;
         }
 
         /// <summary>
-        /// 注入Kafka，单例模式
+        /// 注入Kafka
         /// </summary>
         /// <param name="this"></param>
         /// <param name="config">连接配置</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
         /// <returns></returns>
-        public static IServiceCollection AddKafka(this IServiceCollection @this, KafkaConfig config)
+        public static IServiceCollection AddKafka(
+            this IServiceCollection @this,
+            KafkaConfig config,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
-            return @this.AddSingleton(new KafkaHelper(config));
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new KafkaHelper(config));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new KafkaHelper(config));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new KafkaHelper(config));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
         }
 
         /// <summary>
-        /// 注入Kafka，单例模式
+        /// 注入Kafka
         /// </summary>
         /// <param name="this"></param>
         /// <param name="producerConfig">生产者连接配置</param>
         /// <param name="consumerConfig">消费者连接配置</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
         /// <returns></returns>
-        public static IServiceCollection AddKafka(this IServiceCollection @this, ProducerConfig producerConfig, ConsumerConfig consumerConfig)
+        public static IServiceCollection AddKafka(
+            this IServiceCollection @this,
+            ProducerConfig producerConfig,
+            ConsumerConfig consumerConfig,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
-            return @this.AddSingleton(new KafkaHelper(producerConfig, consumerConfig));
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new KafkaHelper(producerConfig, consumerConfig));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new KafkaHelper(producerConfig, consumerConfig));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new KafkaHelper(producerConfig, consumerConfig));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
         }
         #endregion
     }
