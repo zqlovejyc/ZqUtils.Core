@@ -193,7 +193,9 @@ namespace ZqUtils.Core.Helpers
         public static async Task StartAsync(string schedName = null)
         {
             var sched = await GetSchedulerAsync(schedName);
-            await sched.Start();
+
+            if (!sched.IsShutdown && !sched.IsStarted)
+                await sched.Start();
         }
 
         /// <summary>
@@ -205,7 +207,9 @@ namespace ZqUtils.Core.Helpers
         public static async Task StartDelayedAsync(TimeSpan dely, string schedName = null)
         {
             var sched = await GetSchedulerAsync(schedName);
-            await sched.StartDelayed(dely);
+
+            if (!sched.IsShutdown && !sched.IsStarted)
+                await sched.StartDelayed(dely);
         }
 
         /// <summary>
@@ -281,6 +285,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">IJob实现类</typeparam>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="jobDescription">Job描述</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="jobData">自定义Job数据</param>
@@ -290,6 +295,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static async Task AddJobAsync<T>(
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string jobDescription = null,
             string triggerDescription = null,
             Dictionary<string, object> jobData = null,
@@ -298,7 +304,7 @@ namespace ZqUtils.Core.Helpers
             bool? start = null)
             where T : IJob
         {
-            await AddJobAsync(typeof(T), cron, jobDescription, triggerDescription, jobData, triggerData, schedName, start);
+            await AddJobAsync(typeof(T), cron, timeZoneInfo, jobDescription, triggerDescription, jobData, triggerData, schedName, start);
         }
 
         /// <summary>
@@ -306,6 +312,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="type">IJob实现类Type</param>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="jobDescription">Job描述</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="jobData">自定义Job数据</param>
@@ -316,6 +323,7 @@ namespace ZqUtils.Core.Helpers
         public static async Task AddJobAsync(
             Type type,
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string jobDescription = null,
             string triggerDescription = null,
             Dictionary<string, object> jobData = null,
@@ -324,7 +332,7 @@ namespace ZqUtils.Core.Helpers
             bool? start = null)
         {
             var attribute = GetQuartzJobAttribute(type);
-            await AddJobAsync(type, attribute.JobName, attribute.JobGroupName, attribute.TriggerName, attribute.TriggerGroupName, cron, jobDescription ?? attribute.JobDescription, triggerDescription ?? attribute.TriggerDescription, jobData, triggerData, schedName, start);
+            await AddJobAsync(type, attribute.JobName, attribute.JobGroupName, attribute.TriggerName, attribute.TriggerGroupName, cron, timeZoneInfo, jobDescription ?? attribute.JobDescription, triggerDescription ?? attribute.TriggerDescription, jobData, triggerData, schedName, start);
         }
 
         /// <summary>
@@ -336,6 +344,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="triggerName">触发器名</param>
         /// <param name="triggerGroupName">触发器组名</param>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="jobDescription">Job描述</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="jobData">自定义Job数据</param>
@@ -349,6 +358,7 @@ namespace ZqUtils.Core.Helpers
             string triggerName,
             string triggerGroupName,
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string jobDescription = null,
             string triggerDescription = null,
             Dictionary<string, object> jobData = null,
@@ -357,7 +367,7 @@ namespace ZqUtils.Core.Helpers
             bool? start = null)
             where T : IJob
         {
-            await AddJobAsync(typeof(T), jobName, jobGroupName, triggerName, triggerGroupName, cron, jobDescription, triggerDescription, jobData, triggerData, schedName, start);
+            await AddJobAsync(typeof(T), jobName, jobGroupName, triggerName, triggerGroupName, cron, timeZoneInfo, jobDescription, triggerDescription, jobData, triggerData, schedName, start);
         }
 
         /// <summary>
@@ -369,6 +379,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="triggerName">触发器名</param>
         /// <param name="triggerGroupName">触发器组名</param>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="jobDescription">Job描述</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="jobData">自定义Job数据</param>
@@ -383,6 +394,7 @@ namespace ZqUtils.Core.Helpers
             string triggerName,
             string triggerGroupName,
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string jobDescription = null,
             string triggerDescription = null,
             Dictionary<string, object> jobData = null,
@@ -419,13 +431,21 @@ namespace ZqUtils.Core.Helpers
                     triggerDataMap[item.Key] = item.Value;
                 }
             }
+
+            //创建CronScheduleBuilder
+            var cronSchedule = CronScheduleBuilder
+                                    .CronSchedule(cron)
+                                    .WithMisfireHandlingInstructionDoNothing();//对错过的内容不再执行
+
+            //自定义时区
+            if (timeZoneInfo != null)
+                cronSchedule.InTimeZone(timeZoneInfo);
+
             //创建Trigger
             var trigger = TriggerBuilder
                             .Create()
                             .WithIdentity(new TriggerKey(triggerName, triggerGroupName))
-                            .WithSchedule(CronScheduleBuilder
-                                .CronSchedule(cron)
-                                .WithMisfireHandlingInstructionDoNothing())//对错过的内容不再执行
+                            .WithSchedule(cronSchedule)
                             .WithDescription(triggerDescription ?? "")
                             .UsingJobData(triggerDataMap)
                             .Build();
@@ -495,6 +515,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">IJob实现类</typeparam>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="triggerData">自定义Trigger数据</param>
         /// <param name="schedName">调度器名称</param>
@@ -502,13 +523,14 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static async Task UpdateJobAsync<T>(
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string triggerDescription = null,
             Dictionary<string, object> triggerData = null,
             string schedName = null,
             bool? start = null)
             where T : IJob
         {
-            await UpdateJobAsync(typeof(T), cron, triggerDescription, triggerData, schedName, start);
+            await UpdateJobAsync(typeof(T), cron, timeZoneInfo, triggerDescription, triggerData, schedName, start);
         }
 
         /// <summary>
@@ -516,6 +538,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="type">IJob实现类Type</param>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="triggerData">自定义Trigger数据</param>
         /// <param name="schedName">调度器名称</param>
@@ -524,13 +547,14 @@ namespace ZqUtils.Core.Helpers
         public static async Task UpdateJobAsync(
             Type type,
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string triggerDescription = null,
             Dictionary<string, object> triggerData = null,
             string schedName = null,
             bool? start = null)
         {
             var attribute = GetQuartzJobAttribute(type);
-            await UpdateJobAsync(attribute.JobName, attribute.JobGroupName, attribute.TriggerName, attribute.TriggerGroupName, cron, triggerDescription ?? attribute.TriggerDescription, triggerData, schedName, start);
+            await UpdateJobAsync(attribute.JobName, attribute.JobGroupName, attribute.TriggerName, attribute.TriggerGroupName, cron, timeZoneInfo, triggerDescription ?? attribute.TriggerDescription, triggerData, schedName, start);
         }
 
         /// <summary>
@@ -541,6 +565,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="triggerName">新触发器名</param>
         /// <param name="triggerGroupName">新触发器组名</param>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="triggerData">自定义Trigger数据</param>
         /// <param name="schedName">调度器名称</param>
@@ -552,6 +577,7 @@ namespace ZqUtils.Core.Helpers
             string triggerName,
             string triggerGroupName,
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string triggerDescription = null,
             Dictionary<string, object> triggerData = null,
             string schedName = null,
@@ -574,13 +600,20 @@ namespace ZqUtils.Core.Helpers
                         }
                     }
 
+                    //创建CronScheduleBuilder
+                    var cronSchedule = CronScheduleBuilder
+                                            .CronSchedule(cron)
+                                            .WithMisfireHandlingInstructionDoNothing();//对错过的内容不再执行
+
+                    //自定义时区
+                    if (timeZoneInfo != null)
+                        cronSchedule.InTimeZone(timeZoneInfo);
+
                     //创建Trigger 
                     var trigger = TriggerBuilder
                                         .Create()
                                         .WithIdentity(triggerName, triggerGroupName)
-                                        .WithSchedule(CronScheduleBuilder
-                                            .CronSchedule(cron)
-                                            .WithMisfireHandlingInstructionDoNothing())
+                                        .WithSchedule(cronSchedule)
                                         .WithDescription(triggerDescription ?? cronTrigger.Description)
                                         .UsingJobData(jobDataMap)
                                         .Build();
@@ -913,6 +946,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">IJob实现类</typeparam>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="triggerData">自定义Trigger数据</param>
         /// <param name="schedName">调度器名称</param>
@@ -920,13 +954,14 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static async Task AddTriggerAsync<T>(
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string triggerDescription = null,
             Dictionary<string, object> triggerData = null,
             string schedName = null,
             bool? start = null)
             where T : IJob
         {
-            await AddTriggerAsync(typeof(T), cron, triggerDescription, triggerData, schedName, start);
+            await AddTriggerAsync(typeof(T), cron, timeZoneInfo, triggerDescription, triggerData, schedName, start);
         }
 
         /// <summary>
@@ -934,6 +969,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="type">IJob实现类Type</param>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="triggerData">自定义Trigger数据</param>
         /// <param name="schedName">调度器名称</param>
@@ -942,12 +978,13 @@ namespace ZqUtils.Core.Helpers
         public static async Task AddTriggerAsync(
             Type type,
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string triggerDescription = null,
             Dictionary<string, object> triggerData = null,
             string schedName = null,
             bool? start = null)
         {
-            await AddTriggerAsync(type, null, null, cron, triggerDescription, triggerData, schedName, start);
+            await AddTriggerAsync(type, null, null, cron, timeZoneInfo, triggerDescription, triggerData, schedName, start);
         }
 
         /// <summary>
@@ -957,6 +994,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="triggerName">触发器名</param>
         /// <param name="triggerGroupName">触发器组名</param>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="triggerData">自定义Trigger数据</param>
         /// <param name="schedName">调度器名称</param>
@@ -966,13 +1004,14 @@ namespace ZqUtils.Core.Helpers
             string triggerName,
             string triggerGroupName,
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string triggerDescription = null,
             Dictionary<string, object> triggerData = null,
             string schedName = null,
             bool? start = null)
             where T : IJob
         {
-            await AddTriggerAsync(typeof(T), triggerName, triggerGroupName, cron, triggerDescription, triggerData, schedName, start);
+            await AddTriggerAsync(typeof(T), triggerName, triggerGroupName, cron, timeZoneInfo, triggerDescription, triggerData, schedName, start);
         }
 
         /// <summary>
@@ -982,6 +1021,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="triggerName">触发器名</param>
         /// <param name="triggerGroupName">触发器组名</param>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="triggerData">自定义Trigger数据</param>
         /// <param name="schedName">调度器名称</param>
@@ -992,13 +1032,14 @@ namespace ZqUtils.Core.Helpers
             string triggerName,
             string triggerGroupName,
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string triggerDescription = null,
             Dictionary<string, object> triggerData = null,
             string schedName = null,
             bool? start = null)
         {
             var attribute = GetQuartzJobAttribute(type);
-            await AddTriggerAsync(type, attribute.JobName, attribute.JobGroupName, triggerName, triggerGroupName, cron, triggerDescription, triggerData, schedName, start);
+            await AddTriggerAsync(type, attribute.JobName, attribute.JobGroupName, triggerName, triggerGroupName, cron, timeZoneInfo, triggerDescription, triggerData, schedName, start);
         }
 
         /// <summary>
@@ -1010,6 +1051,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="triggerName">触发器名</param>
         /// <param name="triggerGroupName">触发器组名</param>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="triggerData">自定义Trigger数据</param>
         /// <param name="schedName">调度器名称</param>
@@ -1021,13 +1063,14 @@ namespace ZqUtils.Core.Helpers
             string triggerName,
             string triggerGroupName,
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string triggerDescription = null,
             Dictionary<string, object> triggerData = null,
             string schedName = null,
             bool? start = null)
             where T : IJob
         {
-            await AddTriggerAsync(typeof(T), jobName, jobGroupName, triggerName, triggerGroupName, cron, triggerDescription, triggerData, schedName, start);
+            await AddTriggerAsync(typeof(T), jobName, jobGroupName, triggerName, triggerGroupName, cron, timeZoneInfo, triggerDescription, triggerData, schedName, start);
         }
 
         /// <summary>
@@ -1039,6 +1082,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="triggerName">触发器名</param>
         /// <param name="triggerGroupName">触发器组名</param>
         /// <param name="cron">时间设置，参考quartz说明文档</param>
+        /// <param name="timeZoneInfo">自定义时区</param>
         /// <param name="triggerDescription">Trigger描述</param>
         /// <param name="triggerData">自定义Trigger数据</param>
         /// <param name="schedName">调度器名称</param>
@@ -1051,6 +1095,7 @@ namespace ZqUtils.Core.Helpers
             string triggerName,
             string triggerGroupName,
             string cron,
+            TimeZoneInfo timeZoneInfo = null,
             string triggerDescription = null,
             Dictionary<string, object> triggerData = null,
             string schedName = null,
@@ -1082,11 +1127,19 @@ namespace ZqUtils.Core.Helpers
                         jobDataMap[item.Key] = item.Value;
                     }
                 }
+
+                //创建CronScheduleBuilder
+                var cronSchedule = CronScheduleBuilder
+                                        .CronSchedule(cron)
+                                        .WithMisfireHandlingInstructionDoNothing();//对错过的内容不再执行
+
+                //自定义时区
+                if (timeZoneInfo != null)
+                    cronSchedule.InTimeZone(timeZoneInfo);
+
                 //创建Trigger
                 var triggerNew = triggerBuilder
-                                    .WithSchedule(CronScheduleBuilder
-                                        .CronSchedule(cron)
-                                        .WithMisfireHandlingInstructionDoNothing())
+                                    .WithSchedule(cronSchedule)
                                     .WithDescription(triggerDescription ?? "")
                                     .UsingJobData(jobDataMap)
                                     .Build();
