@@ -310,18 +310,18 @@ namespace ZqUtils.Core.Extensions
 
             //获取基接口所有继承者
             var inherits = types.Where(x => baseType.IsAssignableFrom(x) && x != baseType).Distinct();
-            if (typeFilter != null)
+            if (typeFilter.IsNotNull())
                 inherits = inherits.Where(typeFilter);
 
             //获取所有实现类
             var implementationTypes = inherits?.Where(x => x.IsClass);
-            if (implementationTypes?.Count() > 0)
+            if (implementationTypes.IsNotNullOrEmpty())
             {
                 foreach (var implementationType in implementationTypes)
                 {
                     //获取继承接口
                     var serviceTypes = implementationType.GetInterfaces()?.Where(x => x != baseType);
-                    if (serviceTypes?.Count() > 0)
+                    if (serviceTypes.IsNotNullOrEmpty())
                     {
                         foreach (var serviceType in serviceTypes)
                         {
