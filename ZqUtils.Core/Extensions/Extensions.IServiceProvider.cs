@@ -18,6 +18,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ZqUtils.Core.Attributes;
 /****************************
@@ -45,6 +46,27 @@ namespace ZqUtils.Core.Extensions
             if (services.IsNotNullOrEmpty())
             {
                 return services
+                        .Where(o => o.GetType().HasAttribute<DependsOnAttribute>(x =>
+                            x.DependedType == typeof(T) &&
+                            x.Name == name))
+                        .FirstOrDefault();
+            }
+
+            return default;
+        }
+
+        /// <summary>
+        /// 根据注入时的唯一名称获取指定的服务
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this">服务实例集合</param>
+        /// <param name="name">注入时的唯一名称</param>
+        /// <returns></returns>
+        public static T GetDependsService<T>(this IEnumerable<T> @this, string name)
+        {
+            if (@this.IsNotNullOrEmpty())
+            {
+                return @this
                         .Where(o => o.GetType().HasAttribute<DependsOnAttribute>(x =>
                             x.DependedType == typeof(T) &&
                             x.Name == name))
