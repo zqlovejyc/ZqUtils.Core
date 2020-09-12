@@ -557,13 +557,13 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
+                    @this.AddSingleton<IMongoClient>(new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
                     break;
                 case ServiceLifetime.Scoped:
-                    @this.AddScoped(x => new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
+                    @this.AddScoped<IMongoClient>(x => new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
                     break;
                 case ServiceLifetime.Transient:
-                    @this.AddTransient(x => new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
+                    @this.AddTransient<IMongoClient>(x => new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
                     break;
                 default:
                     break;
@@ -586,13 +586,13 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new MongoClient(connectionString));
+                    @this.AddSingleton<IMongoClient>(new MongoClient(connectionString));
                     break;
                 case ServiceLifetime.Scoped:
-                    @this.AddScoped(x => new MongoClient(connectionString));
+                    @this.AddScoped<IMongoClient>(x => new MongoClient(connectionString));
                     break;
                 case ServiceLifetime.Transient:
-                    @this.AddTransient(x => new MongoClient(connectionString));
+                    @this.AddTransient<IMongoClient>(x => new MongoClient(connectionString));
                     break;
                 default:
                     break;
@@ -615,13 +615,13 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new MongoClient(url));
+                    @this.AddSingleton<IMongoClient>(new MongoClient(url));
                     break;
                 case ServiceLifetime.Scoped:
-                    @this.AddScoped(x => new MongoClient(url));
+                    @this.AddScoped<IMongoClient>(x => new MongoClient(url));
                     break;
                 case ServiceLifetime.Transient:
-                    @this.AddTransient(x => new MongoClient(url));
+                    @this.AddTransient<IMongoClient>(x => new MongoClient(url));
                     break;
                 default:
                     break;
@@ -644,13 +644,13 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new MongoClient(settings));
+                    @this.AddSingleton<IMongoClient>(new MongoClient(settings));
                     break;
                 case ServiceLifetime.Scoped:
-                    @this.AddScoped(x => new MongoClient(settings));
+                    @this.AddScoped<IMongoClient>(x => new MongoClient(settings));
                     break;
                 case ServiceLifetime.Transient:
-                    @this.AddTransient(x => new MongoClient(settings));
+                    @this.AddTransient<IMongoClient>(x => new MongoClient(settings));
                     break;
                 default:
                     break;
