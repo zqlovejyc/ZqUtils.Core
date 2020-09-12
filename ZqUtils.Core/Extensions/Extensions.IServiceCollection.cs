@@ -541,6 +541,124 @@ namespace ZqUtils.Core.Extensions
         }
         #endregion
 
+        #region AddMongoClient
+        /// <summary>
+        /// 注入MongoClient
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="configuration">appsettiongs配置</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
+        /// <returns></returns>
+        public static IServiceCollection AddMongoClient(
+            this IServiceCollection @this,
+            IConfiguration configuration,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
+        {
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
+        }
+
+        /// <summary>
+        /// 注入MongoClient
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="connectionString">连接字符串</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
+        /// <returns></returns>
+        public static IServiceCollection AddMongoClient(
+            this IServiceCollection @this,
+            string connectionString,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
+        {
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new MongoClient(connectionString));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new MongoClient(connectionString));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new MongoClient(connectionString));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
+        }
+
+        /// <summary>
+        /// 注入MongoClient
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="url">MongoUrl</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
+        /// <returns></returns>
+        public static IServiceCollection AddMongoClient(
+            this IServiceCollection @this,
+            MongoUrl url,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
+        {
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new MongoClient(url));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new MongoClient(url));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new MongoClient(url));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
+        }
+
+        /// <summary>
+        /// 注入MongoClient
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="settings">MongoClient配置</param>
+        /// <param name="lifeTime">生命周期，默认：单例模式</param>
+        /// <returns></returns>
+        public static IServiceCollection AddMongoClient(
+            this IServiceCollection @this,
+            MongoClientSettings settings,
+            ServiceLifetime lifeTime = ServiceLifetime.Singleton)
+        {
+            switch (lifeTime)
+            {
+                case ServiceLifetime.Singleton:
+                    @this.AddSingleton(new MongoClient(settings));
+                    break;
+                case ServiceLifetime.Scoped:
+                    @this.AddScoped(x => new MongoClient(settings));
+                    break;
+                case ServiceLifetime.Transient:
+                    @this.AddTransient(x => new MongoClient(settings));
+                    break;
+                default:
+                    break;
+            }
+            return @this;
+        }
+        #endregion
+
         #region AddRabbitMq
         /// <summary>
         /// 注入RabbitMq
