@@ -169,7 +169,9 @@ namespace ZqUtils.Core.Extensions
                 return @this;
             }
             @this.WriteEncodedInt(src.Length);
-            return @this.Write(src);
+            @this.Write(src);
+
+            return @this;
         }
 
         /// <summary>
