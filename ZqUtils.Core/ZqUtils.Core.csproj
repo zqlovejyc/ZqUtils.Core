@@ -16,7 +16,7 @@
 4.由netstandard2.0升级到netstandard2.1；</PackageReleaseNotes>
     <AssemblyVersion>1.0.3.7</AssemblyVersion>
     <FileVersion>1.0.3.7</FileVersion>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Utils.png</PackageIcon>
   </PropertyGroup>
