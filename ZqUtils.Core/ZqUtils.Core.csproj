@@ -3,28 +3,19 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.3.6</Version>
+    <Version>1.0.3.7</Version>
     <PackageId>Zq.Utils.Core</PackageId>
     <Authors>张强</Authors>
     <Description>.NET Standard2.0版本工具类</Description>
     <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
-    <PackageReleaseNotes>1.优化UseIocJobFactory扩展方法，添加应用生命周期结束后自动关闭Scheduler；
-2.QuartzHelper工具类新增ShutdownAsync；修改UseIocJobFactory扩展方法，添加waitForJobsToComplete参数；修改AddJobAsync、UpdateJobAsync、AddTriggerAsync方法，添加自定义时区timeZoneInfo参数；
-3.重载object类型扩展方法ToDictionary；
-4.修改DnsHelper获取ip地址方法；新增获取客户端段ip地址方法；
-5.新增IsIP、IsBase64字符串扩展方法；
-6.优化KafkaHelper，订阅方法添加异常重试逻辑，添加静态单例，重载构造函数，添加持久化失败或者异常消息逻辑；
-7.新增DependsOn特性，用于标识接口多继承情况；
-8.新增AddDependsOnFromAssembly扩展方法；
-9.新增IServiceProvider扩展类；
-10.重载AddMongoDb、AddRabbitMq扩展方法，添加lifeTime生命周期参数；
-11.新增AddKafka扩展方法；
-12.新增Assembly工具类，转移部分PathHelper静态方法到AssemblyHelper；
-13.修改QuartzHelper工具类，添加自定义时区参数；</PackageReleaseNotes>
-    <AssemblyVersion>1.0.3.6</AssemblyVersion>
-    <FileVersion>1.0.3.6</FileVersion>
+    <PackageReleaseNotes>1.重载GetDependsService扩展方法；
+2.新增MemberInfo扩展类，支持反射调用异步方法；
+3.新增AddMongoClient扩展方法；
+4.由netstandard2.0升级到netstandard2.1；</PackageReleaseNotes>
+    <AssemblyVersion>1.0.3.7</AssemblyVersion>
+    <FileVersion>1.0.3.7</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>Utils.png</PackageIcon>
