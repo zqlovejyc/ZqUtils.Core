@@ -39,7 +39,6 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         public static long NextId => Worker.NextId();
 
-
         /// <summary>
         /// 静态构造函数
         /// </summary>
