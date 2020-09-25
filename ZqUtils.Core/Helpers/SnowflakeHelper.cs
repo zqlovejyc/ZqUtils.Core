@@ -115,7 +115,7 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
-        /// 雪花ID
+        /// 构造函数
         /// </summary>
         /// <param name="datacenterId">数据中心ID</param>
         /// <param name="workerId">工作机器ID</param>
