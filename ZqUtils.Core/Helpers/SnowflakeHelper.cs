@@ -32,11 +32,24 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 初始化IdWorker属性
         /// </summary>
-        public static IdWorker Worker { get; set; } = new IdWorker(1, 1);
+        public static IdWorker Worker { get; set; }
 
         /// <summary>
         /// 生成Id
         /// </summary>
         public static long NextId => Worker.NextId();
+
+
+        /// <summary>
+        /// 静态构造函数
+        /// </summary>
+        static SnowflakeHelper()
+        {
+            var workId = ConfigHelper.GetValue<long>("Snowflake:WorkId", 1);
+            var datacenterId = ConfigHelper.GetValue<long>("Snowflake:DatacenterId", 1);
+            var sequence = ConfigHelper.GetValue<long>("Snowflake:Sequence", 0);
+
+            Worker = new IdWorker(workId, datacenterId, sequence);
+        }
     }
 }
