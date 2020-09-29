@@ -31,6 +31,10 @@
 
   <ItemGroup>
     <None Remove="XmlConfig\NLog.config" />
+    <None Include="Icon\utils.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
