@@ -18,7 +18,7 @@
     <FileVersion>1.0.3.7</FileVersion>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageIcon>Utils.png</PackageIcon>
+    <PackageIcon>utils.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -77,7 +77,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Icon\Utils.png">
+    <None Include="Icon\utils.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
