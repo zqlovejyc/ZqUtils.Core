@@ -16,19 +16,18 @@
  */
 #endregion
 
+using Dapper;
+using Microsoft.Data.SqlClient;
 using System;
-using System.Linq;
-using System.Text;
-using System.Collections.Generic;
 using System.Collections;
-using System.Dynamic;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data.Common;
-using System.Data.SqlClient;
-using System.Collections.Concurrent;
+using System.Dynamic;
+using System.Linq;
 using System.Reflection;
-using ZqUtils.Core.Helpers;
-using Dapper;
+using System.Text;
 /****************************
 * [Author] 张强
 * [Date] 2015-10-26

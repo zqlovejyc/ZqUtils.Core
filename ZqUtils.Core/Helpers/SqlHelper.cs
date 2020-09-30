@@ -16,12 +16,12 @@
  */
 #endregion
 
+using Microsoft.Data.SqlClient;
 using System;
-using System.Data;
-using System.Xml;
-using System.Data.SqlClient;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Xml;
 using ZqUtils.Core.Extensions;
 /****************************
 * [Author] 张强

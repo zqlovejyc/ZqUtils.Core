@@ -16,8 +16,8 @@
  */
 #endregion
 
+using Microsoft.Data.SqlClient;
 using System;
-using System.Data.SqlClient;
 using System.Reflection;
 /****************************
 * [Author] 张强
