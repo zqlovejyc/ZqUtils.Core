@@ -121,6 +121,7 @@ namespace ZqUtils.Core.Attributes
                 if (policy.IsNull())
                 {
                     policy = Policy.NoOpAsync();
+
                     if (EnableCircuitBreaker)
                     {
                         policy = policy.WrapAsync(Policy.Handle<Exception>()
@@ -141,17 +142,19 @@ namespace ZqUtils.Core.Attributes
                             i => TimeSpan.FromMilliseconds(RetryIntervalMilliseconds)));
                     }
 
-                    var policyFallBack = Policy
+                    if (FallBackMethod.IsNotNullOrEmpty())
+                    {
+                        var policyFallBack = Policy
                         .Handle<Exception>()
                         .FallbackAsync(async (ctx, t) =>
                         {
+                            var fallBackMethod = context.ImplementationMethod.DeclaringType?.GetMethod(FallBackMethod);
+                            var fallBackResult = fallBackMethod?.Invoke(context.Implementation, context.Parameters);
+
                             var aspectContext = (AspectContext)ctx["aspectContext"];
-                            if (aspectContext.IsNotNull() && FallBackMethod.IsNotNullOrEmpty())
-                            {
-                                var fallBackMethod = context.ImplementationMethod.DeclaringType?.GetMethod(FallBackMethod);
-                                var fallBackResult = fallBackMethod?.Invoke(context.Implementation, context.Parameters);
+                            if (aspectContext.IsNotNull())
                                 aspectContext.ReturnValue = fallBackResult;
-                            }
+
                             await Task.CompletedTask;
                         }, async (ex, t) =>
                         {
@@ -159,7 +162,9 @@ namespace ZqUtils.Core.Attributes
                             await Task.CompletedTask;
                         });
 
-                    policy = policyFallBack.WrapAsync(policy);
+                        policy = policyFallBack.WrapAsync(policy);
+                    }
+
                     policies.TryAdd(context.ServiceMethod, policy);
                 }
             }
