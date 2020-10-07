@@ -25,6 +25,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading.Tasks;
+using ZqUtils.Core.Extensions;
 /****************************
 * [Author] 张强
 * [Date] 2020-10-07
@@ -117,7 +118,7 @@ namespace ZqUtils.Core.Attributes
             //current method is possible to be called by more than one thread.
             lock (policies)
             {
-                if (policy == null)
+                if (policy.IsNull())
                 {
                     policy = Policy.NoOpAsync();
                     if (EnableCircuitBreaker)
@@ -145,9 +146,12 @@ namespace ZqUtils.Core.Attributes
                         .FallbackAsync(async (ctx, t) =>
                         {
                             var aspectContext = (AspectContext)ctx["aspectContext"];
-                            var fallBackMethod = context.ImplementationMethod.DeclaringType?.GetMethod(FallBackMethod);
-                            var fallBackResult = fallBackMethod?.Invoke(context.Implementation, context.Parameters);
-                            aspectContext.ReturnValue = fallBackResult;
+                            if (aspectContext.IsNotNull() && FallBackMethod.IsNotNullOrEmpty())
+                            {
+                                var fallBackMethod = context.ImplementationMethod.DeclaringType?.GetMethod(FallBackMethod);
+                                var fallBackResult = fallBackMethod?.Invoke(context.Implementation, context.Parameters);
+                                aspectContext.ReturnValue = fallBackResult;
+                            }
                             await Task.CompletedTask;
                         }, async (ex, t) =>
                         {
@@ -166,8 +170,7 @@ namespace ZqUtils.Core.Attributes
             if (CacheTtl > 0)
             {
                 //use assembly.class.method+parameters as cache key
-                var cacheKey =
-                    $"HystrixMethodCacheManager_Key_{context.ImplementationMethod.DeclaringType.FullName}.{context.ImplementationMethod}{string.Join("_", context.Parameters)}";
+                var cacheKey = $"HystrixMethodCacheManager_Key_{context.ImplementationMethod.DeclaringType.FullName}.{context.ImplementationMethod}{string.Join("_", context.Parameters)}";
 
                 //try to get result from cache firstly.If success return it directly
                 if (memoryCache.TryGetValue(cacheKey, out var cacheValue))
@@ -176,12 +179,11 @@ namespace ZqUtils.Core.Attributes
                 {
                     //it's not cached currently,just execute the method 
                     await policy.ExecuteAsync(ctx => next(context), pollyCtx);
+
                     //cache it
-                    using (var cacheEntry = memoryCache.CreateEntry(cacheKey))
-                    {
-                        cacheEntry.Value = context.ReturnValue;
-                        cacheEntry.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMilliseconds(CacheTtl);
-                    }
+                    using var cacheEntry = memoryCache.CreateEntry(cacheKey);
+                    cacheEntry.Value = context.ReturnValue;
+                    cacheEntry.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMilliseconds(CacheTtl);
                 }
             }
             else //disabled cache,just execute the method directly
