@@ -21,6 +21,7 @@ using System.IO;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ZqUtils.Core.Extensions;
 /****************************
 * [Author] 张强
 * [Date] 2018-06-07
@@ -46,9 +47,14 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         static ConfigHelper()
         {
+            var jsonFile = "appsettings.json";
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (environment.IsNotNullOrEmpty())
+                jsonFile = $"appsettings.{environment}.json";
+
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile(jsonFile, optional: true, reloadOnChange: true)
                 .Build();
         }
         #endregion
