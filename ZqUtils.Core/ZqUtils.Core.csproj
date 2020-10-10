@@ -3,19 +3,22 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.3.7</Version>
+    <Version>1.0.3.9</Version>
     <PackageId>Zq.Utils.Core</PackageId>
     <Authors>张强</Authors>
     <Description>.NET Standard2.0版本工具类</Description>
     <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
-    <PackageReleaseNotes>1.重载GetDependsService扩展方法；
-2.新增MemberInfo扩展类，支持反射调用异步方法；
-3.新增AddMongoClient扩展方法；
-4.由netstandard2.0升级到netstandard2.1；</PackageReleaseNotes>
-    <AssemblyVersion>1.0.3.7</AssemblyVersion>
-    <FileVersion>1.0.3.7</FileVersion>
+    <PackageReleaseNotes>1.优化ToDateTime扩展方法；
+2.新增雪花算法生成Id工具类；
+3.新增EncryptPassword密码加密方法；
+4.优化IDataReader部分扩展方法；
+5.修改SqlServer驱动，由System.Data.SqlClient改为Microsoft.Data.SqlClient；
+6.新增基于AspectCore和Polly实现的重试、熔断等拦截特性HystrixAttribute；
+7.优化appsettings配置，根据环境变量自动选择开发环境和正式环境配置；</PackageReleaseNotes>
+    <AssemblyVersion>1.0.3.9</AssemblyVersion>
+    <FileVersion>1.0.3.9</FileVersion>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageIcon>utils.png</PackageIcon>
