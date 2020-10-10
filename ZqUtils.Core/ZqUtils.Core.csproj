@@ -77,7 +77,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
-    <PackageReference Include="ZXing.Net.Bindings.ZKWeb.System.Drawing" Version="0.16.4" />
+    <PackageReference Include="ZXing.Net.Bindings.ZKWeb.System.Drawing" Version="0.16.5" />
   </ItemGroup>
 
 </Project>
