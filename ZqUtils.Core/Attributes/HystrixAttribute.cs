@@ -185,9 +185,11 @@ namespace ZqUtils.Core.Attributes
                     await policy.ExecuteAsync(ctx => next(context), pollyCtx);
 
                     //存入缓存中
-                    using var cacheEntry = memoryCache.CreateEntry(cacheKey);
-                    cacheEntry.Value = context.ReturnValue;
-                    cacheEntry.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMilliseconds(CacheTtl);
+                    using (var cacheEntry = memoryCache.CreateEntry(cacheKey))
+                    {
+                        cacheEntry.Value = context.ReturnValue;
+                        cacheEntry.AbsoluteExpiration = DateTime.Now + TimeSpan.FromMilliseconds(CacheTtl);
+                    }
                 }
             }
             else //如果没有启用缓存，就直接执行业务方法
