@@ -19,8 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using ZqUtils.Core.Extensions;
 /****************************
@@ -55,7 +53,7 @@ namespace ZqUtils.Core.Helpers
         {
             get
             {
-                if (_Mono == null) 
+                if (_Mono == null)
                     _Mono = Type.GetType("Mono.Runtime") != null;
                 return _Mono.Value;
             }
@@ -96,10 +94,10 @@ namespace ZqUtils.Core.Helpers
                 default:
                     break;
             }
-            if (dir.IsNullOrEmpty()) 
+            if (dir.IsNullOrEmpty())
                 return Path.GetFullPath(path);
             // 处理网络路径
-            if (path.StartsWith(@"\\")) 
+            if (path.StartsWith(@"\\"))
                 return Path.GetFullPath(path);
             // 考虑兼容Linux
             if (!Mono)
@@ -138,7 +136,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static string GetFullPath(this string path)
         {
-            if (string.IsNullOrEmpty(path)) 
+            if (string.IsNullOrEmpty(path))
                 return path;
 
             return GetPath(path, 1);
@@ -154,7 +152,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static string GetBasePath(this string path)
         {
-            if (string.IsNullOrEmpty(path)) 
+            if (string.IsNullOrEmpty(path))
                 return path;
 
             return GetPath(path, 2);
@@ -171,7 +169,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static string GetCurrentPath(this string path)
         {
-            if (string.IsNullOrEmpty(path)) 
+            if (string.IsNullOrEmpty(path))
                 return path;
 
             return GetPath(path, 3);
@@ -213,7 +211,7 @@ namespace ZqUtils.Core.Helpers
         {
             if (ps == null || ps.Length < 1)
                 return path;
-            if (path == null) 
+            if (path == null)
                 path = string.Empty;
             foreach (var item in ps)
             {
@@ -280,7 +278,7 @@ namespace ZqUtils.Core.Helpers
         {
             using (var fs = file.OpenRead())
             {
-                if (encoding == null) 
+                if (encoding == null)
                     encoding = fs.Detect() ?? Encoding.UTF8;
                 using (var reader = new StreamReader(fs, encoding))
                 {
@@ -300,7 +298,7 @@ namespace ZqUtils.Core.Helpers
         {
             using (var fs = file.OpenWrite())
             {
-                if (encoding == null) 
+                if (encoding == null)
                     encoding = fs.Detect() ?? Encoding.UTF8;
                 using (var writer = new StreamWriter(fs, encoding))
                 {
@@ -375,7 +373,7 @@ namespace ZqUtils.Core.Helpers
         {
             if (di == null || !di.Exists)
                 yield break;
-            if (string.IsNullOrEmpty(exts)) 
+            if (string.IsNullOrEmpty(exts))
                 exts = "*";
             var opt = allSub ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             foreach (var pattern in exts.Split(";", "|", ","))
@@ -398,7 +396,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static string[] CopyTo(this DirectoryInfo di, string destDirName, string exts = null, bool allSub = false, Action<string> callback = null)
         {
-            if (!di.Exists) 
+            if (!di.Exists)
                 return new string[0];
             var list = new List<string>();
             // 来源目录根，用于截断
@@ -426,7 +424,7 @@ namespace ZqUtils.Core.Helpers
         public static string[] CopyToIfNewer(this DirectoryInfo di, string destDirName, string exts = null, bool allSub = false, Action<string> callback = null)
         {
             var dest = destDirName.AsDirectory();
-            if (!dest.Exists) 
+            if (!dest.Exists)
                 return new string[0];
             var list = new List<string>();
             // 目标目录根，用于截断
@@ -476,9 +474,9 @@ namespace ZqUtils.Core.Helpers
                     if (rs != null && rs.Length > 0)
                         list.AddRange(rs);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    throw ex;
+                    throw;
                 }
             }
             return list.ToArray();

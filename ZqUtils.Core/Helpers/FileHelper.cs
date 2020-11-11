@@ -175,9 +175,9 @@ namespace ZqUtils.Core.Helpers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -235,9 +235,9 @@ namespace ZqUtils.Core.Helpers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -302,9 +302,9 @@ namespace ZqUtils.Core.Helpers
                 HttpContextHelper.Current.Response.Body.Write(bytes);
                 HttpContextHelper.Current.Response.Body.Flush();//输出缓存，此部不可少
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -352,9 +352,9 @@ namespace ZqUtils.Core.Helpers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -411,9 +411,9 @@ namespace ZqUtils.Core.Helpers
                 }
                 return null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -470,9 +470,9 @@ namespace ZqUtils.Core.Helpers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -531,9 +531,9 @@ namespace ZqUtils.Core.Helpers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -566,9 +566,9 @@ namespace ZqUtils.Core.Helpers
                 await HttpContextHelper.Current.Response.Body.WriteAsync(bytes, 0, bytes.Length);
                 await HttpContextHelper.Current.Response.Body.FlushAsync();//输出缓存，此部不可少
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -648,9 +648,9 @@ namespace ZqUtils.Core.Helpers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {
@@ -707,9 +707,9 @@ namespace ZqUtils.Core.Helpers
                 }
                 return null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {

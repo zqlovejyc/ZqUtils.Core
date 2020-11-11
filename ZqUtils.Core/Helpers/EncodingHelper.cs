@@ -150,7 +150,9 @@ namespace ZqUtils.Core.Helpers
             if (boms[0] == 0xfe && boms[1] == 0xff) return Encoding.BigEndianUnicode;
             if (boms.Length < 3) return null;
             if (boms[0] == 0xef && boms[1] == 0xbb && boms[2] == 0xbf) return Encoding.UTF8;
+#if !NET5_0
             if (boms[0] == 0x2b && boms[1] == 0x2f && boms[2] == 0x76) return Encoding.UTF7;
+#endif
             if (boms.Length < 4) return null;
             if (boms[0] == 0xff && boms[1] == 0xfe && boms[2] == 0 && boms[3] == 0) return Encoding.UTF32;
             if (boms[0] == 0 && boms[1] == 0 && boms[2] == 0xfe && boms[3] == 0xff) return Encoding.GetEncoding(12001);
@@ -174,27 +176,24 @@ namespace ZqUtils.Core.Helpers
 
         static bool IsMatch(byte[] data, Encoding encoding)
         {
-            if (encoding == null) encoding = Encoding.UTF8;
-            try
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+
+            var str = encoding.GetString(data);
+            var buf = encoding.GetBytes(str);
+            // 考虑到噪声干扰，只要0.9
+            var score = buf.Length * 9 / 10;
+            var match = 0;
+            for (var i = 0; i < buf.Length; i++)
             {
-                var str = encoding.GetString(data);
-                var buf = encoding.GetBytes(str);
-                // 考虑到噪声干扰，只要0.9
-                var score = buf.Length * 9 / 10;
-                var match = 0;
-                for (var i = 0; i < buf.Length; i++)
+                if (data[i] == buf[i])
                 {
-                    if (data[i] == buf[i])
-                    {
-                        match++;
-                        if (match >= score) return true;
-                    }
+                    match++;
+                    if (match >= score)
+                        return true;
                 }
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+
             return false;
         }
 

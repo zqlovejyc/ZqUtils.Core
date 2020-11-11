@@ -1116,9 +1116,9 @@ namespace ZqUtils.Core.Helpers
             {
                 handler(msg);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {

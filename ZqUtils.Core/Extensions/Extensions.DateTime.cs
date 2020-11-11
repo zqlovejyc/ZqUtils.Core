@@ -241,8 +241,6 @@ namespace ZqUtils.Core.Extensions
         /// <param name="identifier">标识符“-”</param>
         public static string ToDateTimeString(this DateTime @this, bool isRemoveSecond = false, string identifier = "-")
         {
-            if (@this == null)
-                return string.Empty;
             if (isRemoveSecond)
                 return @this.ToString($"yyyy{identifier}MM{identifier}dd HH:mm");
             return @this.ToString($"yyyy{identifier}MM{identifier}dd HH:mm:ss");
@@ -268,8 +266,6 @@ namespace ZqUtils.Core.Extensions
         /// <param name="identifier">标识符“-”</param>
         public static string ToDateString(this DateTime @this, string identifier = "-")
         {
-            if (@this == null)
-                return string.Empty;
             return @this.ToString($"yyyy{identifier}MM{identifier}dd");
         }
 
@@ -291,8 +287,6 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this">日期</param>
         public static string ToTimeString(this DateTime @this)
         {
-            if (@this == null)
-                return string.Empty;
             return @this.ToString("HH:mm:ss");
         }
 
@@ -314,8 +308,6 @@ namespace ZqUtils.Core.Extensions
         /// <param name="identifier">标识符“-”</param>
         public static string ToMillisecondString(this DateTime @this, string identifier = "-")
         {
-            if (@this == null)
-                return string.Empty;
             return @this.ToString($"yyyy{identifier}MM{identifier}dd HH:mm:ss.fff");
         }
 
@@ -337,8 +329,6 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this">日期</param>
         public static string ToChineseDateString(this DateTime @this)
         {
-            if (@this == null)
-                return string.Empty;
             return @this.ToString("yyyy年MM月dd日");
         }
 
@@ -360,8 +350,6 @@ namespace ZqUtils.Core.Extensions
         /// <param name="isRemoveSecond">是否移除秒</param>
         public static string ToChineseDateTimeString(this DateTime @this, bool isRemoveSecond = false)
         {
-            if (@this == null)
-                return string.Empty;
             var result = new StringBuilder(@this.ToString("yyyy年MM月dd日 HH时mm分")); ;
             if (isRemoveSecond == false)
                 result.Append($"{@this.Second}秒");

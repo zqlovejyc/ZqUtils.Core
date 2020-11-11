@@ -5898,13 +5898,13 @@ namespace ZqUtils.Core.Extensions
         /// <returns>the copied object.</returns>
         public static T DeepClone<T>(this T @this)
         {
-            IFormatter formatter = new BinaryFormatter();
-            using (var stream = new MemoryStream())
-            {
-                formatter.Serialize(stream, @this);
-                stream.Seek(0, SeekOrigin.Begin);
-                return (T)formatter.Deserialize(stream);
-            }
+            // Don't serialize a null object, simply return the default for that object
+            if (@this == null)
+                return default;
+
+            var deserializeSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
+            var serializeSettings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(@this, serializeSettings), deserializeSettings);
         }
         #endregion
 

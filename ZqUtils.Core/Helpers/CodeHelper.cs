@@ -17,16 +17,15 @@
 #endregion
 
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.DrawingCore;
-using System.DrawingCore.Imaging;
 using System.DrawingCore.Drawing2D;
+using System.DrawingCore.Imaging;
+using System.IO;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
-using ZXing.ZKWeb;
 /****************************
 * [Author] 张强
 * [Date] 2015-10-26
@@ -34,6 +33,8 @@ using ZXing.ZKWeb;
 * **************************/
 namespace ZqUtils.Core.Helpers
 {
+    using ZXing.ZKWeb;
+
     /// <summary>
     /// 二维码/条形码/验证码工具类
     /// </summary>

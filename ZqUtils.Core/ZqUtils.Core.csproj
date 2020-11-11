@@ -1,89 +1,92 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.3.9</Version>
-    <PackageId>Zq.Utils.Core</PackageId>
-    <Authors>张强</Authors>
-    <Description>.NET Standard2.0版本工具类</Description>
-    <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageProjectUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
-    <PackageReleaseNotes>1.优化ToDateTime扩展方法；
-2.新增雪花算法生成Id工具类；
-3.新增EncryptPassword密码加密方法；
-4.优化IDataReader部分扩展方法；
-5.修改SqlServer驱动，由System.Data.SqlClient改为Microsoft.Data.SqlClient；
-6.新增基于AspectCore和Polly实现的重试、熔断等拦截特性HystrixAttribute；
-7.优化appsettings配置，根据环境变量自动选择开发环境和正式环境配置；</PackageReleaseNotes>
-    <AssemblyVersion>1.0.3.9</AssemblyVersion>
-    <FileVersion>1.0.3.9</FileVersion>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageIcon>utils.png</PackageIcon>
-    <RepositoryUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>Utility;Utils</PackageTags>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>1.1.0</Version>
+        <PackageId>Zq.Utils.Core</PackageId>
+        <Authors>张强</Authors>
+        <Description>.NET Standard2.1版本工具类</Description>
+        <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
+        <PackageLicenseUrl></PackageLicenseUrl>
+        <PackageProjectUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
+        <PackageReleaseNotes>1.修复MongoDbHelper所有涉及到Expression条件的删除、更新、查询方法调用错误bug；
+2.优化MongoDbHelper分页查询；
+3.新增Default扩展方法；
+4.优化Substring扩展方法；
+5.升级，支持net5.0；
+6.升级Nuget包引用；</PackageReleaseNotes>
+        <AssemblyVersion>1.1.0.0</AssemblyVersion>
+        <FileVersion>1.1.0.0</FileVersion>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageIcon>utils.png</PackageIcon>
+        <RepositoryUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>Utility;Utils</PackageTags>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard2.1\ZqUtils.Core.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\netstandard2.0\ZqUtils.Core.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\ZqUtils.Core.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\netstandard2.1\ZqUtils.Core.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="XmlConfig\NLog.config" />
-    <None Include="Icon\utils.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\net5.0\ZqUtils.Core.xml</DocumentationFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="XmlConfig\NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="XmlConfig\NLog.config" />
+        <None Include="Icon\utils.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AspectCore.Extensions.DependencyInjection" Version="2.1.0" />
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
-    <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="BouncyCastle.NetCore" Version="1.8.8" />
-    <PackageReference Include="Confluent.Kafka" Version="1.5.2" />
-    <PackageReference Include="CSRedisCore" Version="3.6.5" />
-    <PackageReference Include="Dapper" Version="2.0.35" />
-    <PackageReference Include="DnsClient" Version="1.3.2" />
-    <PackageReference Include="EPPlus" Version="4.5.3.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="3.1.9" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.9" />
-    <PackageReference Include="MongoDB.Driver" Version="2.11.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NLog" Version="4.7.5" />
-    <PackageReference Include="Polly" Version="7.2.1" />
-    <PackageReference Include="Quartz.Plugins.TimeZoneConverter" Version="3.2.3" />
-    <PackageReference Include="Quartz.Serialization.Json" Version="3.2.3" />
-    <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
-    <PackageReference Include="Scrutor" Version="3.2.2" />
-    <PackageReference Include="SharpZipLib" Version="1.3.0" />
-    <PackageReference Include="StackExchange.Redis" Version="2.1.58" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
-    <PackageReference Include="ZXing.Net.Bindings.ZKWeb.System.Drawing" Version="0.16.5" />
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="XmlConfig\NLog.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AspectCore.Extensions.DependencyInjection" Version="2.1.0" />
+        <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
+        <PackageReference Include="AutoMapper" Version="10.1.1" />
+        <PackageReference Include="BouncyCastle.NetCore" Version="1.8.8" />
+        <PackageReference Include="Confluent.Kafka" Version="1.5.2" />
+        <PackageReference Include="CSRedisCore" Version="3.6.5" />
+        <PackageReference Include="Dapper" Version="2.0.35" />
+        <PackageReference Include="DnsClient" Version="1.3.2" />
+        <PackageReference Include="EPPlus" Version="4.5.3.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
+        <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
+        <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="NLog" Version="4.7.5" />
+        <PackageReference Include="Polly" Version="7.2.1" />
+        <PackageReference Include="Quartz.Plugins.TimeZoneConverter" Version="3.2.3" />
+        <PackageReference Include="Quartz.Serialization.Json" Version="3.2.3" />
+        <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
+        <PackageReference Include="Scrutor" Version="3.3.0" />
+        <PackageReference Include="SharpZipLib" Version="1.3.0" />
+        <PackageReference Include="StackExchange.Redis" Version="2.1.58" />
+        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
+        <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+        <PackageReference Include="System.Text.Json" Version="5.0.0" />
+        <PackageReference Include="ZXing.Net.Bindings.ZKWeb.System.Drawing" Version="0.16.5" />
+    </ItemGroup>
 
 </Project>
