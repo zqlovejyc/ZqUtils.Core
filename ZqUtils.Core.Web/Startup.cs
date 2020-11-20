@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using CrystalQuartz.AspNetCore;
 using Exceptionless;
@@ -56,6 +57,11 @@ namespace ZqUtils.Core.Web
                     .Where(x => x.Namespace == "ZqUtils.Core.Web"),
                 assembly => assembly
                     .StartsWith("ZqUtils.Core"));
+
+            services
+               .AddHttpClient("default")
+               .ConfigurePrimaryHttpMessageHandler(() =>
+                   new HttpClientHandler { ServerCertificateCustomValidationCallback = (request, certificate, chain, errors) => true });
 
             //services.AddFromAssembly(typeof(IDenpendency),
             //    assembly => assembly
