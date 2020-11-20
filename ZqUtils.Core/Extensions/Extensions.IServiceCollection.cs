@@ -20,6 +20,7 @@ using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Confluent.Kafka;
+using FreeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -30,7 +31,7 @@ using System.Linq;
 using System.Reflection;
 using ZqUtils.Core.Attributes;
 using ZqUtils.Core.Helpers;
-using RedisClient = CSRedis.CSRedisClient;
+using CsRedisClient = CSRedis.CSRedisClient;
 /****************************
 * [Author] 张强
 * [Date] 2018-05-17
@@ -431,18 +432,46 @@ namespace ZqUtils.Core.Extensions
         {
             var connectionStrings = configuration.GetSection("Redis:ConnectionStrings").Get<string[]>();
 
-            RedisClient client;
+            CsRedisClient client;
             if (connectionStrings.Length == 1)
                 //普通模式
-                client = new RedisClient(connectionStrings[0]);
+                client = new CsRedisClient(connectionStrings[0]);
             else
                 //集群模式
                 //实现思路：根据key.GetHashCode() % 节点总数量，确定连向的节点
                 //也可以自定义规则(第一个参数设置)
-                client = new RedisClient(null, connectionStrings);
+                client = new CsRedisClient(null, connectionStrings);
 
             //初始化 RedisHelper
             RedisHelper.Initialization(client);
+
+            return @this;
+        }
+        #endregion
+
+        #region AddFreeRedis
+        /// <summary>
+        /// 注入FreeRedis
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddFreeRedis(this IServiceCollection @this, IConfiguration configuration)
+        {
+            var connectionStrings = configuration.GetSection("Redis:ConnectionStrings").Get<string[]>();
+
+            @this.AddSingleton(x =>
+            {
+                RedisClient client;
+                if (connectionStrings.Length == 1)
+                    //普通模式
+                    client = new RedisClient(connectionStrings[0]);
+                else
+                    //集群模式
+                    client = new RedisClient(connectionStrings.Select(v => ConnectionStringBuilder.Parse(v)).ToArray());
+
+                return client;
+            });
 
             return @this;
         }
