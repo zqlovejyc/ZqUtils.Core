@@ -83,6 +83,7 @@ namespace ZqUtils.Core.Helpers
         /// </list>
         /// <list type="number">
         ///     <item>注意ConfigureServices里面必须要注入：services.TryAddSingleton&lt;IHttpContextAccessor, HttpContextAccessor&gt;();</item>
+        ///     <item>注意Configure里面调用：app.UseHttpContext();</item>
         ///     <item>如果Jexus反代AspNetCore的话，从http头“X-Forwarded-For”可以得到客户端IP地址；</item>
         ///     <item>如果是使用Jexus的AppHost驱动Asp.Net Core应用，可以从HTTP头“X-Real-IP”或“X-Original-For”等头域中得到客户端IP</item>
         /// </list>
