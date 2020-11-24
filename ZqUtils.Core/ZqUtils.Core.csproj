@@ -23,7 +23,7 @@
         <PackageIcon>utils.png</PackageIcon>
         <RepositoryUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageTags>Utility;Utils</PackageTags>
+        <PackageTags>utility;utils;helper;extensions</PackageTags>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
