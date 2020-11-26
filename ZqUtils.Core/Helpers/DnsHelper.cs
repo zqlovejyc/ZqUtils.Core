@@ -91,25 +91,26 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static string GetClientRemoteIpAddress()
         {
-            string res;
-            var ip = HttpContextHelper.Current.Connection.RemoteIpAddress;
-            //判断是否为回环地址
-            if (ip.IsNotNull() && !IPAddress.IsLoopback(ip))
+            //Jexus反向代理Asp.Net Core
+            var res = HttpContextHelper.Current.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-forwarded-for")).Value;
+            if (res.IsNullOrEmpty() || IPAddress.IsLoopback(IPAddress.Parse(res)))
             {
-                res = ip.ToString();
+                //使用Jexus的AppHost驱动Asp.Net Core应用
+                res = HttpContextHelper.Current.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-real-ip")).Value;
+                if (res.IsNullOrEmpty())
+                    res = HttpContextHelper.Current.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-original-for")).Value;
             }
-            else
+
+            if (res.IsNullOrEmpty() || IPAddress.IsLoopback(IPAddress.Parse(res)))
             {
-                //Jexus反向代理Asp.Net Core
-                res = HttpContextHelper.Current.Request.Headers["X-Forwarded-For"];
-                if (res.IsNullOrEmpty() || IPAddress.IsLoopback(IPAddress.Parse(res)))
+                var ip = HttpContextHelper.Current.Connection.RemoteIpAddress;
+                //判断是否为回环地址
+                if (ip.IsNotNull() && !IPAddress.IsLoopback(ip))
                 {
-                    //使用Jexus的AppHost驱动Asp.Net Core应用
-                    res = HttpContextHelper.Current.Request.Headers["X-Real-IP"];
-                    if (res.IsNullOrEmpty())
-                        res = HttpContextHelper.Current.Request.Headers["X-Original-For"];
+                    res = ip.ToString();
                 }
             }
+
             return res;
         }
     }
