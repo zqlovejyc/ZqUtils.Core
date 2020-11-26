@@ -175,6 +175,11 @@ namespace ZqUtils.Core.Console
     {
         public static async Task Main(string[] args)
         {
+            #region Cmd
+            var res = CmdHelper.Windows("ipconfig /all");
+            SysConsole.WriteLine(res.Output);
+            #endregion
+
             #region Kafka
             ////读取配置文件
             //var kafka = new KafkaHelper();
