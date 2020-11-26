@@ -82,7 +82,7 @@ namespace ZqUtils.Core.Helpers
         ///     <item>获取远程客户端IP地址</item>
         /// </list>
         /// <list type="number">
-        ///     <item>注意ConfigureServices里面必须要注入：services.TryAddSingleton&lt;IHttpContextAccessor, HttpContextAccessor&gt;();</item>
+        ///     <item>注意ConfigureServices里面必须要注入：services.AddSingleton&lt;IHttpContextAccessor, HttpContextAccessor&gt;();</item>
         ///     <item>注意Configure里面调用：app.UseHttpContext();</item>
         ///     <item>如果Jexus反代AspNetCore的话，从http头“X-Forwarded-For”可以得到客户端IP地址；</item>
         ///     <item>如果是使用Jexus的AppHost驱动Asp.Net Core应用，可以从HTTP头“X-Real-IP”或“X-Original-For”等头域中得到客户端IP</item>
@@ -91,24 +91,25 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static string GetClientRemoteIpAddress()
         {
+            //HttpContext
+            var httpContext = HttpContextHelper.Current;
+
             //Jexus反向代理Asp.Net Core
-            var res = HttpContextHelper.Current.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-forwarded-for")).Value;
+            var res = httpContext.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-forwarded-for")).Value;
             if (res.IsNullOrEmpty() || IPAddress.IsLoopback(IPAddress.Parse(res)))
             {
                 //使用Jexus的AppHost驱动Asp.Net Core应用
-                res = HttpContextHelper.Current.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-real-ip")).Value;
+                res = httpContext.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-real-ip")).Value;
                 if (res.IsNullOrEmpty())
-                    res = HttpContextHelper.Current.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-original-for")).Value;
+                    res = httpContext.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-original-for")).Value;
             }
 
             if (res.IsNullOrEmpty() || IPAddress.IsLoopback(IPAddress.Parse(res)))
             {
-                var ip = HttpContextHelper.Current.Connection.RemoteIpAddress;
+                var ip = httpContext.Connection.RemoteIpAddress;
                 //判断是否为回环地址
                 if (ip.IsNotNull() && !IPAddress.IsLoopback(ip))
-                {
                     res = ip.ToString();
-                }
             }
 
             return res;
