@@ -161,7 +161,7 @@ namespace ZqUtils.Core.Helpers
     }
 
     /// <summary>
-    /// Cmd命令类型
+    /// cmd命令类型
     /// </summary>
     public enum CmdType
     {
