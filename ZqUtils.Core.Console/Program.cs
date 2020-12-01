@@ -176,8 +176,7 @@ namespace ZqUtils.Core.Console
         public static async Task Main(string[] args)
         {
             #region Cmd
-            var res = CmdHelper.Windows("ipconfig /all");
-            SysConsole.WriteLine(res.Output);
+            SysConsole.WriteLine("dotnet --version".Execute().Output);
             #endregion
 
             #region Kafka

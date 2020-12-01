@@ -159,4 +159,20 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         public bool Success { get; set; }
     }
+
+    /// <summary>
+    /// Cmd命令类型
+    /// </summary>
+    public enum CmdType
+    {
+        /// <summary>
+        /// Windows命令
+        /// </summary>
+        Windows = 0,
+
+        /// <summary>
+        /// Linux命令
+        /// </summary>
+        Linux = 1
+    }
 }
