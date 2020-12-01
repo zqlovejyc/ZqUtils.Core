@@ -17,6 +17,7 @@
 #endregion
 
 using DnsClient;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -88,11 +89,12 @@ namespace ZqUtils.Core.Helpers
         ///     <item>如果是使用Jexus的AppHost驱动Asp.Net Core应用，可以从HTTP头“X-Real-IP”或“X-Original-For”等头域中得到客户端IP</item>
         /// </list>
         /// </summary>
+        /// <param name="httpContext">自定义HttpContext，默认：HttpContextHelper.Current</param>
         /// <returns></returns>
-        public static string GetClientRemoteIpAddress()
+        public static string GetClientRemoteIpAddress(HttpContext httpContext = null)
         {
             //HttpContext
-            var httpContext = HttpContextHelper.Current;
+            httpContext = httpContext ?? HttpContextHelper.Current;
 
             //Jexus反向代理Asp.Net Core
             var res = httpContext.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-forwarded-for")).Value;
