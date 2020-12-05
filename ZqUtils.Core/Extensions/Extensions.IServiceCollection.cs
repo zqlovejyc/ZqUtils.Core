@@ -24,6 +24,7 @@ using FreeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Scrutor;
 using System;
@@ -31,7 +32,6 @@ using System.Linq;
 using System.Reflection;
 using ZqUtils.Core.Attributes;
 using ZqUtils.Core.Helpers;
-using CsRedisClient = CSRedis.CSRedisClient;
 /****************************
 * [Author] 张强
 * [Date] 2018-05-17
@@ -421,34 +421,6 @@ namespace ZqUtils.Core.Extensions
         }
         #endregion
 
-        #region AddCsRedis
-        /// <summary>
-        /// 初始化CSRedisCore，之后程序中可以直接使用RedisHelper的静态方法
-        /// </summary>
-        /// <param name="this"></param>
-        /// <param name="configuration">json配置</param>
-        /// <returns></returns>
-        public static IServiceCollection AddCsRedis(this IServiceCollection @this, IConfiguration configuration)
-        {
-            var connectionStrings = configuration.GetSection("Redis:ConnectionStrings").Get<string[]>();
-
-            CsRedisClient client;
-            if (connectionStrings.Length == 1)
-                //普通模式
-                client = new CsRedisClient(connectionStrings[0]);
-            else
-                //集群模式
-                //实现思路：根据key.GetHashCode() % 节点总数量，确定连向的节点
-                //也可以自定义规则(第一个参数设置)
-                client = new CsRedisClient(null, connectionStrings);
-
-            //初始化 RedisHelper
-            RedisHelper.Initialization(client);
-
-            return @this;
-        }
-        #endregion
-
         #region AddFreeRedis
         /// <summary>
         /// 注入FreeRedis
@@ -469,6 +441,10 @@ namespace ZqUtils.Core.Extensions
                 else
                     //集群模式
                     client = new RedisClient(connectionStrings.Select(v => ConnectionStringBuilder.Parse(v)).ToArray());
+
+                //配置序列化和反序列化
+                client.Serialize = obj => JsonConvert.SerializeObject(obj);
+                client.Deserialize = (json, type) => JsonConvert.DeserializeObject(json, type);
 
                 return client;
             });
