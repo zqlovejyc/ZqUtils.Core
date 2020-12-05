@@ -3,21 +3,25 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.1.0</Version>
+        <Version>1.1.1</Version>
         <PackageId>Zq.Utils.Core</PackageId>
         <Authors>张强</Authors>
         <Description>.NET Standard2.1版本工具类</Description>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
-        <PackageReleaseNotes>1.修复MongoDbHelper所有涉及到Expression条件的删除、更新、查询方法调用错误bug；
-2.优化MongoDbHelper分页查询；
-3.新增Default扩展方法；
-4.优化Substring扩展方法；
-5.升级，支持net5.0；
-6.升级Nuget包引用；</PackageReleaseNotes>
-        <AssemblyVersion>1.1.0.0</AssemblyVersion>
-        <FileVersion>1.1.0.0</FileVersion>
+        <PackageReleaseNotes>1.引入FastExpressionCompiler，优化Expression编译；
+2.重命名IsAssignableFrom -&gt; AssignableFrom，IsAssignableTo -&gt; AssignableTo；
+3.优化HttpClientHelper，添加httpClientName参数；
+4.优化RedisHelper；
+5.新增AddFreeRedis扩展方法；
+6.重载Default扩展方法；
+7.优化GetClientRemoteIpAddress；
+8.新增CmdHelper工具类；
+9.重载AppendWhereOrAndIf；
+10.新增执行Cmd命令字符串扩展方法Execute；</PackageReleaseNotes>
+        <AssemblyVersion>1.1.1.0</AssemblyVersion>
+        <FileVersion>1.1.1.0</FileVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageIcon>utils.png</PackageIcon>
@@ -63,7 +67,7 @@
         <PackageReference Include="DnsClient" Version="1.3.2" />
         <PackageReference Include="EPPlus" Version="4.5.3.3" />
         <PackageReference Include="FastExpressionCompiler" Version="2.0.0" />
-        <PackageReference Include="FreeRedis" Version="0.1.5" />
+        <PackageReference Include="FreeRedis" Version="0.1.7" />
         <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
         <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
         <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.0" />
@@ -74,7 +78,7 @@
         <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
-        <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
+        <PackageReference Include="MongoDB.Driver" Version="2.11.5" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Include="NLog" Version="4.7.5" />
         <PackageReference Include="Polly" Version="7.2.1" />
