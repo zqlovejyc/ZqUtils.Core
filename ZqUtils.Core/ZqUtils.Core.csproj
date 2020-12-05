@@ -3,25 +3,17 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.1.1</Version>
+        <Version>1.1.2</Version>
         <PackageId>Zq.Utils.Core</PackageId>
         <Authors>张强</Authors>
         <Description>.NET Standard2.1版本工具类</Description>
         <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
-        <PackageReleaseNotes>1.引入FastExpressionCompiler，优化Expression编译；
-2.重命名IsAssignableFrom -&gt; AssignableFrom，IsAssignableTo -&gt; AssignableTo；
-3.优化HttpClientHelper，添加httpClientName参数；
-4.优化RedisHelper；
-5.新增AddFreeRedis扩展方法；
-6.重载Default扩展方法；
-7.优化GetClientRemoteIpAddress；
-8.新增CmdHelper工具类；
-9.重载AppendWhereOrAndIf；
-10.新增执行Cmd命令字符串扩展方法Execute；</PackageReleaseNotes>
-        <AssemblyVersion>1.1.1.0</AssemblyVersion>
-        <FileVersion>1.1.1.0</FileVersion>
+        <PackageReleaseNotes>1.移除CsRedis，新增FreeRedisHelper工具类
+2.优化AddFreeRedis</PackageReleaseNotes>
+        <AssemblyVersion>1.1.2.0</AssemblyVersion>
+        <FileVersion>1.1.2.0</FileVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageIcon>utils.png</PackageIcon>
