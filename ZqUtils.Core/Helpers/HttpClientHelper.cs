@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using ZqUtils.Core.Extensions;
 /****************************
@@ -236,7 +237,7 @@ namespace ZqUtils.Core.Helpers
             httpClient.DefaultRequestHeaders.Add("user-agent", UserAgent);
 
             if (!accept.IsNullOrEmpty())
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(accept) { CharSet = "utf-8" });
 
             if (headers?.Count > 0)
             {
@@ -398,9 +399,9 @@ namespace ZqUtils.Core.Helpers
         {
             var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
 
-            var content = new StringContent((data?.GetType() == typeof(string) ? data?.ToString() : data?.ToJson()) ?? "");
+            var content = new StringContent((data?.GetType() == typeof(string) ? data?.ToString() : data?.ToJson()) ?? "", Encoding.UTF8);
             if (!contentType.IsNullOrEmpty())
-                content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+                content.Headers.ContentType = new MediaTypeHeaderValue(contentType) { CharSet = "utf-8" };
 
             (string result, HttpStatusCode code) result;
             using (var response = await httpClient.PostAsync(url, content))
@@ -484,9 +485,9 @@ namespace ZqUtils.Core.Helpers
         {
             var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
 
-            var content = new StringContent((data?.GetType() == typeof(string) ? data?.ToString() : data?.ToJson()) ?? "");
+            var content = new StringContent((data?.GetType() == typeof(string) ? data?.ToString() : data?.ToJson()) ?? "", Encoding.UTF8);
             if (!contentType.IsNullOrEmpty())
-                content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+                content.Headers.ContentType = new MediaTypeHeaderValue(contentType) { CharSet = "utf-8" };
 
             (T result, HttpStatusCode code) result;
             using (var response = await httpClient.PostAsync(url, content))
@@ -580,10 +581,10 @@ namespace ZqUtils.Core.Helpers
 
             var req = new HttpRequestMessage(method, url);
             if (data != null)
-                req.Content = new StringContent((data?.GetType() == typeof(string) ? data?.ToString() : data?.ToJson()) ?? "");
+                req.Content = new StringContent((data?.GetType() == typeof(string) ? data?.ToString() : data?.ToJson()) ?? "", Encoding.UTF8);
 
             if (!contentType.IsNullOrEmpty() && req.Content != null)
-                req.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
+                req.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType) { CharSet = "utf-8" };
 
             (string result, HttpStatusCode code) result;
             using (var response = await httpClient.SendAsync(req))
@@ -677,10 +678,10 @@ namespace ZqUtils.Core.Helpers
 
             var req = new HttpRequestMessage(method, url);
             if (data != null)
-                req.Content = new StringContent((data?.GetType() == typeof(string) ? data?.ToString() : data?.ToJson()) ?? "");
+                req.Content = new StringContent((data?.GetType() == typeof(string) ? data?.ToString() : data?.ToJson()) ?? "", Encoding.UTF8);
 
             if (!contentType.IsNullOrEmpty() && req.Content != null)
-                req.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
+                req.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType) { CharSet = "utf-8" };
 
             (T result, HttpStatusCode code) result;
             using (var response = await httpClient.SendAsync(req))
