@@ -465,7 +465,13 @@ namespace ZqUtils.Core.Extensions
             @this.AddSingleton(async x =>
             {
                 var connectionString = configuration.GetValue<string>("Redis:ConnectionStrings");
-                await RedisHelper.SetConnectionRedisMultiplexerAsync(connectionString);
+                if (connectionString.IsNullOrEmpty())
+                    connectionString = configuration.GetSection("Redis:ConnectionStrings").Get<string[]>()?.FirstOrDefault();
+
+                if (connectionString.IsNotNullOrEmpty())
+                    await RedisHelper.SetConnectionRedisMultiplexerAsync(connectionString);
+                else
+                    throw new ArgumentNullException("Redis连接字符串配置为null");
 
                 return new RedisHelper(connectionString);
             });
