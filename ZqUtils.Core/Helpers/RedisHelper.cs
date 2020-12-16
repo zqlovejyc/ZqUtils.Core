@@ -16,14 +16,14 @@
  */
 #endregion
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
 using StackExchange.Redis;
-using ZqUtils.Core.Extensions;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using ZqUtils.Core.Extensions;
 /****************************
 * [Author] 张强
 * [Date] 2018-03-21
@@ -827,6 +827,52 @@ namespace ZqUtils.Core.Helpers
             return Database.HashValues(redisKey).Select(o => o.ToString());
         }
         #endregion
+
+        #region HashLength
+        /// <summary>
+        /// 获取hash长度
+        /// </summary>
+        /// <param name="key">redis存储key</param>
+        /// <param name="flags">操作命令标识</param>
+        /// <returns></returns>
+        public long HashLength(string key, CommandFlags flags = CommandFlags.None)
+        {
+            key = AddKeyPrefix(key);
+            return Database.HashLength(key, flags);
+        }
+        #endregion
+
+        #region HashScan
+        /// <summary>
+        /// hash扫描
+        /// </summary>
+        /// <param name="key">redis存储key</param>
+        /// <param name="pattern">模式匹配key</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="flags">操作命令标识</param>
+        /// <returns></returns>
+        public IEnumerable<HashEntry> HashScan(string key, string pattern, int pageSize, CommandFlags flags)
+        {
+            key = AddKeyPrefix(key);
+            return Database.HashScan(key, pattern, pageSize, flags);
+        }
+
+        /// <summary>
+        /// hash扫描
+        /// </summary>
+        /// <param name="key">redis存储key</param>
+        /// <param name="pattern">模式匹配key</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="cursor">起始位置</param>
+        /// <param name="pageOffset">起始偏移量</param>
+        /// <param name="flags">操作命令标识</param>
+        /// <returns></returns>
+        public IEnumerable<HashEntry> HashScan(string key, string pattern, int pageSize = 250, long cursor = 0L, int pageOffset = 0, CommandFlags flags = CommandFlags.None)
+        {
+            key = AddKeyPrefix(key);
+            return Database.HashScan(key, pattern, pageSize, cursor, pageOffset, flags);
+        }
+        #endregion
         #endregion
 
         #region 异步方法
@@ -997,6 +1043,52 @@ namespace ZqUtils.Core.Helpers
         {
             redisKey = AddKeyPrefix(redisKey);
             return (await Database.HashValuesAsync(redisKey)).Select(o => o.ToString());
+        }
+        #endregion
+
+        #region HashLengthAsync
+        /// <summary>
+        /// 获取hash长度
+        /// </summary>
+        /// <param name="key">redis存储key</param>
+        /// <param name="flags">操作命令标识</param>
+        /// <returns></returns>
+        public async Task<long> HashLengthAsync(string key, CommandFlags flags = CommandFlags.None)
+        {
+            key = AddKeyPrefix(key);
+            return await Database.HashLengthAsync(key, flags);
+        }
+        #endregion
+
+        #region HashScanAsync
+        /// <summary>
+        /// hash扫描
+        /// </summary>
+        /// <param name="key">redis存储key</param>
+        /// <param name="pattern">模式匹配key</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="flags">操作命令标识</param>
+        /// <returns></returns>
+        public IAsyncEnumerable<HashEntry> HashScanAsync(string key, string pattern, int pageSize, CommandFlags flags)
+        {
+            key = AddKeyPrefix(key);
+            return Database.HashScanAsync(key, pattern, pageSize, flags: flags);
+        }
+
+        /// <summary>
+        /// hash扫描
+        /// </summary>
+        /// <param name="key">redis存储key</param>
+        /// <param name="pattern">模式匹配key</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="cursor">起始位置</param>
+        /// <param name="pageOffset">起始偏移量</param>
+        /// <param name="flags">操作命令标识</param>
+        /// <returns></returns>
+        public IAsyncEnumerable<HashEntry> HashScanAsync(string key, string pattern, int pageSize = 250, long cursor = 0L, int pageOffset = 0, CommandFlags flags = CommandFlags.None)
+        {
+            key = AddKeyPrefix(key);
+            return Database.HashScanAsync(key, pattern, pageSize, cursor, pageOffset, flags);
         }
         #endregion
         #endregion
