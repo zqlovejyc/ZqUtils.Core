@@ -453,6 +453,29 @@ namespace ZqUtils.Core.Extensions
         }
         #endregion
 
+        #region AddStackExchangeRedis
+        /// <summary>
+        /// 注入RedisHelper、IConnectionMultiplexer
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddStackExchangeRedis(this IServiceCollection @this, IConfiguration configuration)
+        {
+            @this.AddSingleton(async x =>
+            {
+                var connectionString = configuration.GetValue<string>("Redis:ConnectionStrings");
+                await RedisHelper.SetConnectionRedisMultiplexerAsync(connectionString);
+
+                return new RedisHelper(connectionString);
+            });
+
+            @this.AddSingleton(x => x.GetRequiredService<RedisHelper>().IConnectionMultiplexer);
+
+            return @this;
+        }
+        #endregion
+
         #region AddMongoDb
         /// <summary>
         /// 注入MongoDb
