@@ -20,7 +20,7 @@
         <RepositoryUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>utility;utils;helper;extensions</PackageTags>
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
