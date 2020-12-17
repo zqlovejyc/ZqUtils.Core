@@ -502,10 +502,8 @@ namespace ZqUtils.Core.Helpers
                 _pool.GetOrAdd(database.ToString(), objectPool);
                 return objectPool.Value.GetObject();
             }
-            else
-            {
-                return _pool[database.ToString()].Value.GetObject();
-            }
+
+            return _pool[database.ToString()].Value.GetObject();
         }
         #endregion
 
@@ -519,6 +517,20 @@ namespace ZqUtils.Core.Helpers
         {
             if (connectionMultiplexer != null && connectionMultiplexer.IsConnected)
                 Database = connectionMultiplexer.GetDatabase(database);
+
+            return this;
+        }
+        #endregion
+
+        #region 重置RedisKey前缀
+        /// <summary>
+        /// 重置RedisKey前缀
+        /// </summary>
+        /// <param name="keyPrefix"></param>
+        /// <returns></returns>
+        public RedisHelper ResetKeyPrefix(string keyPrefix = null)
+        {
+            KeyPrefix = keyPrefix;
 
             return this;
         }
