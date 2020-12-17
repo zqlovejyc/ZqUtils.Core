@@ -395,13 +395,16 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         private static void AddRegisterEvent()
         {
-            connectionMultiplexer.ConnectionRestored += ConnMultiplexer_ConnectionRestored;
-            connectionMultiplexer.ConnectionFailed += ConnMultiplexer_ConnectionFailed;
-            connectionMultiplexer.ErrorMessage += ConnMultiplexer_ErrorMessage;
-            connectionMultiplexer.ConfigurationChanged += ConnMultiplexer_ConfigurationChanged;
-            connectionMultiplexer.HashSlotMoved += ConnMultiplexer_HashSlotMoved;
-            connectionMultiplexer.InternalError += ConnMultiplexer_InternalError;
-            connectionMultiplexer.ConfigurationChangedBroadcast += ConnMultiplexer_ConfigurationChangedBroadcast;
+            if (ConfigHelper.GetValue<bool>("Redis:RegisterEvent"))
+            {
+                connectionMultiplexer.ConnectionRestored += ConnMultiplexer_ConnectionRestored;
+                connectionMultiplexer.ConnectionFailed += ConnMultiplexer_ConnectionFailed;
+                connectionMultiplexer.ErrorMessage += ConnMultiplexer_ErrorMessage;
+                connectionMultiplexer.ConfigurationChanged += ConnMultiplexer_ConfigurationChanged;
+                connectionMultiplexer.HashSlotMoved += ConnMultiplexer_HashSlotMoved;
+                connectionMultiplexer.InternalError += ConnMultiplexer_InternalError;
+                connectionMultiplexer.ConfigurationChangedBroadcast += ConnMultiplexer_ConfigurationChangedBroadcast;
+            }
         }
 
         /// <summary>
