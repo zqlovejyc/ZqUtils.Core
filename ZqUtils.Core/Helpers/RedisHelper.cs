@@ -18,7 +18,6 @@
 
 using StackExchange.Redis;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -38,12 +37,6 @@ namespace ZqUtils.Core.Helpers
     {
         #region 私有字段
         /// <summary>
-        /// 对象池
-        /// </summary>
-        private static readonly ConcurrentDictionary<string, Lazy<ObjectPoolHelper<RedisHelper>>> _pool =
-            new ConcurrentDictionary<string, Lazy<ObjectPoolHelper<RedisHelper>>>();
-
-        /// <summary>
         /// 线程锁
         /// </summary>
         private static readonly SemaphoreSlim locker = new SemaphoreSlim(1, 1);
@@ -52,12 +45,11 @@ namespace ZqUtils.Core.Helpers
         /// redis连接对象
         /// </summary>
         private static IConnectionMultiplexer connectionMultiplexer;
-
         #endregion
 
         #region 公有属性
         /// <summary>
-        /// 静态单例
+        /// 静态单例，注意单例对象慎重修改对象公有属性，建议不进行修改操作
         /// </summary>
         public static RedisHelper Instance => SingletonHelper<RedisHelper>.GetInstance();
 
@@ -67,12 +59,12 @@ namespace ZqUtils.Core.Helpers
         public IConnectionMultiplexer IConnectionMultiplexer => connectionMultiplexer;
 
         /// <summary>
-        /// 数据库
+        /// 数据库，注意单例对象不建议修改
         /// </summary>
         public IDatabase Database { get; set; }
 
         /// <summary>
-        /// RedisKey的前缀
+        /// RedisKey的前缀，注意单例对象不建议修改
         /// </summary>
         public string KeyPrefix { get; set; } = ConfigHelper.GetValue<string>("Redis:KeyPrefix");
         #endregion
@@ -491,28 +483,9 @@ namespace ZqUtils.Core.Helpers
         #endregion
 
         #region 公有方法
-        #region 获取实例
-        /// <summary>
-        /// 获取RedisHelper实例对象
-        /// </summary>
-        /// <param name="database">数据库索引</param>
-        /// <returns>返回RedisHelper实例</returns>
-        public RedisHelper GetInstance(int database)
-        {
-            if (!_pool.ContainsKey(database.ToString()))
-            {
-                var objectPool = new Lazy<ObjectPoolHelper<RedisHelper>>(() => new ObjectPoolHelper<RedisHelper>(() => new RedisHelper(database)));
-                _pool.GetOrAdd(database.ToString(), objectPool);
-                return objectPool.Value.GetObject();
-            }
-
-            return _pool[database.ToString()].Value.GetObject();
-        }
-        #endregion
-
         #region 切换IDatabase
         /// <summary>
-        /// 切换数据库
+        /// 切换数据库，注意单例对象慎用
         /// </summary>
         /// <param name="database">数据库索引</param>
         /// <returns></returns>
@@ -527,7 +500,7 @@ namespace ZqUtils.Core.Helpers
 
         #region 重置RedisKey前缀
         /// <summary>
-        /// 重置RedisKey前缀
+        /// 重置RedisKey前缀，注意单例对象慎用
         /// </summary>
         /// <param name="keyPrefix"></param>
         /// <returns></returns>

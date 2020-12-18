@@ -462,17 +462,14 @@ namespace ZqUtils.Core.Extensions
         /// <returns></returns>
         public static IServiceCollection AddStackExchangeRedis(this IServiceCollection @this, IConfiguration configuration)
         {
-            @this.AddSingleton(x =>
-            {
-                var connectionString = configuration.GetValue<string>("Redis:ConnectionStrings");
-                if (connectionString.IsNullOrEmpty())
-                    connectionString = configuration.GetSection("Redis:ConnectionStrings").Get<string[]>()?.FirstOrDefault();
+            var connectionString = configuration.GetValue<string>("Redis:ConnectionStrings");
+            if (connectionString.IsNullOrEmpty())
+                connectionString = configuration.GetSection("Redis:ConnectionStrings").Get<string[]>()?.FirstOrDefault();
 
-                if (connectionString.IsNullOrEmpty())
-                    throw new ArgumentNullException("Redis连接字符串配置为null");
+            if (connectionString.IsNullOrEmpty())
+                throw new ArgumentNullException("Redis连接字符串配置为null");
 
-                return new RedisHelper(connectionString);
-            });
+            @this.AddTransient(x => new RedisHelper(connectionString));
 
             @this.AddSingleton(x => x.GetRequiredService<RedisHelper>().IConnectionMultiplexer);
 
