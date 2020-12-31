@@ -64,14 +64,10 @@ namespace ZqUtils.Core.Extensions
         /// <returns></returns>
         public static string ToJson(this object @this, JsonSerializerOptions options)
         {
-            if (options == null)
+            return JSerializer.Serialize(@this, options ?? new JsonSerializerOptions
             {
-                options = new JsonSerializerOptions
-                {
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                };
-            }
-            return JSerializer.Serialize(@this, options);
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            });
         }
 
         /// <summary>

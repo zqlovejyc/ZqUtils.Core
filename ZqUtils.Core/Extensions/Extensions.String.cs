@@ -680,7 +680,10 @@ namespace ZqUtils.Core.Extensions
                 if (isJsonNet)
                     return JsonConvert.DeserializeObject<T>(@this);
                 else
-                    return JSerializer.Deserialize<T>(@this);
+                    return JSerializer.Deserialize<T>(@this, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                    });
             }
             else
             {
@@ -698,13 +701,12 @@ namespace ZqUtils.Core.Extensions
         public static object ToObject(this string @this, Type type, bool isJsonNet = true)
         {
             if (isJsonNet)
-            {
                 return JsonConvert.DeserializeObject(@this, type);
-            }
             else
-            {
-                return JSerializer.Deserialize(@this, type);
-            }
+                return JSerializer.Deserialize(@this, type, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                });
         }
         #endregion
 
