@@ -682,7 +682,9 @@ namespace ZqUtils.Core.Extensions
                 else
                     return JSerializer.Deserialize<T>(@this, new JsonSerializerOptions
                     {
-                        PropertyNameCaseInsensitive = true,
+                        PropertyNameCaseInsensitive = true, //忽略大小写
+                        ReadCommentHandling = JsonCommentHandling.Skip, //允许json注释
+                        AllowTrailingCommas = true //允许尾随逗号
                     });
             }
             else
@@ -705,7 +707,9 @@ namespace ZqUtils.Core.Extensions
             else
                 return JSerializer.Deserialize(@this, type, new JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true,
+                    PropertyNameCaseInsensitive = true, //忽略大小写
+                    ReadCommentHandling = JsonCommentHandling.Skip, //允许json注释
+                    AllowTrailingCommas = true //允许尾随逗号
                 });
         }
         #endregion
