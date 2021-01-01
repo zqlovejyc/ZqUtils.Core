@@ -7,7 +7,7 @@
         <PackageId>Zq.Utils.Core</PackageId>
         <Authors>张强</Authors>
         <Description>.NET Standard2.1版本工具类</Description>
-        <Copyright>Copyright © 2018-2020 , 张强 943620963@qq.com</Copyright>
+        <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://gitee.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
         <PackageReleaseNotes>1.移除CsRedis，新增FreeRedisHelper工具类
