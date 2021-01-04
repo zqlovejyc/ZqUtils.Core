@@ -42,6 +42,11 @@ namespace ZqUtils.Core.Helpers
 #else
         public static string BaseDirectory { get; set; } = AppDomain.CurrentDomain.BaseDirectory;
 #endif
+
+        /// <summary>
+        /// 当前操作系统路径分隔符，兼容Windows和Linux
+        /// </summary>
+        public static char CurrentOsDirectorySeparator = Path.DirectorySeparatorChar;
         #endregion
 
         #region Mono
@@ -70,7 +75,7 @@ namespace ZqUtils.Core.Helpers
         private static string GetPath(string path, int mode)
         {
             // 处理路径分隔符，兼容Windows和Linux
-            var sep = Path.DirectorySeparatorChar;
+            var sep = CurrentOsDirectorySeparator;
             var sep2 = sep == '/' ? '\\' : '/';
             path = path.Replace(sep2, sep);
             var dir = "";
@@ -124,6 +129,17 @@ namespace ZqUtils.Core.Helpers
                 }
             }
             return Path.GetFullPath(path);
+        }
+
+        /// <summary>
+        /// 转换为当前操作系统的文件路径
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string ConvertToCurrentOsPath(string path)
+        {
+            var sep = CurrentOsDirectorySeparator == '/' ? '\\' : '/';
+            return path.Replace(sep, CurrentOsDirectorySeparator);
         }
 
         /// <summary>

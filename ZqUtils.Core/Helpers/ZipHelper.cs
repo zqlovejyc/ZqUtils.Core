@@ -224,12 +224,12 @@ namespace ZqUtils.Core.Helpers
             if (!File.Exists(fileToUnZip))
                 return false;
 
-            if (!Directory.Exists(zipedFolder)) 
+            if (!Directory.Exists(zipedFolder))
                 Directory.CreateDirectory(zipedFolder);
 
             using (var zipStream = new ZipInputStream(File.OpenRead(fileToUnZip)))
             {
-                if (!string.IsNullOrEmpty(password)) 
+                if (!string.IsNullOrEmpty(password))
                     zipStream.Password = password;
 
                 ZipEntry ent;
@@ -238,8 +238,8 @@ namespace ZqUtils.Core.Helpers
                     if (!string.IsNullOrEmpty(ent.Name))
                     {
                         var fileName = Path.Combine(zipedFolder, ent.Name);
-                        fileName = fileName.Replace('/', '\\');
-                        if (fileName.EndsWith("\\"))
+                        fileName = PathHelper.ConvertToCurrentOsPath(fileName);
+                        if (fileName.EndsWith(PathHelper.CurrentOsDirectorySeparator.ToString()))
                         {
                             Directory.CreateDirectory(fileName);
                             continue;
