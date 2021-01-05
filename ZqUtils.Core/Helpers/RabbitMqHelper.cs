@@ -1204,6 +1204,7 @@ namespace ZqUtils.Core.Helpers
     /// <summary>
     /// 自定义的RabbitMq队列信息实体特性
     /// </summary>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class RabbitMqAttribute : Attribute
     {
         /// <summary>
