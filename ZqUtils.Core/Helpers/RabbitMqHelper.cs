@@ -1056,7 +1056,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="subscriber">消费处理委托</param>
         /// <param name="handler">异常处理委托</param>
-        public void Subscribe<T>(Func<T, bool> subscriber, Action<string, int, Exception> handler) where T : class
+        public void Subscribe<T>(Func<T, BasicDeliverEventArgs, bool> subscriber, Action<string, int, Exception> handler) where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
@@ -1149,7 +1149,7 @@ namespace ZqUtils.Core.Helpers
             string exchange,
             string queue,
             string routingKey,
-            Func<T, bool> subscriber,
+            Func<T, BasicDeliverEventArgs, bool> subscriber,
             Action<string, int, Exception> handler,
             int retryCount = 5,
             ushort prefetchCount = 1,
@@ -1195,7 +1195,7 @@ namespace ZqUtils.Core.Helpers
                     try
                     {
                         var msg = body.ToObject<T>();
-                        result = subscriber?.Invoke(msg);
+                        result = subscriber?.Invoke(msg, ea);
                         if (result == true)
                             channel.BasicAck(ea.DeliveryTag, false);
                         else
@@ -1237,7 +1237,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler">消费处理委托</param>
-        public void Pull<T>(Action<T> handler) where T : class
+        public void Pull<T>(Action<T, BasicGetResult> handler) where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
@@ -1258,7 +1258,7 @@ namespace ZqUtils.Core.Helpers
             string exchange,
             string queue,
             string routingKey,
-            Action<T> handler) where T : class
+            Action<T, BasicGetResult> handler) where T : class
         {
             //获取管道
             var channel = GetChannel(queue);
@@ -1285,7 +1285,7 @@ namespace ZqUtils.Core.Helpers
             var msg = result.Body.ToArray().DeserializeUtf8().ToObject<T>();
             try
             {
-                handler(msg);
+                handler(msg, result);
             }
             catch (Exception)
             {
