@@ -780,8 +780,11 @@ namespace ZqUtils.Core.Helpers
         public long HashDelete(string key, IEnumerable<string> hashFields)
         {
             key = AddKeyPrefix(key);
-            var fields = hashFields.Select(x => (RedisValue)x);
-            return Database.HashDelete(key, fields.ToArray());
+            var fields = hashFields?.Select(x => (RedisValue)x);
+            if (fields.IsNotNullOrEmpty())
+                return Database.HashDelete(key, fields.ToArray());
+
+            return 0;
         }
         #endregion
 
@@ -1001,8 +1004,11 @@ namespace ZqUtils.Core.Helpers
         public async Task<long> HashDeleteAsync(string key, IEnumerable<string> hashFields)
         {
             key = AddKeyPrefix(key);
-            var fields = hashFields.Select(x => (RedisValue)x);
-            return await Database.HashDeleteAsync(key, fields.ToArray());
+            var fields = hashFields?.Select(x => (RedisValue)x);
+            if (fields.IsNotNullOrEmpty())
+                return await Database.HashDeleteAsync(key, fields.ToArray());
+
+            return 0;
         }
         #endregion
 
@@ -2350,8 +2356,11 @@ namespace ZqUtils.Core.Helpers
         /// <returns>返回是否移除成功</returns>
         public long KeyDelete(IEnumerable<string> redisKeys)
         {
-            var keys = redisKeys.Select(x => (RedisKey)AddKeyPrefix(x));
-            return Database.KeyDelete(keys.ToArray());
+            var keys = redisKeys?.Select(x => (RedisKey)AddKeyPrefix(x));
+            if (keys.IsNotNullOrEmpty())
+                return Database.KeyDelete(keys.ToArray());
+
+            return 0;
         }
 
         /// <summary>
@@ -2372,7 +2381,8 @@ namespace ZqUtils.Core.Helpers
                     var server = connectionMultiplexer.GetServer(point);
                     var keys = server.Keys(database: database, pattern: pattern);
 
-                    result += KeyDelete(keys.Select(x => (string)x));
+                    if (keys.IsNotNullOrEmpty())
+                        result += KeyDelete(keys.Select(x => (string)x));
                 }
             }
             return result;
@@ -2471,7 +2481,10 @@ namespace ZqUtils.Core.Helpers
         public async Task<long> KeyDeleteAsync(IEnumerable<string> redisKeys)
         {
             var keys = redisKeys.Select(x => (RedisKey)AddKeyPrefix(x));
-            return await Database.KeyDeleteAsync(keys.ToArray());
+            if (keys.IsNotNullOrEmpty())
+                return await Database.KeyDeleteAsync(keys.ToArray());
+
+            return 0;
         }
 
         /// <summary>
@@ -2497,7 +2510,8 @@ namespace ZqUtils.Core.Helpers
                         keyDeletes.Add(key);
                     }
 
-                    result += await Database.KeyDeleteAsync(keyDeletes.ToArray());
+                    if (keyDeletes.IsNotNullOrEmpty())
+                        result += await Database.KeyDeleteAsync(keyDeletes.ToArray());
                 }
             }
 
