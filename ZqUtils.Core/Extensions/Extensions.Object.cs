@@ -16,6 +16,7 @@
  */
 #endregion
 
+using Force.DeepCloner;
 using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -5895,36 +5896,53 @@ namespace ZqUtils.Core.Extensions
 
         #region DeepClone
         /// <summary>
-        /// A T extension method that makes a deep copy of '@this' object.
+        ///  Performs deep (full) copy of object and related graph
         /// </summary>
         /// <typeparam name="T">Generic type parameter.</typeparam>
         /// <param name="this">The @this to act on.</param>
         /// <returns>the copied object.</returns>
         public static T DeepClone<T>(this T @this)
         {
-            // Don't serialize a null object, simply return the default for that object
-            if (@this == null)
-                return default;
-
-            var deserializeSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
-            var serializeSettings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
-            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(@this, serializeSettings), deserializeSettings);
+            return DeepClonerExtensions.DeepClone(@this);
         }
         #endregion
 
-        #region ShallowCopy
+        #region DeepCloneTo
         /// <summary>
-        /// A T extension method that shallow copy.
+		/// Performs deep (full) copy of object and related graph to existing object
+		/// </summary>
+		/// <returns>existing filled object</returns>
+		/// <remarks>Method is valid only for classes, classes should be descendants in reality, not in declaration</remarks>
+		public static TTo DeepCloneTo<TFrom, TTo>(this TFrom @this, TTo to) where TTo : class, TFrom
+        {
+            return DeepClonerExtensions.DeepCloneTo(@this, to);
+        }
+        #endregion
+
+        #region ShallowClone
+        /// <summary>
+        /// Performs shallow (only new object returned, without cloning of dependencies) copy of object
         /// </summary>
         /// <typeparam name="T">Generic type parameter.</typeparam>
         /// <param name="this">The @this to act on.</param>
         /// <returns>A T.</returns>
-        public static T ShallowCopy<T>(this T @this)
+        public static T ShallowClone<T>(this T @this)
         {
-            MethodInfo method = @this.GetType().GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance);
-            return (T)method.Invoke(@this, null);
+            return DeepClonerExtensions.ShallowClone(@this);
         }
-        #endregion        
+        #endregion
+
+        #region ShallowCloneTo
+        /// <summary>
+		/// Performs shallow copy of object to existing object
+		/// </summary>
+		/// <returns>existing filled object</returns>
+		/// <remarks>Method is valid only for classes, classes should be descendants in reality, not in declaration</remarks>
+		public static TTo ShallowCloneTo<TFrom, TTo>(this TFrom @this, TTo to) where TTo : class, TFrom
+        {
+            return DeepClonerExtensions.ShallowCloneTo(@this, to);
+        }
+        #endregion
 
         #region ChangeType
         /// <summary>
