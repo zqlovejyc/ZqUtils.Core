@@ -8,17 +8,30 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.1.2</Version>
+        <Version>1.1.3</Version>
         <PackageId>Zq.Utils.Core</PackageId>
         <Authors>张强</Authors>
         <Description>.NET Standard2.1版本工具类</Description>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
-        <PackageReleaseNotes>1.移除CsRedis，新增FreeRedisHelper工具类
-2.优化AddFreeRedis</PackageReleaseNotes>
-        <AssemblyVersion>1.1.2.0</AssemblyVersion>
-        <FileVersion>1.1.2.0</FileVersion>
+        <PackageReleaseNotes>1.FieHelper新增创建文件方法；
+2.重载并优化EPPlusReadExcel，优化Exel导入，去除前后空格、换行符、制表符；
+3.优化PollyHelper部分方法返回类型；
+4.优化HttpClientHelper字符编码；
+5.优化RedisHelper；新增AddStackExchangeRedis扩展方法；DefaultKey字段重名名为KeyPrefix，新增Keys方法，Redis:ConnectionString连接字符串key为Redis:ConnectionStrings；新增HashLength、HashScan、ResetKeyPrefix方法；
+6.优化TreeToJson、TreeToDictionary；
+7.重载ToJson扩展方法；
+8.优化Json反序列化，添加忽略大小写配置；
+9.优化RabbitMqHelper，修复队列无法绑定多个RouteKey的bug；修改订阅消息和获取消息处理委托参数；发布消息，新增消息头部参数；
+10.新增ObjectMethodExecutors，新增Execute、ExecuteAsync扩展方法；
+11.新增ForEachAsync异步遍历扩展方法；
+12.引用DeepCloner，优化DeepClone和ShallowClone；
+13.添加对SourceLink的支持；
+14.重载ToObject扩展方法；
+15.重命名HttpUtility为HttpHelper，移除HttpUtility，优化代码；</PackageReleaseNotes>
+        <AssemblyVersion>1.1.3.0</AssemblyVersion>
+        <FileVersion>1.1.3.0</FileVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageIcon>utils.png</PackageIcon>
@@ -63,7 +76,7 @@
         <PackageReference Include="Dapper" Version="2.0.78" />
         <PackageReference Include="DeepCloner" Version="0.10.2" />
         <PackageReference Include="DnsClient" Version="1.3.2" />
-        <PackageReference Include="EPPlus" Version="5.5.1" />
+        <PackageReference Include="EPPlus" Version="5.5.2" />
         <PackageReference Include="FastExpressionCompiler" Version="2.0.0" />
         <PackageReference Include="FreeRedis" Version="0.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
@@ -80,12 +93,12 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MongoDB.Driver" Version="2.11.5" />
+        <PackageReference Include="MongoDB.Driver" Version="2.11.6" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-        <PackageReference Include="NLog" Version="4.7.6" />
+        <PackageReference Include="NLog" Version="4.7.7" />
         <PackageReference Include="Polly" Version="7.2.1" />
-        <PackageReference Include="Quartz.Plugins.TimeZoneConverter" Version="3.2.3" />
-        <PackageReference Include="Quartz.Serialization.Json" Version="3.2.3" />
+        <PackageReference Include="Quartz.Plugins.TimeZoneConverter" Version="3.2.4" />
+        <PackageReference Include="Quartz.Serialization.Json" Version="3.2.4" />
         <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
         <PackageReference Include="Scrutor" Version="3.3.0" />
         <PackageReference Include="SharpZipLib" Version="1.3.1" />
