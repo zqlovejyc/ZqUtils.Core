@@ -208,7 +208,7 @@ namespace ZqUtils.Core.Helpers
                 //文件数据
                 var fileStream = new MemoryStream();
                 //分隔符
-                var boundary = $"---------------------------{DateTime.Now.Ticks:x}";
+                var boundary = $"----WebKitFormBoundary{DateTime.Now.Ticks:x}";
 
                 //byte字节
                 if (req.PostDataType == PostDataType.Byte && req.PostByte?.Length > 0)
@@ -230,12 +230,19 @@ namespace ZqUtils.Core.Helpers
                         if (!string.IsNullOrEmpty(req.PostString))
                         {
                             //表单数据
-                            formData.Append($"--{boundary}")
-                                    .Append("\r\n")
-                                    .Append("Content-Disposition: form-data; name=\"content\"")
-                                    .Append("\r\n\r\n")
-                                    .Append(req.PostString)
-                                    .Append("\r\n");
+                            var formDic = req.PostString.ToDictionary();
+                            if (formDic.IsNotNullOrEmpty())
+                            {
+                                foreach (var item in formDic)
+                                {
+                                    formData.Append($"--{boundary}")
+                                            .Append("\r\n")
+                                            .Append($"Content-Disposition: form-data; name=\"{item.Key}\"")
+                                            .Append("\r\n\r\n")
+                                            .Append(item.Value)
+                                            .Append("\r\n");
+                                }
+                            }
                         }
                         //文件数据
                         var fileList = req.PostFiles?.ToList();
@@ -247,9 +254,9 @@ namespace ZqUtils.Core.Helpers
                                 {
                                     formData.Append($"--{boundary}")
                                             .Append("\r\n")
-                                            .Append($"Content-Disposition: form-data; name=\"{o.Key}\"; filename=\"{o.Value}\"")
+                                            .Append($"Content-Disposition: form-data; name=\"{o.Key}\"; filename=\"{o.Value.Substring(PathHelper.CurrentOsDirectorySeparator.ToString())}\"")
                                             .Append("\r\n")
-                                            .Append("Content-Type: application/octet-stream")
+                                            .Append($"Content-Type: {o.Value.GetContentType()}")
                                             .Append("\r\n\r\n");
                                     //文件流
                                     using var fs = new FileStream(o.Value, FileMode.Open, FileAccess.Read);

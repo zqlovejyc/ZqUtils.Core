@@ -1179,7 +1179,10 @@ namespace ZqUtils.Core.Helpers
             var suffix = Path.GetExtension(fileName);
 
             //获取文件ContentType
-            return provider.Mappings[suffix];
+            if (provider.Mappings.ContainsKey(suffix))
+                return provider.Mappings[suffix];
+
+            return "application/octet-stream";
         }
         #endregion
     }
