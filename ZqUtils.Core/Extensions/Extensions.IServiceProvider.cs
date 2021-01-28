@@ -48,7 +48,7 @@ namespace ZqUtils.Core.Extensions
                 return services
                         .Where(o => o.GetType().HasAttribute<DependsOnAttribute>(x =>
                             x.DependedType == typeof(T) &&
-                            x.Name == name))
+                            x.Name.EqualIgnoreCase(name)))
                         .FirstOrDefault();
             }
 
@@ -69,7 +69,7 @@ namespace ZqUtils.Core.Extensions
                 return @this
                         .Where(o => o.GetType().HasAttribute<DependsOnAttribute>(x =>
                             x.DependedType == typeof(T) &&
-                            x.Name == name))
+                            x.Name.EqualIgnoreCase(name)))
                         .FirstOrDefault();
             }
 
