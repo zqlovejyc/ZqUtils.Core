@@ -406,7 +406,7 @@ namespace ZqUtils.Core.Helpers
                         {
                             using (var fs = File.OpenRead(file))
                             {
-                                var entry = new ZipEntry(ZipEntry.CleanName(file)) { Size = fs.Length };
+                                var entry = new ZipEntry(ZipEntry.CleanName(file)) { Size = fs.Length, IsUnicodeText = true };
                                 //Setting the Size provides WinXP built-in extractor compatibility,
                                 //but if not available, you can set zipOutputStream.UseZip64 = UseZip64.Off instead.
                                 zipStream.PutNextEntry(entry);
@@ -461,7 +461,7 @@ namespace ZqUtils.Core.Helpers
                             {
                                 using (var fs = File.OpenRead(file))
                                 {
-                                    var entry = new ZipEntry(ZipEntry.CleanName(file)) { Size = fs.Length };
+                                    var entry = new ZipEntry(ZipEntry.CleanName(file)) { Size = fs.Length, IsUnicodeText = true };
                                     //Setting the Size provides WinXP built-in extractor compatibility,
                                     //but if not available, you can set zipOutputStream.UseZip64 = UseZip64.Off instead.
                                     zipStream.PutNextEntry(entry);
@@ -702,7 +702,7 @@ namespace ZqUtils.Core.Helpers
                         {
                             using (var fs = File.OpenRead(file))
                             {
-                                var entry = new ZipEntry(ZipEntry.CleanName(file)) { Size = fs.Length };
+                                var entry = new ZipEntry(ZipEntry.CleanName(file)) { Size = fs.Length, IsUnicodeText = true };
                                 //Setting the Size provides WinXP built-in extractor compatibility,
                                 //but if not available, you can set zipOutputStream.UseZip64 = UseZip64.Off instead.
                                 zipStream.PutNextEntry(entry);
@@ -757,7 +757,7 @@ namespace ZqUtils.Core.Helpers
                             {
                                 using (var fs = File.OpenRead(file))
                                 {
-                                    var entry = new ZipEntry(ZipEntry.CleanName(file)) { Size = fs.Length };
+                                    var entry = new ZipEntry(ZipEntry.CleanName(file)) { Size = fs.Length, IsUnicodeText = true };
                                     //Setting the Size provides WinXP built-in extractor compatibility,
                                     //but if not available, you can set zipOutputStream.UseZip64 = UseZip64.Off instead.
                                     zipStream.PutNextEntry(entry);
