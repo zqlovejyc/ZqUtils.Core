@@ -255,7 +255,7 @@ namespace ZqUtils.Core.Helpers
                                         .Append("\r\n")
                                         .Append($"Content-Disposition: form-data; name=\"{item.Key}\"; filename=\"{item.Value.Substring(PathHelper.CurrentOsDirectorySeparator.ToString())}\"")
                                         .Append("\r\n")
-                                        .Append($"Content-Type: {item.Value.GetContentType()}")
+                                        .Append($"Content-Type: application/octet-stream")
                                         .Append("\r\n\r\n");
                                 //文件流
                                 using var fs = new FileStream(item.Value, FileMode.Open, FileAccess.Read);
@@ -279,7 +279,7 @@ namespace ZqUtils.Core.Helpers
                                 .Append("\r\n")
                                 .Append($"Content-Disposition: form-data; name=\"{name}\"; filename=\"{fileName}\"")
                                 .Append("\r\n")
-                                .Append($"Content-Type: {fileName.GetContentType()}")
+                                .Append($"Content-Type: application/octet-stream")
                                 .Append("\r\n\r\n");
                         //文件流
                         using var fs = req.PostFileStream;
@@ -374,32 +374,37 @@ namespace ZqUtils.Core.Helpers
             if (req.AcceptEncoding.IsNotNullOrEmpty())
                 request.Headers.Add("Accept-Encoding", req.AcceptEncoding);
 
-            // 设置代理
-            SetProxy(req);
+            //设置用于请求的HTTP版本
             if (req.ProtocolVersion != null)
                 request.ProtocolVersion = req.ProtocolVersion;
 
+            //设置是否使用100-Continue行为
             request.ServicePoint.Expect100Continue = req.Expect100Continue;
 
             //请求方式Get或者Post
             request.Method = req.Method;
 
+            //请求超时时间
             request.Timeout = req.Timeout;
 
+            //持久连接
             request.KeepAlive = req.KeepAlive;
 
+            //写入Post数据超时间
             request.ReadWriteTimeout = req.ReadWriteTimeout;
 
+            //设置Host的标头信息
             if (req.Host.IsNotNullOrEmpty())
                 request.Host = req.Host;
 
+            //获取和设置IfModifiedSince
             if (req.IfModifiedSince != null)
                 request.IfModifiedSince = Convert.ToDateTime(req.IfModifiedSince);
 
-            //Accept
+            //浏览器可接受的MIME类型
             request.Accept = req.Accept;
 
-            //ContentType返回类型
+            //Post请求数据类型
             request.ContentType = req.ContentType;
 
             //UserAgent客户端的访问类型，包括浏览器版本和操作系统信息
@@ -408,24 +413,28 @@ namespace ZqUtils.Core.Helpers
             //设置安全凭证
             request.Credentials = req.ICredentials;
 
-            //设置Cookie
-            SetCookie(req);
-
             //来源地址
             request.Referer = req.Referer;
 
             //是否执行跳转功能
             request.AllowAutoRedirect = req.AllowAutoRedirect;
 
+            //设置请求将跟随的重定向的最大数目
             if (req.MaximumAutomaticRedirections > 0)
                 request.MaximumAutomaticRedirections = req.MaximumAutomaticRedirections;
-
-            //设置Post数据
-            SetPostData(req);
 
             //设置最大连接
             if (req.ConnectionLimit > 0)
                 request.ServicePoint.ConnectionLimit = req.ConnectionLimit;
+
+            //设置代理
+            SetProxy(req);
+
+            //设置Cookie
+            SetCookie(req);
+
+            //设置Post数据
+            SetPostData(req);
         }
 
         /// <summary>
@@ -781,7 +790,7 @@ namespace ZqUtils.Core.Helpers
         public string AcceptEncoding { get; set; } = "gzip,deflate";
 
         /// <summary>
-        /// 请求返回类型，默认：text/html
+        /// Post请求数据类型，默认：text/html
         /// </summary>
         public string ContentType { get; set; } = "text/html";
 
