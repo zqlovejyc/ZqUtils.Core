@@ -383,7 +383,8 @@ namespace ZqUtils.Core.Helpers
         /// <param name="filePaths">文件路径数组</param>
         /// <param name="zipName">压缩文件名</param>
         /// <param name="isDeleteFiles">是否删除源文件</param>
-        public static void GetFileOfZip(string[] filePaths, string zipName, bool isDeleteFiles = false)
+        /// <param name="password">压缩密码</param>
+        public static void GetFileOfZip(string[] filePaths, string zipName, bool isDeleteFiles = false, string password = null)
         {
             try
             {
@@ -394,6 +395,10 @@ namespace ZqUtils.Core.Helpers
                     //jquery.fileDownload插件必须添加以下Cookie设置，否则successCallback回调无效
                     HttpContextHelper.Current.Response.Cookies.Append("fileDownload", "true");
                     using var zipStream = new ZipOutputStream(HttpContextHelper.Current.Response.Body);
+
+                    if (password.IsNotNullOrEmpty())
+                        zipStream.Password = password;
+
                     zipStream.SetLevel(3); //0-9, 9 being the highest level of compression
                     foreach (string file in filePaths)
                     {
@@ -436,7 +441,8 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="filePaths">文件路径数组</param>
         /// <param name="isDeleteFiles">是否删除源文件</param>
-        public static byte[] GetFileOfZip(string[] filePaths, bool isDeleteFiles = false)
+        /// <param name="password">压缩密码</param>
+        public static byte[] GetFileOfZip(string[] filePaths, bool isDeleteFiles = false, string password = null)
         {
             try
             {
@@ -444,6 +450,10 @@ namespace ZqUtils.Core.Helpers
                 {
                     using var stream = new MemoryStream();
                     using var zipStream = new ZipOutputStream(stream);
+
+                    if (password.IsNotNullOrEmpty())
+                        zipStream.Password = password;
+
                     zipStream.SetLevel(3); //0-9, 9 being the highest level of compression
                     foreach (string file in filePaths)
                     {
@@ -678,7 +688,8 @@ namespace ZqUtils.Core.Helpers
         /// <param name="filePaths">文件路径数组</param>
         /// <param name="zipName">压缩文件名</param>
         /// <param name="isDeleteFiles">是否删除源文件</param>
-        public static async Task GetFileOfZipAsync(string[] filePaths, string zipName, bool isDeleteFiles = false)
+        /// <param name="password">压缩密码</param>
+        public static async Task GetFileOfZipAsync(string[] filePaths, string zipName, bool isDeleteFiles = false, string password = null)
         {
             try
             {
@@ -689,6 +700,10 @@ namespace ZqUtils.Core.Helpers
                     //jquery.fileDownload插件必须添加以下Cookie设置，否则successCallback回调无效
                     HttpContextHelper.Current.Response.Cookies.Append("fileDownload", "true");
                     using var zipStream = new ZipOutputStream(HttpContextHelper.Current.Response.Body);
+
+                    if (password.IsNotNullOrEmpty())
+                        zipStream.Password = password;
+
                     zipStream.SetLevel(3); //0-9, 9 being the highest level of compression
                     foreach (string file in filePaths)
                     {
@@ -731,7 +746,8 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="filePaths">文件路径数组</param>
         /// <param name="isDeleteFiles">是否删除源文件</param>
-        public static async Task<byte[]> GetFileOfZipAsync(string[] filePaths, bool isDeleteFiles = false)
+        /// <param name="password">压缩密码</param>
+        public static async Task<byte[]> GetFileOfZipAsync(string[] filePaths, bool isDeleteFiles = false, string password = null)
         {
             try
             {
@@ -739,6 +755,10 @@ namespace ZqUtils.Core.Helpers
                 {
                     using var stream = new MemoryStream();
                     using var zipStream = new ZipOutputStream(stream);
+
+                    if (password.IsNotNullOrEmpty())
+                        zipStream.Password = password;
+
                     zipStream.SetLevel(3); //0-9, 9 being the highest level of compression
                     foreach (string file in filePaths)
                     {
