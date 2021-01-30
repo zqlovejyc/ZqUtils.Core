@@ -1086,7 +1086,7 @@ namespace ZqUtils.Core.Extensions
             {
                 foreach (var item in strs)
                 {
-                    if (@this.StartsWith(item, StringComparison.OrdinalIgnoreCase))
+                    if (item.IsNotNull() && @this.StartsWith(item, StringComparison.OrdinalIgnoreCase))
                         return true;
                 }
             }
@@ -1109,7 +1109,30 @@ namespace ZqUtils.Core.Extensions
             {
                 foreach (var item in strs)
                 {
-                    if (value.EndsWith(item, StringComparison.OrdinalIgnoreCase))
+                    if (item.IsNotNull() && value.EndsWith(item, StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 忽略大小写的字符串包含比较，判断是否以任意一个待比较字符串是否包含
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static bool ContainsIgnoreCase(this string @this, params string[] strs)
+        {
+            if (@this.IsNullOrEmpty())
+                return false;
+
+            if (strs.IsNotNullOrEmpty())
+            {
+                foreach (var item in strs)
+                {
+                    if (item.IsNotNull() && @this.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
                         return true;
                 }
             }
