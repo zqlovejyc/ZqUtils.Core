@@ -1097,19 +1097,19 @@ namespace ZqUtils.Core.Extensions
         /// <summary>
         /// 忽略大小写的字符串结束比较，判断是否以任意一个待比较字符串结束
         /// </summary>
-        /// <param name="value">当前字符串</param>
+        /// <param name="this">当前字符串</param>
         /// <param name="strs">待比较字符串数组</param>
         /// <returns>bool</returns>
-        public static bool EndsWithIgnoreCase(this string value, params string[] strs)
+        public static bool EndsWithIgnoreCase(this string @this, params string[] strs)
         {
-            if (value.IsNullOrEmpty())
+            if (@this.IsNullOrEmpty())
                 return false;
 
             if (strs.IsNotNullOrEmpty())
             {
                 foreach (var item in strs)
                 {
-                    if (item.IsNotNull() && value.EndsWith(item, StringComparison.OrdinalIgnoreCase))
+                    if (item.IsNotNull() && @this.EndsWith(item, StringComparison.OrdinalIgnoreCase))
                         return true;
                 }
             }
