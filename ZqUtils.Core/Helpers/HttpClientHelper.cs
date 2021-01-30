@@ -226,7 +226,7 @@ namespace ZqUtils.Core.Helpers
             else
             {
                 var handler = new HttpClientHandler { AutomaticDecompression = decompressionMethods };
-                if (url?.StartsWith("https", StringComparison.OrdinalIgnoreCase) == true)
+                if (url.StartsWithIgnoreCase("https"))
                     handler.ServerCertificateCustomValidationCallback = (request, certificate, chain, errors) => true;
 
                 httpClient = new HttpClient(handler);
