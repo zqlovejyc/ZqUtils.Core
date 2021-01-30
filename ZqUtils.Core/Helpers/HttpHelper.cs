@@ -197,7 +197,7 @@ namespace ZqUtils.Core.Helpers
         private void SetPostData(HttpRequest req)
         {
             //验证在得到结果时是否有传入数据
-            if (request.Method.EqualIgnoreCase("post"))
+            if (!request.Method.EqualIgnoreCase("get"))
             {
                 //post数据编码
                 if (req.PostEncoding != null)
