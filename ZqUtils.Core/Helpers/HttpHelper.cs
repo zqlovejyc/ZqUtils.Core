@@ -722,8 +722,8 @@ namespace ZqUtils.Core.Helpers
         {
             var fi = new FileInfo(fileSavePath);
             var command = $" -c -s 5 --check-certificate=false -d {fi.DirectoryName} -o {fi.Name} " + url;
-            using var p = new Process();
-            CmdHelper.Execute(p, toolPath, command, (s, e) => action(e.Data));
+            using var process = new Process();
+            CmdHelper.Execute(process, toolPath, command, (s, e) => action(e.Data));
             return true;
         }
 
