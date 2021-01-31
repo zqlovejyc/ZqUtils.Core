@@ -97,22 +97,20 @@ namespace ZqUtils.Core.Helpers
                 ServicePointManager.ServerCertificateValidationCallback = (request, certificate, chain, errors) => true;
 
             //初始化对像，并设置请求的URL地址
-            request = WebRequest.Create(req.Url) as HttpWebRequest;
-            if (request != null)
-            {
-                //多个证书
-                if (req.ClentCertificates?.Count > 0)
-                    SetCerList(req);
+            request = (WebRequest.Create(req.Url) as HttpWebRequest) ?? throw new Exception("创建HttpWebRequest失败");
 
-                //单个证书
-                else if (req.CerPath.IsNotNullOrEmpty())
-                {
-                    //证书是否包含密码
-                    if (req.CerPassword.IsNotNullOrEmpty())
-                        request.ClientCertificates.Add(new X509Certificate2(req.CerPath, req.CerPassword));
-                    else
-                        request.ClientCertificates.Add(new X509Certificate(req.CerPath));
-                }
+            //多个证书
+            if (req.ClentCertificates?.Count > 0)
+                SetCerList(req);
+
+            //单个证书
+            else if (req.CerPath.IsNotNullOrEmpty())
+            {
+                //证书是否包含密码
+                if (req.CerPassword.IsNotNullOrEmpty())
+                    request.ClientCertificates.Add(new X509Certificate2(req.CerPath, req.CerPassword));
+                else
+                    request.ClientCertificates.Add(new X509Certificate(req.CerPath));
             }
         }
 
@@ -443,12 +441,12 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="req">http请求参数</param>
         /// <param name="result">http返回参数</param>
-        /// <param name="ResponseByte">返回的字节码数组</param>
-        private void SetEncoding(HttpRequest req, HttpResult result, byte[] ResponseByte)
+        /// <param name="responseByte">返回的字节码数组</param>
+        private void SetEncoding(HttpRequest req, HttpResult result, byte[] responseByte)
         {
             //是否返回byte类型数据
             if (req.ResultType == ResultType.Byte)
-                result.ResultByte = ResponseByte;
+                result.ResultByte = responseByte;
 
             //返回数据编码
             responseEncoding = req.ResponseEncoding;
@@ -457,7 +455,7 @@ namespace ZqUtils.Core.Helpers
             if (responseEncoding == null)
             {
                 var meta = Regex.Match(
-                    Encoding.Default.GetString(ResponseByte),
+                    Encoding.Default.GetString(responseByte),
                     "<meta[^<]*charset=([^<]*)[\"']",
                     RegexOptions.IgnoreCase);
 
