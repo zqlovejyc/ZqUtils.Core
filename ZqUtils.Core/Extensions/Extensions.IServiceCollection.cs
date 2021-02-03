@@ -370,54 +370,10 @@ namespace ZqUtils.Core.Extensions
             return @this.Scan(scan => scan
                             .FromAssemblies(assemblies)
                             .AddClasses(classes => typeFilter(classes))
+                            .UsingRegistrationStrategy(RegistrationStrategy.Append) //重复注册处理策略，默认Append
                             .AsImplementedInterfaces()
                             .AsSelf()
                             .WithLifetime(lifeTime));
-        }
-
-        /// <summary>
-        /// 扫描程序集自动注入DependsOn特性的服务
-        /// </summary>
-        /// <param name="this"></param>
-        /// <param name="assemblyFilter"></param>
-        /// <param name="lifeTime"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddDependsOnFromAssembly(
-            this IServiceCollection @this,
-            Func<string, bool> assemblyFilter = null,
-            ServiceLifetime lifeTime = ServiceLifetime.Transient)
-        {
-            var types = AssemblyHelper.GetTypesFromAssembly(filter: assemblyFilter);
-            if (types.IsNotNullOrEmpty())
-            {
-                var dependsOnTypes = types.Where(x => x.Has<DependsOnAttribute>()).Distinct();
-                if (dependsOnTypes.IsNotNullOrEmpty())
-                {
-                    foreach (var type in dependsOnTypes)
-                    {
-                        var dependedTypes = type.GetCustomAttributes<DependsOnAttribute>(false).Select(x => x.DependedType).Distinct();
-                        foreach (var dependedType in dependedTypes)
-                        {
-                            switch (lifeTime)
-                            {
-                                case ServiceLifetime.Singleton:
-                                    @this.AddSingleton(dependedType, type);
-                                    break;
-                                case ServiceLifetime.Scoped:
-                                    @this.AddScoped(dependedType, type);
-                                    break;
-                                case ServiceLifetime.Transient:
-                                    @this.AddTransient(dependedType, type);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return @this;
         }
         #endregion
 
