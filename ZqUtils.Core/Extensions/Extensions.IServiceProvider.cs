@@ -43,16 +43,14 @@ namespace ZqUtils.Core.Extensions
         public static T GetDependsService<T>(this IServiceProvider @this, string name)
         {
             var services = @this.GetServices<T>();
-            if (services.IsNotNullOrEmpty())
-            {
-                return services
-                        .Where(o => o.GetType().HasAttribute<DependsOnAttribute>(x =>
-                            x.DependedType == typeof(T) &&
-                            x.Name.EqualIgnoreCase(name)))
-                        .FirstOrDefault();
-            }
+            if (services.IsNullOrEmpty())
+                return default;
 
-            return default;
+            return services
+                    .Where(o =>
+                        o.GetType().HasAttribute<DependsOnAttribute>(x =>
+                        x.Name.EqualIgnoreCase(name)))
+                    .FirstOrDefault();
         }
 
         /// <summary>
@@ -64,16 +62,14 @@ namespace ZqUtils.Core.Extensions
         /// <returns></returns>
         public static T GetDependsService<T>(this IEnumerable<T> @this, string name)
         {
-            if (@this.IsNotNullOrEmpty())
-            {
-                return @this
-                        .Where(o => o.GetType().HasAttribute<DependsOnAttribute>(x =>
-                            x.DependedType == typeof(T) &&
-                            x.Name.EqualIgnoreCase(name)))
-                        .FirstOrDefault();
-            }
+            if (@this.IsNullOrEmpty())
+                return default;
 
-            return default;
+            return @this
+                    .Where(o =>
+                        o.GetType().HasAttribute<DependsOnAttribute>(x =>
+                        x.Name.EqualIgnoreCase(name)))
+                    .FirstOrDefault();
         }
 
         /// <summary>
@@ -86,12 +82,10 @@ namespace ZqUtils.Core.Extensions
         public static T GetService<T>(this IServiceProvider @this, Type type)
         {
             var services = @this.GetServices<T>();
-            if (services.IsNotNullOrEmpty())
-            {
-                return services.Where(x => x.GetType() == type).FirstOrDefault();
-            }
+            if (services.IsNullOrEmpty())
+                return default;
 
-            return default;
+            return services.Where(x => x.GetType() == type).FirstOrDefault();
         }
     }
 }
