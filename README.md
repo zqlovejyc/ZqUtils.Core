@@ -24,7 +24,8 @@
 
 - Gitee：[https://gitee.com/zqlovejyc/ZqUtils.Core](https://gitee.com/zqlovejyc/ZqUtils.Core)
 - GitHub：[https://github.com/zqlovejyc/ZqUtils.Core](https://github.com/zqlovejyc/ZqUtils.Core)
-- Nuget：[https://www.nuget.org/packages/Zq.Utils.Core/](https://www.nuget.org/packages/Zq.Utils.Core/)
+- Nuget：[https://www.nuget.org/packages/Zq.Utils.Core](https://www.nuget.org/packages/Zq.Utils.Core)
+- Myget：[https://www.myget.org/feed/zq-myget/package/nuget/Zq.Utils.Core](https://www.myget.org/feed/zq-myget/package/nuget/Zq.Utils.Core)
 
 ## 🍻 贡献代码
 
