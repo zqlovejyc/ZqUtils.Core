@@ -175,6 +175,24 @@ namespace ZqUtils.Core.Console
     {
         public static async Task Main(string[] args)
         {
+            #region Channel
+            //初始化Channel
+            var channel = new ChannelHelper<string>();
+
+            //订阅消息，注意订阅消息需要另起线程
+            _ = Task.Run(async () => await channel.SubscribeAsync(async message =>
+            {
+                SysConsole.WriteLine(message);
+                await Task.CompletedTask;
+            }));
+
+            //发布消息
+            for (int i = 0; i < 100; i++)
+            {
+                await channel.PublishAsync($"hello channel {i + 1}");
+            }
+            #endregion
+
             #region Cmd
             SysConsole.WriteLine("dotnet --version".Execute().Output);
             #endregion
