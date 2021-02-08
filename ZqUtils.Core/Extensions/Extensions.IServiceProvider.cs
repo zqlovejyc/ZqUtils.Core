@@ -87,5 +87,50 @@ namespace ZqUtils.Core.Extensions
 
             return services.Where(x => x.GetType() == type).FirstOrDefault();
         }
+
+        /// <summary>
+        /// 创建实例
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static T CreateInstance<T>(this IServiceProvider @this, params object[] parameters)
+        {
+            return ActivatorUtilities.CreateInstance<T>(@this, parameters);
+        }
+
+        /// <summary>
+        /// 创建实例
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="type"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static object CreateInstance(this IServiceProvider @this, Type type, params object[] parameters)
+        {
+            return ActivatorUtilities.CreateInstance(@this, type, parameters);
+        }
+
+        /// <summary>
+        /// 获取服务或创建实例
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static T GetServiceOrCreateInstance<T>(this IServiceProvider @this)
+        {
+            return ActivatorUtilities.GetServiceOrCreateInstance<T>(@this);
+        }
+
+        /// <summary>
+        /// 获取服务或创建实例
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static object GetServiceOrCreateInstance(this IServiceProvider @this, Type type)
+        {
+            return ActivatorUtilities.GetServiceOrCreateInstance(@this, type);
+        }
     }
 }
