@@ -764,6 +764,36 @@ namespace ZqUtils.Core.Extensions
         }
         #endregion
 
+        #region IsAnonymousType
+        /// <summary>
+        /// 是否是匿名类型
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static bool IsAnonymousType(this Type @this) =>
+            @this != null && (@this.FullName.StartsWith("<>f__AnonymousType") || @this.FullName.StartsWith("VB$AnonymousType"));
+        #endregion
+
+        #region IsDynamicOrObjectType
+        /// <summary>
+        /// 判断是否是dynamic或者object类型
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static bool IsDynamicOrObjectType(this Type @this) =>
+            @this == typeof(object);
+        #endregion
+
+        #region IsStringType
+        /// <summary>
+        /// 判断是否是string类型
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static bool IsStringType(this Type @this) =>
+            @this == typeof(string);
+        #endregion
+
         #region IsInstanceOfType
         /// <summary>
         /// IsInstanceOfType
@@ -908,7 +938,7 @@ namespace ZqUtils.Core.Extensions
         /// <returns></returns>
         public static bool IsListType(this Type @this)
         {
-            return typeof(IList).IsAssignableFrom(@this);
+            return @this != null && (@this.AssignableTo(typeof(IList)) || @this.AssignableTo(typeof(IList<>)));
         }
         #endregion
 
@@ -932,7 +962,7 @@ namespace ZqUtils.Core.Extensions
         /// <returns></returns>
         public static bool IsDictionaryType(this Type @this)
         {
-            return @this.IsImplementsGenericInterface(typeof(IDictionary<,>));
+            return @this != null && @this.IsImplementsGenericInterface(typeof(IDictionary<,>));
         }
         #endregion
 
@@ -973,14 +1003,29 @@ namespace ZqUtils.Core.Extensions
         }
         #endregion
 
-        #region IsAnonymousType
+        #region IsIntType
         /// <summary>
-        /// 是否是匿名类型
+        /// 是否整数
         /// </summary>
         /// <param name="this"></param>
         /// <returns></returns>
-        public static bool IsAnonymousType(this Type @this) =>
-            @this != null && (@this.FullName.StartsWith("<>f__AnonymousType") || @this.FullName.StartsWith("VB$AnonymousType"));
+        public static bool IsIntType(this Type @this)
+        {
+            switch (@this.GetTypeCode())
+            {
+                case TypeCode.SByte:
+                case TypeCode.Byte:
+                case TypeCode.Int16:
+                case TypeCode.UInt16:
+                case TypeCode.Int32:
+                case TypeCode.UInt32:
+                case TypeCode.Int64:
+                case TypeCode.UInt64:
+                    return true;
+                default:
+                    return false;
+            }
+        }
         #endregion
 
         #region PropertiesWithAnInaccessibleSetter
@@ -1218,49 +1263,6 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this"></param>
         /// <returns></returns>
         public static TypeCode GetTypeCode(this Type @this) => Type.GetTypeCode(@this);
-        #endregion
-
-        #region IsInt
-        /// <summary>
-        /// 是否整数
-        /// </summary>
-        /// <param name="this"></param>
-        /// <returns></returns>
-        public static bool IsInt(this Type @this)
-        {
-            switch (@this.GetTypeCode())
-            {
-                case TypeCode.SByte:
-                case TypeCode.Byte:
-                case TypeCode.Int16:
-                case TypeCode.UInt16:
-                case TypeCode.Int32:
-                case TypeCode.UInt32:
-                case TypeCode.Int64:
-                case TypeCode.UInt64:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-        #endregion
-
-        #region IsList
-        /// <summary>
-        /// 是否泛型列表
-        /// </summary>
-        /// <param name="this"></param>
-        /// <returns></returns>
-        public static bool IsList(this Type @this) => @this != null && @this.IsGenericType && @this.As(typeof(IList<>));
-        #endregion
-
-        #region IsDictionary
-        /// <summary>
-        /// 是否泛型字典
-        /// </summary>
-        /// <param name="this"></param>
-        /// <returns></returns>
-        public static bool IsDictionary(this Type @this) => @this != null && @this.IsGenericType && @this.As(typeof(IDictionary<,>));
         #endregion
 
         #region CreateInstance
