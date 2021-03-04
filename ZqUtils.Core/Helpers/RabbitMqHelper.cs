@@ -748,7 +748,7 @@ namespace ZqUtils.Core.Helpers
                 priority,
                 arguments,
                 null,
-                attribute.Headers.ToObject<Dictionary<string, object>>());
+                attribute.Headers?.ToObject<Dictionary<string, object>>());
         }
 
         /// <summary>
@@ -824,7 +824,7 @@ namespace ZqUtils.Core.Helpers
                 priority,
                 arguments,
                 null,
-                attribute.Headers.ToObject<Dictionary<string, object>>());
+                attribute.Headers?.ToObject<Dictionary<string, object>>());
         }
 
         /// <summary>
