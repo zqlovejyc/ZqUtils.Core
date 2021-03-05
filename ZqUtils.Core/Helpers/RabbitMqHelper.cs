@@ -1099,6 +1099,7 @@ namespace ZqUtils.Core.Helpers
                 attribute.DeadLetter,
                 attribute.ExchangeType,
                 attribute.Durable,
+                attribute.ConsumerCount,
                 arguments,
                 registered: registered,
                 unregistered: unregistered,
@@ -1180,6 +1181,7 @@ namespace ZqUtils.Core.Helpers
                 attribute.DeadLetter,
                 attribute.ExchangeType,
                 attribute.Durable,
+                attribute.ConsumerCount,
                 arguments,
                 registered: registered,
                 unregistered: unregistered,
@@ -1200,6 +1202,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="deadLetter">是否进入内置死信队列，此处与原生死信无关</param>
         /// <param name="exchangeType">交换机类型</param>
         /// <param name="durable">持久化</param>
+        /// <param name="consumerCount">消费者数量</param>
         /// <param name="queueArguments">队列参数</param>
         /// <param name="exchangeArguments">交换机参数</param>
         /// <param name="registered">注册事件</param>
@@ -1216,6 +1219,7 @@ namespace ZqUtils.Core.Helpers
             bool deadLetter = true,
             string exchangeType = ExchangeType.Direct,
             bool durable = true,
+            int consumerCount = 1,
             IDictionary<string, object> queueArguments = null,
             IDictionary<string, object> exchangeArguments = null,
             EventHandler<ConsumerEventArgs> registered = null,
@@ -1239,71 +1243,75 @@ namespace ZqUtils.Core.Helpers
             //设置每次预取数量
             channel.BasicQos(0, prefetchCount, false);
 
-            //创建消费者
-            var consumer = new EventingBasicConsumer(channel);
-
-            //接收消息事件
-            consumer.Received += (sender, ea) =>
+            //根据设置的消费者数量创建消费者
+            for (int i = 0; i < consumerCount; i++)
             {
-                var body = ea.Body.ToArray().DeserializeUtf8();
-                var numberOfRetries = 0;
-                Exception exception = null;
-                bool? result = false;
+                //创建消费者
+                var consumer = new EventingBasicConsumer(channel);
 
-                while (numberOfRetries <= retryCount)
+                //接收消息事件
+                consumer.Received += (sender, ea) =>
                 {
-                    try
+                    var body = ea.Body.ToArray().DeserializeUtf8();
+                    var numberOfRetries = 0;
+                    Exception exception = null;
+                    bool? result = false;
+
+                    while (numberOfRetries <= retryCount)
                     {
-                        var msg = body.ToObject<T>();
+                        try
+                        {
+                            var msg = body.ToObject<T>();
 
-                        result = subscriber?.Invoke(msg, ea);
+                            result = subscriber?.Invoke(msg, ea);
 
-                        if (result == true)
-                            channel.BasicAck(ea.DeliveryTag, false);
-                        else
-                            channel.BasicNack(ea.DeliveryTag, false, false);
+                            if (result == true)
+                                channel.BasicAck(ea.DeliveryTag, false);
+                            else
+                                channel.BasicNack(ea.DeliveryTag, false, false);
 
-                        //异常置空
-                        exception = null;
-                        break;
+                            //异常置空
+                            exception = null;
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            exception = ex;
+                            handler?.Invoke(body, numberOfRetries, ex);
+                            numberOfRetries++;
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        exception = ex;
-                        handler?.Invoke(body, numberOfRetries, ex);
-                        numberOfRetries++;
-                    }
-                }
 
-                //重试后异常仍未解决
-                if (exception != null)
-                    channel.BasicNack(ea.DeliveryTag, false, false);
+                    //重试后异常仍未解决
+                    if (exception != null)
+                        channel.BasicNack(ea.DeliveryTag, false, false);
 
-                //是否进入内置死信队列
-                if (deadLetter && (!(result == true) || exception != null))
-                    PublishToDead(
-                        queue,
-                        ea.Exchange,
-                        ea.RoutingKey,
-                        body,
-                        exception == null ? numberOfRetries : numberOfRetries - 1,
-                        exception);
-            };
+                    //是否进入内置死信队列
+                    if (deadLetter && (!(result == true) || exception != null))
+                        PublishToDead(
+                            queue,
+                            ea.Exchange,
+                            ea.RoutingKey,
+                            body,
+                            exception == null ? numberOfRetries : numberOfRetries - 1,
+                            exception);
+                };
 
-            //注册事件
-            if (registered != null)
-                consumer.Registered += registered;
+                //注册事件
+                if (registered != null)
+                    consumer.Registered += registered;
 
-            //取消注册事件
-            if (unregistered != null)
-                consumer.Unregistered += unregistered;
+                //取消注册事件
+                if (unregistered != null)
+                    consumer.Unregistered += unregistered;
 
-            //关闭事件
-            if (shutdown != null)
-                consumer.Shutdown += shutdown;
+                //关闭事件
+                if (shutdown != null)
+                    consumer.Shutdown += shutdown;
 
-            //手动确认
-            channel.BasicConsume(queue, false, consumer);
+                //手动确认
+                channel.BasicConsume(queue, false, consumer);
+            }
         }
 
         /// <summary>
@@ -1320,6 +1328,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="deadLetter">是否进入内置死信队列，此处与原生死信无关</param>
         /// <param name="exchangeType">交换机类型</param>
         /// <param name="durable">持久化</param>
+        /// <param name="consumerCount">消费者数量</param>
         /// <param name="queueArguments">队列参数</param>
         /// <param name="exchangeArguments">交换机参数</param>
         /// <param name="registered">注册事件</param>
@@ -1336,6 +1345,7 @@ namespace ZqUtils.Core.Helpers
             bool deadLetter = true,
             string exchangeType = ExchangeType.Direct,
             bool durable = true,
+            int consumerCount = 1,
             IDictionary<string, object> queueArguments = null,
             IDictionary<string, object> exchangeArguments = null,
             EventHandler<ConsumerEventArgs> registered = null,
@@ -1359,75 +1369,79 @@ namespace ZqUtils.Core.Helpers
             //设置每次预取数量
             channel.BasicQos(0, prefetchCount, false);
 
-            //创建消费者
-            var consumer = new EventingBasicConsumer(channel);
-
-            //接收消息事件
-            consumer.Received += async (sender, ea) =>
+            //根据设置的消费者数量创建消费者
+            for (int i = 0; i < consumerCount; i++)
             {
-                var body = ea.Body.ToArray().DeserializeUtf8();
-                var numberOfRetries = 0;
-                Exception exception = null;
-                bool? result = false;
+                //创建消费者
+                var consumer = new EventingBasicConsumer(channel);
 
-                while (numberOfRetries <= retryCount)
+                //接收消息事件
+                consumer.Received += async (sender, ea) =>
                 {
-                    try
+                    var body = ea.Body.ToArray().DeserializeUtf8();
+                    var numberOfRetries = 0;
+                    Exception exception = null;
+                    bool? result = false;
+
+                    while (numberOfRetries <= retryCount)
                     {
-                        var msg = body.ToObject<T>();
+                        try
+                        {
+                            var msg = body.ToObject<T>();
 
-                        if (subscriber != null)
-                            result = await subscriber(msg, ea);
+                            if (subscriber != null)
+                                result = await subscriber(msg, ea);
 
-                        if (result == true)
-                            channel.BasicAck(ea.DeliveryTag, false);
-                        else
-                            channel.BasicNack(ea.DeliveryTag, false, false);
+                            if (result == true)
+                                channel.BasicAck(ea.DeliveryTag, false);
+                            else
+                                channel.BasicNack(ea.DeliveryTag, false, false);
 
-                        //异常置空
-                        exception = null;
-                        break;
+                            //异常置空
+                            exception = null;
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            exception = ex;
+
+                            if (handler != null)
+                                await handler(body, numberOfRetries, ex);
+
+                            numberOfRetries++;
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        exception = ex;
 
-                        if (handler != null)
-                            await handler(body, numberOfRetries, ex);
+                    //重试后异常仍未解决
+                    if (exception != null)
+                        channel.BasicNack(ea.DeliveryTag, false, false);
 
-                        numberOfRetries++;
-                    }
-                }
+                    //是否进入内置死信队列
+                    if (deadLetter && (!(result == true) || exception != null))
+                        PublishToDead(
+                            queue,
+                            ea.Exchange,
+                            ea.RoutingKey,
+                            body,
+                            exception == null ? numberOfRetries : numberOfRetries - 1,
+                            exception);
+                };
 
-                //重试后异常仍未解决
-                if (exception != null)
-                    channel.BasicNack(ea.DeliveryTag, false, false);
+                //注册事件
+                if (registered != null)
+                    consumer.Registered += registered;
 
-                //是否进入内置死信队列
-                if (deadLetter && (!(result == true) || exception != null))
-                    PublishToDead(
-                        queue,
-                        ea.Exchange,
-                        ea.RoutingKey,
-                        body,
-                        exception == null ? numberOfRetries : numberOfRetries - 1,
-                        exception);
-            };
+                //取消注册事件
+                if (unregistered != null)
+                    consumer.Unregistered += unregistered;
 
-            //注册事件
-            if (registered != null)
-                consumer.Registered += registered;
+                //关闭事件
+                if (shutdown != null)
+                    consumer.Shutdown += shutdown;
 
-            //取消注册事件
-            if (unregistered != null)
-                consumer.Unregistered += unregistered;
-
-            //关闭事件
-            if (shutdown != null)
-                consumer.Shutdown += shutdown;
-
-            //手动确认
-            channel.BasicConsume(queue, false, consumer);
+                //手动确认
+                channel.BasicConsume(queue, false, consumer);
+            }
         }
         #endregion
 
@@ -1679,6 +1693,11 @@ namespace ZqUtils.Core.Helpers
         /// 消息头部对象json字符串
         /// </summary>
         public string Header { get; set; }
+
+        /// <summary>
+        /// 队列消费者数量，默认1
+        /// </summary>
+        public int ConsumerCount { get; set; } = 1;
 
         /// <summary>
         /// 队列过期时间，过期后队列自动被删除，单位ms
