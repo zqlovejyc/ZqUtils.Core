@@ -93,36 +93,42 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
-        /// 订阅消息，注意订阅消息需要单独开启线程，否则会阻塞主线程
+        /// 订阅消息
         /// </summary>
         /// <param name="handler"></param>
         /// <returns></returns>
-        public async Task SubscribeAsync(Action<T> handler)
+        public void Subscribe(Action<T> handler)
         {
-            while (await ThreadChannel.Reader.WaitToReadAsync())
+            Task.Run(async () =>
             {
-                if (ThreadChannel.Reader.TryRead(out var message))
+                while (await ThreadChannel.Reader.WaitToReadAsync())
                 {
-                    handler?.Invoke(message);
+                    if (ThreadChannel.Reader.TryRead(out var message))
+                    {
+                        handler?.Invoke(message);
+                    }
                 }
-            }
+            });
         }
 
         /// <summary>
-        /// 订阅消息，注意订阅消息需要单独开启线程，否则会阻塞主线程
+        /// 订阅消息
         /// </summary>
         /// <param name="handler"></param>
         /// <returns></returns>
-        public async Task SubscribeAsync(Func<T, Task> handler)
+        public void Subscribe(Func<T, Task> handler)
         {
-            while (await ThreadChannel.Reader.WaitToReadAsync())
+            Task.Run(async () =>
             {
-                if (ThreadChannel.Reader.TryRead(out var message))
+                while (await ThreadChannel.Reader.WaitToReadAsync())
                 {
-                    if (handler != null)
-                        await handler(message);
+                    if (ThreadChannel.Reader.TryRead(out var message))
+                    {
+                        if (handler != null)
+                            await handler(message);
+                    }
                 }
-            }
+            });
         }
     }
 }
