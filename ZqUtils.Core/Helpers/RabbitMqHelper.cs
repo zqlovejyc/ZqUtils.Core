@@ -748,7 +748,7 @@ namespace ZqUtils.Core.Helpers
                 priority,
                 arguments,
                 null,
-                attribute.Headers?.ToObject<Dictionary<string, object>>());
+                attribute.Header?.ToObject<Dictionary<string, object>>());
         }
 
         /// <summary>
@@ -824,7 +824,7 @@ namespace ZqUtils.Core.Helpers
                 priority,
                 arguments,
                 null,
-                attribute.Headers?.ToObject<Dictionary<string, object>>());
+                attribute.Header?.ToObject<Dictionary<string, object>>());
         }
 
         /// <summary>
@@ -1678,7 +1678,7 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 消息头部对象json字符串
         /// </summary>
-        public string Headers { get; set; }
+        public string Header { get; set; }
 
         /// <summary>
         /// 队列过期时间，过期后队列自动被删除，单位ms
