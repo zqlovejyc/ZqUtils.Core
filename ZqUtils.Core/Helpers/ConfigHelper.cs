@@ -52,10 +52,7 @@ namespace ZqUtils.Core.Helpers
             if (environment.IsNotNullOrEmpty())
                 jsonFile = $"appsettings.{environment}.json";
 
-            Configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile(jsonFile, optional: true, reloadOnChange: true)
-                .Build();
+            SetConfigurationFile(jsonFile);
         }
         #endregion
 
