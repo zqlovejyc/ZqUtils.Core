@@ -33,13 +33,13 @@ namespace ZqUtils.Core.Attributes
         /// <summary>
         /// 注入名称，多继承时唯一标识
         /// </summary>
-        public string Name { get; set; }
+        public string[] Name { get; set; }
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="name">注入名称，多继承时唯一标识</param>
-        public DependsOnAttribute(string name)
+        public DependsOnAttribute(params string[] name)
         {
             Name = name;
         }

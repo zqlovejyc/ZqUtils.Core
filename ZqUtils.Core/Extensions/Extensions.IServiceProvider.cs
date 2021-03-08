@@ -49,7 +49,8 @@ namespace ZqUtils.Core.Extensions
             return services
                     .Where(o =>
                         o.GetType().HasAttribute<DependsOnAttribute>(x =>
-                        x.Name.EqualIgnoreCase(name)))
+                        x.Name.IsNotNullOrEmpty() &&
+                        x.Name.Any(k => k.EqualIgnoreCase(name))))
                     .FirstOrDefault();
         }
 
@@ -68,7 +69,8 @@ namespace ZqUtils.Core.Extensions
             return @this
                     .Where(o =>
                         o.GetType().HasAttribute<DependsOnAttribute>(x =>
-                        x.Name.EqualIgnoreCase(name)))
+                        x.Name.IsNotNullOrEmpty() &&
+                        x.Name.Any(k => k.EqualIgnoreCase(name))))
                     .FirstOrDefault();
         }
 
