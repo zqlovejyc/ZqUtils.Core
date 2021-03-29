@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 /****************************
@@ -75,7 +76,7 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 发布消息
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">消息内容</param>
         /// <returns></returns>
         public bool Publish(T message)
         {
@@ -85,7 +86,7 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 发布消息
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">消息内容</param>
         /// <returns></returns>
         public async Task PublishAsync(T message)
         {
@@ -95,40 +96,60 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 订阅消息
         /// </summary>
-        /// <param name="handler"></param>
+        /// <param name="handler">自定义处理委托</param>
+        /// <param name="threadCount">线程数量</param>
         /// <returns></returns>
-        public void Subscribe(Action<T> handler)
+        public void Subscribe(Action<T> handler, int threadCount = 1)
         {
-            Task.Run(async () =>
-            {
-                while (await ThreadChannel.Reader.WaitToReadAsync())
+            Task.WhenAll(Enumerable
+                .Range(0, threadCount)
+                .Select(_ => Task.Run(async () =>
                 {
-                    if (ThreadChannel.Reader.TryRead(out var message))
+                    try
                     {
-                        handler?.Invoke(message);
+                        while (await ThreadChannel.Reader.WaitToReadAsync())
+                        {
+                            if (ThreadChannel.Reader.TryRead(out var message))
+                            {
+                                handler?.Invoke(message);
+                            }
+                        }
                     }
-                }
-            });
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error(ex, $"Subscribe Exception:{ex.Message}");
+                    }
+                })).ToArray());
         }
 
         /// <summary>
         /// 订阅消息
         /// </summary>
-        /// <param name="handler"></param>
+        /// <param name="handler">自定义处理委托</param>
+        /// <param name="threadCount">线程数量</param>
         /// <returns></returns>
-        public void Subscribe(Func<T, Task> handler)
+        public void Subscribe(Func<T, Task> handler, int threadCount = 1)
         {
-            Task.Run(async () =>
-            {
-                while (await ThreadChannel.Reader.WaitToReadAsync())
+            Task.WhenAll(Enumerable
+                .Range(0, threadCount)
+                .Select(_ => Task.Run(async () =>
                 {
-                    if (ThreadChannel.Reader.TryRead(out var message))
+                    try
                     {
-                        if (handler != null)
-                            await handler(message);
+                        while (await ThreadChannel.Reader.WaitToReadAsync())
+                        {
+                            if (ThreadChannel.Reader.TryRead(out var message))
+                            {
+                                if (handler != null)
+                                    await handler(message);
+                            }
+                        }
                     }
-                }
-            });
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error(ex, $"Subscribe Exception:{ex.Message}");
+                    }
+                })).ToArray());
         }
     }
 }
