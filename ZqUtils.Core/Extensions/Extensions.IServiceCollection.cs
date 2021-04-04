@@ -30,7 +30,6 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Scrutor;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ZqUtils.Core.Helpers;
@@ -833,7 +832,7 @@ namespace ZqUtils.Core.Extensions
         /// <returns></returns>
         public static IServiceCollection AddElasticSearch(this IServiceCollection @this, IConfiguration configuration)
         {
-            var uris = configuration.GetSection("ElasticSearch:Url").Get<List<string>>().ConvertAll(x => new Uri(x));
+            var uris = configuration.GetSection("ElasticSearch:Url").Get<string[]>().Select(x => new Uri(x));
             var defaultIndex = configuration.GetValue<string>("ElasticSearch:DefaultIndex");
 
             var connectionPool = new StaticConnectionPool(uris);
