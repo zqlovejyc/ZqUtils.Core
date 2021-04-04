@@ -20,17 +20,19 @@ using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Confluent.Kafka;
+using Elasticsearch.Net;
 using FreeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using Nest;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Scrutor;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ZqUtils.Core.Attributes;
 using ZqUtils.Core.Helpers;
 /****************************
 * [Author] 张强
@@ -819,6 +821,27 @@ namespace ZqUtils.Core.Extensions
                     break;
             }
             return @this;
+        }
+        #endregion
+
+        #region AddElasticSearch
+        /// <summary>
+        /// 注入ElasticSearch
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddElasticSearch(this IServiceCollection @this, IConfiguration configuration)
+        {
+            var uris = configuration.GetSection("ElasticSearch:Url").Get<List<string>>().ConvertAll(x => new Uri(x));
+            var defaultIndex = configuration.GetValue<string>("ElasticSearch:DefaultIndex");
+
+            var connectionPool = new StaticConnectionPool(uris);
+            var settings = new ConnectionSettings(connectionPool).DefaultIndex(defaultIndex);
+
+            return @this
+                .AddSingleton<IElasticClient>(x => new ElasticClient(settings))
+                .AddSingleton<IElasticLowLevelClient>(x => new ElasticLowLevelClient(settings));
         }
         #endregion
     }
