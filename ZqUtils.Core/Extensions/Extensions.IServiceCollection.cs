@@ -29,6 +29,7 @@ using Nest;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Scrutor;
+using StackExchange.Redis;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -414,10 +415,11 @@ namespace ZqUtils.Core.Extensions
         /// <summary>
         /// 注入RedisHelper、IConnectionMultiplexer
         /// </summary>
-        /// <param name="this"></param>
-        /// <param name="configuration"></param>
+        /// <param name="this">IServiceCollection</param>
+        /// <param name="configuration">json配置</param>
+        /// <param name="action">IConnectionMultiplexer自定义委托</param>
         /// <returns></returns>
-        public static IServiceCollection AddStackExchangeRedis(this IServiceCollection @this, IConfiguration configuration)
+        public static IServiceCollection AddStackExchangeRedis(this IServiceCollection @this, IConfiguration configuration, Action<IConnectionMultiplexer> action = null)
         {
             var connectionString = configuration.GetValue<string>("Redis:ConnectionStrings");
             if (connectionString.IsNullOrEmpty())
@@ -426,7 +428,13 @@ namespace ZqUtils.Core.Extensions
             if (connectionString.IsNullOrEmpty())
                 throw new ArgumentNullException("Redis连接字符串配置为null");
 
-            @this.AddTransient(x => new RedisHelper(connectionString));
+            @this.AddTransient(x =>
+            {
+                var helper = new RedisHelper(connectionString);
+                action?.Invoke(helper.IConnectionMultiplexer);
+
+                return helper;
+            });
 
             @this.AddSingleton(x => x.GetRequiredService<RedisHelper>().IConnectionMultiplexer);
 
