@@ -33,7 +33,7 @@
 16.优化RabbitMq订阅方法，添加部分事件参数；重载订阅方法和拉取消息方法，优化消息头部Headers；优化Subscribe，添加consumerCount消费者数量参数；
 17.新增AddElasticSearch扩展方法；
 18.优化RedisHelper，添加IConnectionMultiplexer自定义委托可选参数；
-18.优化AddStackExchangeRedis，添加IConnectionMultiplexer自定义委托参数；</PackageReleaseNotes>
+19.优化AddStackExchangeRedis，添加IConnectionMultiplexer自定义委托参数；</PackageReleaseNotes>
         <AssemblyVersion>1.1.4.0</AssemblyVersion>
         <FileVersion>1.1.4.0</FileVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
