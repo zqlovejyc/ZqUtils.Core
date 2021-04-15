@@ -50,7 +50,7 @@ namespace ZqUtils.Core.Extensions
         /// <summary>
         /// 私有静态字段
         /// </summary>
-        private static readonly ContainerBuilder container = new ContainerBuilder();
+        private static readonly ContainerBuilder container = new();
         #endregion      
 
         #region RegisterAutofac
@@ -59,7 +59,9 @@ namespace ZqUtils.Core.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <param name="modules"></param>
-        public static void RegisterAutofac(this IServiceCollection services, params IModule[] modules)
+        public static void RegisterAutofac(
+            this IServiceCollection services,
+            params IModule[] modules)
         {
             if (modules?.Length > 0)
             {
@@ -75,7 +77,9 @@ namespace ZqUtils.Core.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <param name="assemblies"></param>
-        public static void RegisterAutofac(this IServiceCollection services, params Assembly[] assemblies)
+        public static void RegisterAutofac(
+            this IServiceCollection services,
+            params Assembly[] assemblies)
         {
             if (assemblies?.Length > 0)
             {
@@ -93,7 +97,10 @@ namespace ZqUtils.Core.Extensions
         /// <param name="services"></param>
         /// <param name="predicate"></param>
         /// <param name="assemblies"></param>
-        public static void RegisterAutofac(this IServiceCollection services, Func<Type, bool> predicate, params Assembly[] assemblies)
+        public static void RegisterAutofac(
+            this IServiceCollection services,
+            Func<Type, bool> predicate,
+            params Assembly[] assemblies)
         {
             if (assemblies?.Length > 0)
             {
@@ -112,7 +119,10 @@ namespace ZqUtils.Core.Extensions
         /// <param name="services"></param>
         /// <param name="modules"></param>
         /// <param name="assemblies"></param>
-        public static void RegisterAutofac(this IServiceCollection services, IModule[] modules, Assembly[] assemblies)
+        public static void RegisterAutofac(
+            this IServiceCollection services,
+            IModule[] modules,
+            Assembly[] assemblies)
         {
             if (modules?.Length > 0)
             {
@@ -138,7 +148,11 @@ namespace ZqUtils.Core.Extensions
         /// <param name="modules"></param>
         /// <param name="assemblies"></param>
         /// <param name="predicate"></param>
-        public static void RegisterAutofac(this IServiceCollection services, IModule[] modules, Assembly[] assemblies, Func<Type, bool> predicate)
+        public static void RegisterAutofac(
+            this IServiceCollection services,
+            IModule[] modules,
+            Assembly[] assemblies,
+            Func<Type, bool> predicate)
         {
             if (modules?.Length > 0)
             {
@@ -165,7 +179,8 @@ namespace ZqUtils.Core.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceProvider AddAutofac(this IServiceCollection services)
+        public static IServiceProvider AddAutofac(
+            this IServiceCollection services)
         {
             container.Populate(services);
             return new AutofacServiceProvider(container.Build());
@@ -177,7 +192,9 @@ namespace ZqUtils.Core.Extensions
         /// <param name="services"></param>
         /// <param name="modules"></param>
         /// <returns></returns>
-        public static IServiceProvider AddAutofac(this IServiceCollection services, params IModule[] modules)
+        public static IServiceProvider AddAutofac(
+            this IServiceCollection services,
+            params IModule[] modules)
         {
             if (modules?.Length > 0)
             {
@@ -196,7 +213,9 @@ namespace ZqUtils.Core.Extensions
         /// <param name="services"></param>
         /// <param name="assemblies"></param>
         /// <returns></returns>
-        public static IServiceProvider AddAutofac(this IServiceCollection services, params Assembly[] assemblies)
+        public static IServiceProvider AddAutofac(
+            this IServiceCollection services,
+            params Assembly[] assemblies)
         {
             if (assemblies?.Length > 0)
             {
@@ -217,7 +236,10 @@ namespace ZqUtils.Core.Extensions
         /// <param name="predicate"></param>
         /// <param name="assemblies"></param>
         /// <returns></returns>
-        public static IServiceProvider AddAutofac(this IServiceCollection services, Func<Type, bool> predicate, params Assembly[] assemblies)
+        public static IServiceProvider AddAutofac(
+            this IServiceCollection services,
+            Func<Type, bool> predicate,
+            params Assembly[] assemblies)
         {
             if (assemblies?.Length > 0)
             {
@@ -239,7 +261,10 @@ namespace ZqUtils.Core.Extensions
         /// <param name="modules"></param>
         /// <param name="assemblies"></param>
         /// <returns></returns>
-        public static IServiceProvider AddAutofac(this IServiceCollection services, IModule[] modules, Assembly[] assemblies)
+        public static IServiceProvider AddAutofac(
+            this IServiceCollection services,
+            IModule[] modules,
+            Assembly[] assemblies)
         {
             if (modules?.Length > 0)
             {
@@ -268,7 +293,11 @@ namespace ZqUtils.Core.Extensions
         /// <param name="assemblies"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public static IServiceProvider AddAutofac(this IServiceCollection services, IModule[] modules, Assembly[] assemblies, Func<Type, bool> predicate)
+        public static IServiceProvider AddAutofac(
+            this IServiceCollection services,
+            IModule[] modules,
+            Assembly[] assemblies,
+            Func<Type, bool> predicate)
         {
             if (modules?.Length > 0)
             {
@@ -386,7 +415,9 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IServiceCollection AddFreeRedis(this IServiceCollection @this, IConfiguration configuration)
+        public static IServiceCollection AddFreeRedis(
+            this IServiceCollection @this,
+            IConfiguration configuration)
         {
             var connectionStrings = configuration.GetSection("Redis:ConnectionStrings").Get<string[]>();
 
@@ -419,7 +450,10 @@ namespace ZqUtils.Core.Extensions
         /// <param name="configuration">json配置</param>
         /// <param name="action">IConnectionMultiplexer自定义委托</param>
         /// <returns></returns>
-        public static IServiceCollection AddStackExchangeRedis(this IServiceCollection @this, IConfiguration configuration, Action<IConnectionMultiplexer> action = null)
+        public static IServiceCollection AddStackExchangeRedis(
+            this IServiceCollection @this,
+            IConfiguration configuration,
+            Action<IConnectionMultiplexer> action = null)
         {
             var connectionString = configuration.GetValue<string>("Redis:ConnectionStrings");
             if (connectionString.IsNullOrEmpty())
@@ -428,13 +462,7 @@ namespace ZqUtils.Core.Extensions
             if (connectionString.IsNullOrEmpty())
                 throw new ArgumentNullException("Redis连接字符串配置为null");
 
-            @this.AddTransient(x =>
-            {
-                var helper = new RedisHelper(connectionString);
-                action?.Invoke(helper.IConnectionMultiplexer);
-
-                return helper;
-            });
+            @this.AddTransient(x => new RedisHelper(connectionString, action));
 
             @this.AddSingleton(x => x.GetRequiredService<RedisHelper>().IConnectionMultiplexer);
 
@@ -838,7 +866,9 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IServiceCollection AddElasticSearch(this IServiceCollection @this, IConfiguration configuration)
+        public static IServiceCollection AddElasticSearch(
+            this IServiceCollection @this,
+            IConfiguration configuration)
         {
             var uris = configuration.GetSection("ElasticSearch:Url").Get<string[]>().Select(x => new Uri(x));
             var defaultIndex = configuration.GetValue<string>("ElasticSearch:DefaultIndex");
