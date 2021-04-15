@@ -8,30 +8,34 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.1.3</Version>
+        <Version>1.1.4</Version>
         <PackageId>Zq.Utils.Core</PackageId>
         <Authors>张强</Authors>
-        <Description>.NET Standard2.1版本工具类</Description>
+        <Description>.NET Standard2.0、.NET Standard2.1、.NET5版本工具类</Description>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
-        <PackageReleaseNotes>1.FieHelper新增创建文件方法；
-2.重载并优化EPPlusReadExcel，优化Exel导入，去除前后空格、换行符、制表符；
-3.优化PollyHelper部分方法返回类型；
-4.优化HttpClientHelper字符编码；
-5.优化RedisHelper；新增AddStackExchangeRedis扩展方法；DefaultKey字段重名名为KeyPrefix，新增Keys方法，Redis:ConnectionString连接字符串key为Redis:ConnectionStrings；新增HashLength、HashScan、ResetKeyPrefix方法；
-6.优化TreeToJson、TreeToDictionary；
-7.重载ToJson扩展方法；
-8.优化Json反序列化，添加忽略大小写配置；
-9.优化RabbitMqHelper，修复队列无法绑定多个RouteKey的bug；修改订阅消息和获取消息处理委托参数；发布消息，新增消息头部参数；
-10.新增ObjectMethodExecutors，新增Execute、ExecuteAsync扩展方法；
-11.新增ForEachAsync异步遍历扩展方法；
-12.引用DeepCloner，优化DeepClone和ShallowClone；
-13.添加对SourceLink的支持；
-14.重载ToObject扩展方法；
-15.重命名HttpUtility为HttpHelper，移除HttpUtility，优化代码；</PackageReleaseNotes>
-        <AssemblyVersion>1.1.3.0</AssemblyVersion>
-        <FileVersion>1.1.3.0</FileVersion>
+        <PackageReleaseNotes>1.优化HttpHelper表单+文件上传；新增PostFileStream、PostFileStreamInfo参数；
+2.优化GetDependsService，支持忽略大小写；
+3.优化字符串比较扩展方法；
+4.优化Zip压缩，编码格式采用UTF8；
+5.获取压缩文件添加密码参数；
+6.新增GetMD5HashFromStream；
+7.优化DownloadByAria2；
+8.重载ToDateTime；
+9.重载WeekOfYear；
+10.优化HttpRequest，Method属性改为HttpMethod；
+11.新增IsAnonymousType扩展方法；
+12.移除FastExpressionCompiler，存在部分情况下Expression编译错误；
+13.新增ChannelHelper；
+14.新增CreateInstance、GetServiceOrCreateInstance扩展方法；
+15.新增IComparerHelper；
+16.优化RabbitMq订阅方法，添加部分事件参数；重载订阅方法和拉取消息方法，优化消息头部Headers；优化Subscribe，添加consumerCount消费者数量参数；
+17.新增AddElasticSearch扩展方法；
+18.优化RedisHelper，添加IConnectionMultiplexer自定义委托可选参数；
+18.优化AddStackExchangeRedis，添加IConnectionMultiplexer自定义委托参数；</PackageReleaseNotes>
+        <AssemblyVersion>1.1.4.0</AssemblyVersion>
+        <FileVersion>1.1.4.0</FileVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageIcon>utils.png</PackageIcon>
@@ -76,8 +80,8 @@
         <PackageReference Include="Dapper" Version="2.0.78" />
         <PackageReference Include="DeepCloner" Version="0.10.2" />
         <PackageReference Include="DnsClient" Version="1.4.0" />
-        <PackageReference Include="EPPlus" Version="5.6.1" />
-        <PackageReference Include="FreeRedis" Version="0.3.0" />
+        <PackageReference Include="EPPlus" Version="5.6.2" />
+        <PackageReference Include="FreeRedis" Version="0.3.5" />
         <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
         <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
         <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.2" />
@@ -86,27 +90,27 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="5.0.4" />
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="5.0.5" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MongoDB.Driver" Version="2.12.1" />
+        <PackageReference Include="MongoDB.Driver" Version="2.12.2" />
         <PackageReference Include="NEST" Version="7.12.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="NLog" Version="4.7.9" />
-        <PackageReference Include="Polly" Version="7.2.1" />
-        <PackageReference Include="Quartz.Plugins.TimeZoneConverter" Version="3.2.4" />
-        <PackageReference Include="Quartz.Serialization.Json" Version="3.2.4" />
+        <PackageReference Include="Polly" Version="7.2.2" />
+        <PackageReference Include="Quartz.Plugins.TimeZoneConverter" Version="3.3.2" />
+        <PackageReference Include="Quartz.Serialization.Json" Version="3.3.2" />
         <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
         <PackageReference Include="Scrutor" Version="3.3.0" />
         <PackageReference Include="SharpZipLib" Version="1.3.1" />
         <PackageReference Include="StackExchange.Redis" Version="2.2.4" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.10.0" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.10.1" />
         <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-        <PackageReference Include="System.Text.Json" Version="5.0.1" />
+        <PackageReference Include="System.Text.Json" Version="5.0.2" />
         <PackageReference Include="ZXing.Net.Bindings.ZKWeb.System.Drawing" Version="0.16.5" />
     </ItemGroup>
 
