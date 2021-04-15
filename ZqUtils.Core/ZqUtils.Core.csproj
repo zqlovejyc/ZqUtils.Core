@@ -8,34 +8,16 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.1.4</Version>
+        <Version>1.1.5</Version>
         <PackageId>Zq.Utils.Core</PackageId>
         <Authors>张强</Authors>
         <Description>.NET Standard2.0、.NET Standard2.1、.NET5版本工具类</Description>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
-        <PackageReleaseNotes>1.优化HttpHelper表单+文件上传；新增PostFileStream、PostFileStreamInfo参数；
-2.优化GetDependsService，支持忽略大小写；
-3.优化字符串比较扩展方法；
-4.优化Zip压缩，编码格式采用UTF8；
-5.获取压缩文件添加密码参数；
-6.新增GetMD5HashFromStream；
-7.优化DownloadByAria2；
-8.重载ToDateTime；
-9.重载WeekOfYear；
-10.优化HttpRequest，Method属性改为HttpMethod；
-11.新增IsAnonymousType扩展方法；
-12.移除FastExpressionCompiler，存在部分情况下Expression编译错误；
-13.新增ChannelHelper；
-14.新增CreateInstance、GetServiceOrCreateInstance扩展方法；
-15.新增IComparerHelper；
-16.优化RabbitMq订阅方法，添加部分事件参数；重载订阅方法和拉取消息方法，优化消息头部Headers；优化Subscribe，添加consumerCount消费者数量参数；
-17.新增AddElasticSearch扩展方法；
-18.优化RedisHelper，添加IConnectionMultiplexer自定义委托可选参数；
-19.优化AddStackExchangeRedis，添加IConnectionMultiplexer自定义委托参数；</PackageReleaseNotes>
-        <AssemblyVersion>1.1.4.0</AssemblyVersion>
-        <FileVersion>1.1.4.0</FileVersion>
+        <PackageReleaseNotes>1.修复NLog.config nuget包配置错误bug；</PackageReleaseNotes>
+        <AssemblyVersion>1.1.5</AssemblyVersion>
+        <FileVersion>1.1.5</FileVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageIcon>utils.png</PackageIcon>
