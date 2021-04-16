@@ -59,7 +59,7 @@ namespace ZqUtils.Core.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <param name="modules"></param>
-        public static void RegisterAutofac(
+        public static IServiceCollection RegisterAutofac(
             this IServiceCollection services,
             params IModule[] modules)
         {
@@ -70,6 +70,8 @@ namespace ZqUtils.Core.Extensions
                     container.RegisterModule(module);
                 }
             }
+
+            return services;
         }
 
         /// <summary>
@@ -77,7 +79,7 @@ namespace ZqUtils.Core.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <param name="assemblies"></param>
-        public static void RegisterAutofac(
+        public static IServiceCollection RegisterAutofac(
             this IServiceCollection services,
             params Assembly[] assemblies)
         {
@@ -89,6 +91,8 @@ namespace ZqUtils.Core.Extensions
                    .PropertiesAutowired()
                    .AsSelf();
             }
+
+            return services;
         }
 
         /// <summary>
@@ -97,7 +101,7 @@ namespace ZqUtils.Core.Extensions
         /// <param name="services"></param>
         /// <param name="predicate"></param>
         /// <param name="assemblies"></param>
-        public static void RegisterAutofac(
+        public static IServiceCollection RegisterAutofac(
             this IServiceCollection services,
             Func<Type, bool> predicate,
             params Assembly[] assemblies)
@@ -111,6 +115,8 @@ namespace ZqUtils.Core.Extensions
                    .PropertiesAutowired()
                    .AsSelf();
             }
+
+            return services;
         }
 
         /// <summary>
@@ -119,7 +125,7 @@ namespace ZqUtils.Core.Extensions
         /// <param name="services"></param>
         /// <param name="modules"></param>
         /// <param name="assemblies"></param>
-        public static void RegisterAutofac(
+        public static IServiceCollection RegisterAutofac(
             this IServiceCollection services,
             IModule[] modules,
             Assembly[] assemblies)
@@ -131,6 +137,7 @@ namespace ZqUtils.Core.Extensions
                     container.RegisterModule(module);
                 }
             }
+
             if (assemblies?.Length > 0)
             {
                 container
@@ -139,6 +146,8 @@ namespace ZqUtils.Core.Extensions
                     .PropertiesAutowired()
                     .AsSelf();
             }
+
+            return services;
         }
 
         /// <summary>
@@ -148,7 +157,7 @@ namespace ZqUtils.Core.Extensions
         /// <param name="modules"></param>
         /// <param name="assemblies"></param>
         /// <param name="predicate"></param>
-        public static void RegisterAutofac(
+        public static IServiceCollection RegisterAutofac(
             this IServiceCollection services,
             IModule[] modules,
             Assembly[] assemblies,
@@ -161,6 +170,7 @@ namespace ZqUtils.Core.Extensions
                     container.RegisterModule(module);
                 }
             }
+
             if (assemblies?.Length > 0)
             {
                 container
@@ -170,6 +180,8 @@ namespace ZqUtils.Core.Extensions
                     .PropertiesAutowired()
                     .AsSelf();
             }
+
+            return services;
         }
         #endregion
 
