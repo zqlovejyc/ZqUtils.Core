@@ -580,7 +580,7 @@ namespace ZqUtils.Core.Extensions
         /// 注入MongoClient
         /// </summary>
         /// <param name="this"></param>
-        /// <param name="configuration">appsettiongs配置</param>
+        /// <param name="configuration">appsettings配置</param>
         /// <param name="lifeTime">生命周期，默认：单例模式</param>
         /// <returns></returns>
         public static IServiceCollection AddMongoClient(
