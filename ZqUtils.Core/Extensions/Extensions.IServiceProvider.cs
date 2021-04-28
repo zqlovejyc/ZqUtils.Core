@@ -40,7 +40,7 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this">IServiceProvider</param>
         /// <param name="name">注入时的唯一名称</param>
         /// <returns></returns>
-        public static T GetDependsService<T>(this IServiceProvider @this, string name)
+        public static T GetNamedService<T>(this IServiceProvider @this, string name)
         {
             var services = @this.GetServices<T>();
             if (services.IsNullOrEmpty())
@@ -48,7 +48,7 @@ namespace ZqUtils.Core.Extensions
 
             return services
                     .Where(o =>
-                        o.GetType().HasAttribute<DependsOnAttribute>(x =>
+                        o.GetType().HasAttribute<ServiceNameAttribute>(x =>
                         x.Name.IsNotNullOrEmpty() &&
                         x.Name.Any(k => k.EqualIgnoreCase(name))))
                     .FirstOrDefault();
@@ -61,14 +61,14 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this">服务实例集合</param>
         /// <param name="name">注入时的唯一名称</param>
         /// <returns></returns>
-        public static T GetDependsService<T>(this IEnumerable<T> @this, string name)
+        public static T GetNamedService<T>(this IEnumerable<T> @this, string name)
         {
             if (@this.IsNullOrEmpty())
                 return default;
 
             return @this
                     .Where(o =>
-                        o.GetType().HasAttribute<DependsOnAttribute>(x =>
+                        o.GetType().HasAttribute<ServiceNameAttribute>(x =>
                         x.Name.IsNotNullOrEmpty() &&
                         x.Name.Any(k => k.EqualIgnoreCase(name))))
                     .FirstOrDefault();
@@ -81,7 +81,7 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this">IServiceProvider</param>
         /// <param name="type">目标服务类型</param>
         /// <returns></returns>
-        public static T GetService<T>(this IServiceProvider @this, Type type)
+        public static T GetTypedService<T>(this IServiceProvider @this, Type type)
         {
             var services = @this.GetServices<T>();
             if (services.IsNullOrEmpty())
