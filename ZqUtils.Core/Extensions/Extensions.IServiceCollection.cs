@@ -141,6 +141,10 @@ namespace ZqUtils.Core.Extensions
             this IServiceCollection @this,
             IConfiguration configuration)
         {
+            //判断是否禁用Redis
+            if (configuration.GetValue<bool?>("Redis:Enabled") == false)
+                return @this;
+
             var connectionStrings = configuration.GetSection("Redis:ConnectionStrings").Get<string[]>();
 
             @this.AddSingleton(x =>
@@ -177,6 +181,10 @@ namespace ZqUtils.Core.Extensions
             IConfiguration configuration,
             Action<IConnectionMultiplexer> action = null)
         {
+            //判断是否禁用Redis
+            if (configuration.GetValue<bool?>("Redis:Enabled") == false)
+                return @this;
+
             var connectionString = configuration.GetValue<string>("Redis:ConnectionStrings");
             if (connectionString.IsNullOrEmpty())
                 connectionString = configuration.GetSection("Redis:ConnectionStrings").Get<string[]>()?.FirstOrDefault();
@@ -203,6 +211,9 @@ namespace ZqUtils.Core.Extensions
             this IServiceCollection @this,
             ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
+            if (ConfigHelper.GetValue<bool?>("Mongodb:Enabled") == false)
+                return @this;
+
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
@@ -298,6 +309,9 @@ namespace ZqUtils.Core.Extensions
             IConfiguration configuration,
             ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
+            if (configuration.GetValue<bool?>("Mongodb:Enabled") == false)
+                return @this;
+
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
@@ -474,6 +488,9 @@ namespace ZqUtils.Core.Extensions
             IConfiguration configuration,
             ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
+            if (configuration.GetValue<bool?>("RabbitMq:Enabled") == false)
+                return @this;
+
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
@@ -503,6 +520,9 @@ namespace ZqUtils.Core.Extensions
             this IServiceCollection @this,
             ServiceLifetime lifeTime = ServiceLifetime.Singleton)
         {
+            if (ConfigHelper.GetValue<bool?>("KafkaConfig:Enabled") == false)
+                return @this;
+
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
@@ -592,6 +612,9 @@ namespace ZqUtils.Core.Extensions
             this IServiceCollection @this,
             IConfiguration configuration)
         {
+            if (configuration.GetValue<bool?>("ElasticSearch:Enabled") == false)
+                return @this;
+
             var uris = configuration.GetSection("ElasticSearch:Url").Get<string[]>().Select(x => new Uri(x));
             var defaultIndex = configuration.GetValue<string>("ElasticSearch:DefaultIndex");
 

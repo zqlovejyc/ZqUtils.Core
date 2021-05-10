@@ -16,11 +16,13 @@
  */
 #endregion
 
-using System;
-using System.IO;
-using Microsoft.Extensions.Options;
+using Com.Ctrip.Framework.Apollo;
+using Com.Ctrip.Framework.Apollo.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System;
+using System.IO;
 using ZqUtils.Core.Extensions;
 /****************************
 * [Author] 张强
@@ -68,6 +70,36 @@ namespace ZqUtils.Core.Helpers
                 .SetBasePath(string.IsNullOrEmpty(basePath) ? Directory.GetCurrentDirectory() : basePath)
                 .AddJsonFile(fileName, optional: true, reloadOnChange: true)
                 .Build();
+        }
+
+        /// <summary>
+        /// 设置app配置
+        /// </summary>
+        /// <param name="appId">Apollo的AppId</param>
+        /// <param name="metaServer">Apollo的配置中心地址</param>
+        /// <param name="nameSpace">Apollo命名空间</param>
+        public static void SetConfigurationFile(string appId, string metaServer, string nameSpace)
+        {
+            Configuration = new ConfigurationBuilder()
+                .AddApollo(appId, metaServer)
+                .AddNamespace(nameSpace, ConfigFileFormat.Json)
+                .Build();
+        }
+
+        /// <summary>
+        /// 设置app配置
+        /// </summary>
+        /// <param name="appId">Apollo的AppId</param>
+        /// <param name="metaServer">Apollo的配置中心地址</param>
+        /// <param name="action">Apollo自定义委托</param>
+        public static void SetConfigurationFile(string appId, string metaServer, Action<IApolloConfigurationBuilder> action)
+        {
+            var builder = new ConfigurationBuilder()
+                .AddApollo(appId, metaServer);
+
+            action?.Invoke(builder);
+
+            Configuration = builder.Build();
         }
         #endregion
 
