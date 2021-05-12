@@ -19,6 +19,7 @@
 using Confluent.Kafka;
 using Elasticsearch.Net;
 using FreeRedis;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -624,6 +625,64 @@ namespace ZqUtils.Core.Extensions
             return @this
                 .AddSingleton<IElasticClient>(x => new ElasticClient(settings))
                 .AddSingleton<IElasticLowLevelClient>(x => new ElasticLowLevelClient(settings));
+        }
+        #endregion
+
+        #region AddIf
+        /// <summary>
+        /// 根据条件注入服务
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="condition"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddIf(
+            this IServiceCollection @this,
+            bool condition,
+            Action<IServiceCollection> action)
+        {
+            if (condition && action != null)
+                action(@this);
+
+            return @this;
+        }
+        #endregion
+
+        #region UseIf
+        /// <summary>
+        /// 根据条件配置Application
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="condition"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseIf(
+            this IApplicationBuilder @this,
+            bool condition,
+            Action<IApplicationBuilder> action)
+        {
+            if (condition && action != null)
+                action(@this);
+
+            return @this;
+        }
+
+        /// <summary>
+        /// 根据条件配置Application
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="condition"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseIf(
+            this IApplicationBuilder @this,
+            bool condition,
+            Action<IServiceProvider, IApplicationBuilder> action)
+        {
+            if (condition && action != null)
+                action(@this.ApplicationServices, @this);
+
+            return @this;
         }
         #endregion
     }
