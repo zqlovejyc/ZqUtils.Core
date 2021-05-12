@@ -19,7 +19,6 @@
 using Confluent.Kafka;
 using Elasticsearch.Net;
 using FreeRedis;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -643,44 +642,6 @@ namespace ZqUtils.Core.Extensions
         {
             if (condition && action != null)
                 action(@this);
-
-            return @this;
-        }
-        #endregion
-
-        #region UseIf
-        /// <summary>
-        /// 根据条件配置Application
-        /// </summary>
-        /// <param name="this"></param>
-        /// <param name="condition"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public static IApplicationBuilder UseIf(
-            this IApplicationBuilder @this,
-            bool condition,
-            Action<IApplicationBuilder> action)
-        {
-            if (condition && action != null)
-                action(@this);
-
-            return @this;
-        }
-
-        /// <summary>
-        /// 根据条件配置Application
-        /// </summary>
-        /// <param name="this"></param>
-        /// <param name="condition"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public static IApplicationBuilder UseIf(
-            this IApplicationBuilder @this,
-            bool condition,
-            Action<IServiceProvider, IApplicationBuilder> action)
-        {
-            if (condition && action != null)
-                action(@this.ApplicationServices, @this);
 
             return @this;
         }
