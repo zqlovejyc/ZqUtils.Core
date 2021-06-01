@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using ZqUtils.Core.Helpers;
-using ZqUtils.Core.Utilities;
 
 namespace ZqUtils.Core.Web.Controllers
 {
@@ -141,7 +140,7 @@ namespace ZqUtils.Core.Web.Controllers
             await QuartzHelper.AddJobAsync<TestJob>("0/3 * * * * ?");
 
             //获取redis缓存值
-            var res = await RedisHelper.GetAsync("LRADMSlearun_adms_area_0");
+            var res = await RedisHelper.Instance.StringGetAsync("LRADMSlearun_adms_area_0");
 
             //读取cookie
             //var cookie = CookieHelper.Get("cookie1");

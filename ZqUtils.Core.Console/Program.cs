@@ -179,12 +179,11 @@ namespace ZqUtils.Core.Console
             //初始化Channel
             var channel = new ChannelHelper<string>();
 
-            //订阅消息，注意订阅消息需要另起线程
-            _ = Task.Run(async () => await channel.SubscribeAsync(async message =>
+            channel.Subscribe(async message =>
             {
                 SysConsole.WriteLine(message);
                 await Task.CompletedTask;
-            }));
+            });
 
             //发布消息
             for (int i = 0; i < 100; i++)

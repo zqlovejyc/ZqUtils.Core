@@ -73,7 +73,7 @@ namespace ZqUtils.Core.Web
             services.AddJobAndJobFactory(x => x.StartsWith("ZqUtils.Core"));
 
             //注入Redis
-            services.AddCsRedis(Configuration);
+            services.AddFreeRedis(Configuration);
 
             //允许同步IO操作
             services.Configure<KestrelServerOptions>(options =>
