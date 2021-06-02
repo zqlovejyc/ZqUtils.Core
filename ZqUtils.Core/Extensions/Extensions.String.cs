@@ -1121,6 +1121,109 @@ namespace ZqUtils.Core.Extensions
 
             return false;
         }
+
+        /// <summary>
+        /// 判断是否包含目标字符串，区分大小写
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="strs">目标字符串数组"</param>
+        /// <returns></returns>
+        public static bool Contains(this string @this, params string[] strs)
+        {
+            if (@this.IsNullOrEmpty())
+                return false;
+
+            if (strs.IsNotNullOrEmpty())
+            {
+                foreach (var item in strs)
+                {
+                    if (item != null && @this.Contains(item))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 正则判断是否包含目标字符串
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="value">目标字符串，例如：判断是否包含ASC或DESC为@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)"</param>
+        /// <param name="options">匹配模式</param>
+        /// <returns></returns>
+        public static bool Contains(this string @this, string value, RegexOptions options)
+        {
+            return Regex.IsMatch(@this, value, options);
+        }
+
+        /// <summary>
+        /// 忽略大小写的字符串包含比较，判断是否以任意一个待比较字符串是否包含
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static bool ContainsIgnoreCase(this string @this, params string[] strs)
+        {
+            if (@this.IsNullOrEmpty())
+                return false;
+
+            if (strs.IsNotNullOrEmpty())
+            {
+                foreach (var item in strs)
+                {
+                    if (item.IsNotNull() && @this.Contains(item, RegexOptions.IgnoreCase))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 正则判断是否不包含目标字符串
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="value">目标字符串，例如：判断是否包含ASC或DESC为@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)"</param>
+        /// <param name="options">匹配模式</param>
+        /// <returns></returns>
+        public static bool NotContains(this string @this, string value, RegexOptions options)
+        {
+            return !@this.Contains(value, options);
+        }
+
+        /// <summary>
+        /// 判断是否不包含目标字符串
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="value">目标字符串</param>
+        /// <returns></returns>
+        public static bool NotContains(this string @this, string value)
+        {
+            return !@this.Contains(value);
+        }
+
+        /// <summary>
+        /// 判断是否不包含目标字符串，区分大小写
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="strs">目标字符串数组"</param>
+        /// <returns></returns>
+        public static bool NotContains(this string @this, params string[] strs)
+        {
+            return !@this.Contains(strs);
+        }
+
+        /// <summary>
+        /// 忽略大小写的字符串包含比较，判断是否以任意一个待比较字符串是否包含
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="strs"></param>
+        /// <returns></returns>
+        public static bool NotContainsIgnoreCase(this string @this, params string[] strs)
+        {
+            return !@this.ContainsIgnoreCase(strs);
+        }
         #endregion
 
         #region 拆分字符串
@@ -1610,111 +1713,6 @@ namespace ZqUtils.Core.Extensions
             if (!@this.IsNullOrEmpty())
                 @this = Regex.Replace(@this, pattern, replacement);
             return @this;
-        }
-        #endregion
-
-        #region 正则判断是否包含/不包含目标字符串
-        /// <summary>
-        /// 判断是否包含目标字符串，区分大小写
-        /// </summary>
-        /// <param name="this">源字符串</param>
-        /// <param name="strs">目标字符串数组"</param>
-        /// <returns></returns>
-        public static bool Contains(this string @this, params string[] strs)
-        {
-            if (@this.IsNullOrEmpty())
-                return false;
-
-            if (strs.IsNotNullOrEmpty())
-            {
-                foreach (var item in strs)
-                {
-                    if (item != null && @this.Contains(item))
-                        return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// 正则判断是否包含目标字符串
-        /// </summary>
-        /// <param name="this">源字符串</param>
-        /// <param name="value">目标字符串，例如：判断是否包含ASC或DESC为@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)"</param>
-        /// <param name="options">匹配模式</param>
-        /// <returns></returns>
-        public static bool Contains(this string @this, string value, RegexOptions options)
-        {
-            return Regex.IsMatch(@this, value, options);
-        }
-
-        /// <summary>
-        /// 忽略大小写的字符串包含比较，判断是否以任意一个待比较字符串是否包含
-        /// </summary>
-        /// <param name="this"></param>
-        /// <param name="strs"></param>
-        /// <returns></returns>
-        public static bool ContainsIgnoreCase(this string @this, params string[] strs)
-        {
-            if (@this.IsNullOrEmpty())
-                return false;
-
-            if (strs.IsNotNullOrEmpty())
-            {
-                foreach (var item in strs)
-                {
-                    if (item.IsNotNull() && @this.Contains(item, RegexOptions.IgnoreCase))
-                        return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// 正则判断是否不包含目标字符串
-        /// </summary>
-        /// <param name="this">源字符串</param>
-        /// <param name="value">目标字符串，例如：判断是否包含ASC或DESC为@"(/\*(?:|)*?\*/)|(\b(ASC|DESC)\b)"</param>
-        /// <param name="options">匹配模式</param>
-        /// <returns></returns>
-        public static bool NotContains(this string @this, string value, RegexOptions options)
-        {
-            return !@this.Contains(value, options);
-        }
-
-        /// <summary>
-        /// 判断是否不包含目标字符串
-        /// </summary>
-        /// <param name="this">源字符串</param>
-        /// <param name="value">目标字符串</param>
-        /// <returns></returns>
-        public static bool NotContains(this string @this, string value)
-        {
-            return !@this.Contains(value);
-        }
-
-        /// <summary>
-        /// 判断是否不包含目标字符串，区分大小写
-        /// </summary>
-        /// <param name="this">源字符串</param>
-        /// <param name="strs">目标字符串数组"</param>
-        /// <returns></returns>
-        public static bool NotContains(this string @this, params string[] strs)
-        {
-            return !@this.Contains(strs);
-        }
-
-        /// <summary>
-        /// 忽略大小写的字符串包含比较，判断是否以任意一个待比较字符串是否包含
-        /// </summary>
-        /// <param name="this"></param>
-        /// <param name="strs"></param>
-        /// <returns></returns>
-        public static bool NotContainsIgnoreCase(this string @this, params string[] strs)
-        {
-            return !@this.ContainsIgnoreCase(strs);
         }
         #endregion
 
