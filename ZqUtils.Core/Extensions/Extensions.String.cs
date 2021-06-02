@@ -1172,7 +1172,7 @@ namespace ZqUtils.Core.Extensions
             {
                 foreach (var item in strs)
                 {
-                    if (item.IsNotNull() && @this.Contains(item, RegexOptions.IgnoreCase))
+                    if (item.IsNotNull() && @this.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
                         return true;
                 }
             }
