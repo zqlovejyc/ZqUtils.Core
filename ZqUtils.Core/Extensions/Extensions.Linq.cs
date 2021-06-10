@@ -1208,7 +1208,7 @@ namespace ZqUtils.Core.Extensions
             try
             {
                 result = true;
-                return (T)@this.ToObject();
+                return @this.ToObject().To<T>();
             }
             catch
             {
