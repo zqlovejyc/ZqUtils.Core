@@ -1201,7 +1201,7 @@ namespace ZqUtils.Core.Extensions
         /// 转换Expression为object
         /// </summary>
         /// <param name="this"></param>
-        /// <param name="result"></param>
+        /// <param name="result">转换结果，当ToObject转换成功时：true，转换异常时：false</param>
         /// <returns></returns>
         public static T ToObject<T>(this Expression @this, out bool result)
         {
