@@ -422,8 +422,8 @@ namespace ZqUtils.Core.Helpers
         /// <param name="sourceDirectory">要压缩的目录</param>
         public static void CreateTarGz(string tgzFilename, string sourceDirectory)
         {
-            Stream outStream = File.Create(tgzFilename);
-            Stream gzoStream = new GZipOutputStream(outStream);
+            var outStream = File.Create(tgzFilename);
+            var gzoStream = new GZipOutputStream(outStream);
             var tarArchive = TarArchive.CreateOutputTarArchive(gzoStream);
 
             // Note that the RootPath is currently case sensitive and must be forward slashes e.g. "c:/temp"
@@ -448,12 +448,12 @@ namespace ZqUtils.Core.Helpers
         {
             // Optionally, write an entry for the directory itself.
             // Specify false for recursion here if we will add the directory's files individually.
-            TarEntry tarEntry = TarEntry.CreateEntryFromFile(sourceDirectory);
+            var tarEntry = TarEntry.CreateEntryFromFile(sourceDirectory);
             tarArchive.WriteEntry(tarEntry, false);
 
             // Write each file to the tar.
-            string[] filenames = Directory.GetFiles(sourceDirectory);
-            foreach (string filename in filenames)
+            var filenames = Directory.GetFiles(sourceDirectory);
+            foreach (var filename in filenames)
             {
                 tarEntry = TarEntry.CreateEntryFromFile(filename);
                 tarArchive.WriteEntry(tarEntry, true);
@@ -461,13 +461,11 @@ namespace ZqUtils.Core.Helpers
 
             if (recurse)
             {
-                string[] directories = Directory.GetDirectories(sourceDirectory);
-                foreach (string directory in directories)
+                var directories = Directory.GetDirectories(sourceDirectory);
+                foreach (var directory in directories)
                     AddDirectoryFilesToTar(tarArchive, directory, recurse);
             }
         }
-
-
         #endregion
 
         #region TarGz解压缩
