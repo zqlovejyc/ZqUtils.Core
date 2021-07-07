@@ -964,7 +964,7 @@ namespace ZqUtils.Core.Helpers
         }
         #endregion
 
-        #region 构建Excel头部
+        #region 构建Excel表头
         /// <summary>
         /// 构建Excel表头
         /// </summary>
