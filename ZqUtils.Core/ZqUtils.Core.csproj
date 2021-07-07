@@ -40,6 +40,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Remove="Helpers\ExcelHelper.cs~RF1b25b11.TMP" />
         <None Remove="XmlConfig\NLog.config" />
         <None Include="Icon\utils.png">
             <Pack>True</Pack>
