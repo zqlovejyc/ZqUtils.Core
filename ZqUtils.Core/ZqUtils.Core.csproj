@@ -8,16 +8,27 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>1.1.5</Version>
+        <Version>1.1.6</Version>
         <PackageId>Zq.Utils.Core</PackageId>
         <Authors>张强</Authors>
         <Description>.NET Standard2.0、.NET Standard2.1、.NET5版本工具类</Description>
         <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
-        <PackageReleaseNotes>1.修复NLog.config nuget包配置错误bug；</PackageReleaseNotes>
-        <AssemblyVersion>1.1.5</AssemblyVersion>
-        <FileVersion>1.1.5</FileVersion>
+        <PackageReleaseNotes>1.移除Autofac相关扩展方法；
+2.重命名DependsOnAttribute -&gt; ServiceNameAttribute、GetDependsService -&gt; GetNamedService；
+3.优化BuildIOrderedQueryable、MapProvider；
+4.优化ConfigHelper，新增重载SetConfigurationFile；
+5.新增ConvertToDateTimeOffset、ConvertToDateTime扩展方法；重载ChangeType扩展方法；
+6.新增AddIf、UseIf扩展方法；
+7.新增Contains、NotContais、NotContainsIgnoreCase扩展方法；
+8.优化Expression扩展方法ToObject；新增ToOrderedQueryable扩展方法；
+9.新增字符串Equals、NotEquals扩展方法；
+10.ZipHelper新增BZip2压缩、解压缩方法；新增FastZip、TarGz压缩和解压缩；
+11.ExcelHeaderCell新增BackgroundColor属性；
+12.优化JwtTokenHelper，新增CanReadToken；</PackageReleaseNotes>
+        <AssemblyVersion>1.1.6</AssemblyVersion>
+        <FileVersion>1.1.6</FileVersion>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageIcon>utils.png</PackageIcon>
