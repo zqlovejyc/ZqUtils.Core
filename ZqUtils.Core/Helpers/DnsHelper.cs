@@ -94,10 +94,11 @@ namespace ZqUtils.Core.Helpers
         public static string GetClientRemoteIpAddress(HttpContext httpContext = null)
         {
             //HttpContext
-            httpContext = httpContext ?? HttpContextHelper.Current;
+            httpContext ??= HttpContextHelper.Current;
 
             //Jexus反向代理Asp.Net Core
             string res = httpContext.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-forwarded-for")).Value;
+
             if (res.IsNullOrEmpty() || !res.Trim(',').Split(',').Any(x => !IPAddress.IsLoopback(IPAddress.Parse(res))))
             {
                 //使用Jexus的AppHost驱动Asp.Net Core应用
@@ -111,9 +112,7 @@ namespace ZqUtils.Core.Helpers
                 var ip = httpContext.Connection.RemoteIpAddress;
                 //判断是否为回环地址
                 if (ip.IsNotNull() && !IPAddress.IsLoopback(ip))
-                {
                     res = ip.ToString();
-                }
             }
 
             return res;
