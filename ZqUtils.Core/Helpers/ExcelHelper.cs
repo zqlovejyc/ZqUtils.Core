@@ -899,12 +899,8 @@ namespace ZqUtils.Core.Helpers
             //加载数据
             sheet.Cells["A1"].LoadFromCollection(list, true, styles, BindingFlags.Public | BindingFlags.Instance, props);
 
-            //设置Excel头部标题
-            var colStart = sheet.Dimension.Start.Column;//工作区开始列
-            var colEnd = sheet.Dimension.End.Column;//工作区结束列
-
             //遍历列
-            for (var col = colStart; col <= colEnd; col++)
+            for (var col = sheet.Dimension.Start.Column; col <= sheet.Dimension.End.Column; col++)
             {
                 //修复Epplus自动转换实体字段中的下划线为空格导致无法获取PropertyInfo问题
                 var prop = typeof(T).GetProperty(sheet.Cells[1, col].Value.ToString().Replace(" ", "_"));
@@ -939,11 +935,11 @@ namespace ZqUtils.Core.Helpers
                                 v => v.Split(':')[1]);
 
                             //遍历行
-                            for (int i = 2; i <= sheet.Dimension.End.Row; i++)
+                            for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                             {
-                                var cellValue = sheet.Cells[i, col].Value?.ToString();
+                                var cellValue = sheet.Cells[row, col].Value?.ToString();
                                 if (cellValue != null && dic.Keys.Contains(cellValue))
-                                    sheet.Cells[i, col].Value = dic[cellValue];
+                                    sheet.Cells[row, col].Value = dic[cellValue];
                             }
                         }
 
@@ -960,25 +956,25 @@ namespace ZqUtils.Core.Helpers
                             var columnOffsetPixels = int.Parse(dic["cop"]);
 
                             //遍历行
-                            for (int i = 2; i <= sheet.Dimension.End.Row; i++)
+                            for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                             {
-                                var imageValue = sheet.Cells[i, col].Value;
+                                var imageValue = sheet.Cells[row, col].Value;
                                 if (imageValue != null && imageValue is byte[] imgeBytes)
                                 {
                                     //获取图片
                                     using var image = Image.FromStream(new MemoryStream(imgeBytes));
 
                                     //设置行高
-                                    sheet.Row(i).Height = image.Height;
+                                    sheet.Row(row).Height = image.Height;
 
                                     //添加图片
                                     var pic = sheet.Drawings.AddPicture($"image_{DateTime.Now.Ticks}", image);
 
                                     //设定图片位置
-                                    pic.SetPosition(i - 1, rowOffsetPixels, col - 1, columnOffsetPixels);
+                                    pic.SetPosition(row - 1, rowOffsetPixels, col - 1, columnOffsetPixels);
 
                                     //置空
-                                    sheet.Cells[i, col].Value = null;
+                                    sheet.Cells[row, col].Value = null;
                                 }
                             }
                         }
