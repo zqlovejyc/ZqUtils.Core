@@ -99,15 +99,19 @@ namespace ZqUtils.Core.Helpers
             //Jexus反向代理Asp.Net Core
             string res = httpContext.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-forwarded-for")).Value;
 
-            if (res.IsNullOrEmpty() || !res.Trim(',').Split(',').Any(x => !IPAddress.IsLoopback(IPAddress.Parse(x))))
+            res = res?.Trim(',').Split(',').FirstOrDefault();
+
+            if (res.IsNullOrEmpty() || IPAddress.IsLoopback(IPAddress.Parse(res)))
             {
                 //使用Jexus的AppHost驱动Asp.Net Core应用
                 res = httpContext.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-real-ip")).Value;
                 if (res.IsNullOrEmpty())
                     res = httpContext.Request.Headers.FirstOrDefault(x => x.Key.EqualIgnoreCase("x-original-for")).Value;
+
+                res = res?.Trim(',').Split(',').FirstOrDefault();
             }
 
-            if (res.IsNullOrEmpty() || !res.Trim(',').Split(',').Any(x => !IPAddress.IsLoopback(IPAddress.Parse(x))))
+            if (res.IsNullOrEmpty() || IPAddress.IsLoopback(IPAddress.Parse(res)))
             {
                 var ip = httpContext.Connection.RemoteIpAddress;
                 //判断是否为回环地址
