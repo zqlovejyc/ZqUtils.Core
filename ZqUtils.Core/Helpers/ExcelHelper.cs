@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -961,8 +962,15 @@ namespace ZqUtils.Core.Helpers
                                 var imageValue = sheet.Cells[row, col].Value;
                                 if (imageValue != null && imageValue is byte[] imgeBytes)
                                 {
-                                    //获取图片
-                                    using var image = Image.FromStream(new MemoryStream(imgeBytes));
+                                    //加载图片
+                                    using var originImage = Image.FromStream(new MemoryStream(imgeBytes));
+
+                                    //转换图片格式为png，修复jpg在linux下无法导出的问题
+                                    using var pngStream = new MemoryStream();
+                                    originImage.Save(pngStream, ImageFormat.Png);
+
+                                    //重新加载图片
+                                    using var image = Image.FromStream(pngStream);
 
                                     //设置行高
                                     sheet.Row(row).Height = image.Height;
