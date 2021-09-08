@@ -111,6 +111,56 @@ namespace ZqUtils.Core.Extensions
         }
         #endregion
 
+        #region Utf8序列化/反序列化
+        /// <summary>
+        /// 对象序列化为utf8格式的字节数组
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static byte[] SerializeToUtf8Bytes<T>(this T @this, JsonSerializerOptions options = null)
+        {
+            return JSerializer.SerializeToUtf8Bytes(@this, options);
+        }
+
+        /// <summary>
+        /// 对象序列化为utf8格式的字节数组
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="inputType"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static byte[] SerializeToUtf8Bytes(this object @this, Type inputType, JsonSerializerOptions options = null)
+        {
+            return JSerializer.SerializeToUtf8Bytes(@this, inputType, options);
+        }
+
+        /// <summary>
+        /// utf8格式字节数组反序列化为指定类型的对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static T DeserializeUtf8Bytes<T>(this byte[] @this, JsonSerializerOptions options = null)
+        {
+            return JSerializer.Deserialize<T>(@this, options);
+        }
+
+        /// <summary>
+        /// utf8格式字节数组反序列化为指定类型的对象
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="returnType"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static object DeserializeUtf8Bytes(this byte[] @this, Type returnType, JsonSerializerOptions options = null)
+        {
+            return JSerializer.Deserialize(@this, returnType, options);
+        }
+        #endregion
+
         #region ToExpando
         /// <summary>
         /// 匿名对象转换为ExpandoObject，用于mvc中view返回model值
@@ -6013,10 +6063,10 @@ namespace ZqUtils.Core.Extensions
         /// <returns>转换后的对象</returns>
         public static object ChangeType(this object @this, Type type)
         {
-            if (type == null) 
+            if (type == null)
                 return @this;
 
-            if (@this == null) 
+            if (@this == null)
                 return type.IsValueType ? Activator.CreateInstance(type) : null;
 
             var underlyingType = Nullable.GetUnderlyingType(type);
@@ -6028,7 +6078,7 @@ namespace ZqUtils.Core.Extensions
             {
                 if (underlyingType != null && string.IsNullOrEmpty(@this.ToString()))
                     return null;
-                else 
+                else
                     return Enum.Parse(underlyingType ?? type, @this.ToString());
             }
             // 处理DateTime -> DateTimeOffset 类型
