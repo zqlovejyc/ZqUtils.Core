@@ -30,6 +30,7 @@ using StackExchange.Redis;
 using System;
 using System.Linq;
 using ZqUtils.Core.Helpers;
+using NatsConnectionFactory = NATS.Client.ConnectionFactory;
 using NatsOptions = NATS.Client.Options;
 /****************************
 * [Author] 张强
@@ -659,7 +660,8 @@ namespace ZqUtils.Core.Extensions
         /// <returns></returns>
         public static IServiceCollection AddNats(this IServiceCollection @this, IConfiguration configuration)
         {
-            var options = configuration.GetSection("NatsConfig").Get<NatsOptions>();
+            var options = NatsConnectionFactory.GetDefaultOptions();
+            configuration.GetSection("NatsConfig").Bind(options);
 
             return @this.AddNats(options);
         }
