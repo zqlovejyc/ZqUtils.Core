@@ -30,6 +30,7 @@ using StackExchange.Redis;
 using System;
 using System.Linq;
 using ZqUtils.Core.Helpers;
+using NatsOptions = NATS.Client.Options;
 /****************************
 * [Author] 张强
 * [Date] 2018-05-17
@@ -624,6 +625,43 @@ namespace ZqUtils.Core.Extensions
             return @this
                 .AddSingleton<IElasticClient>(x => new ElasticClient(settings))
                 .AddSingleton<IElasticLowLevelClient>(x => new ElasticLowLevelClient(settings));
+        }
+        #endregion
+
+        #region AddNats
+        /// <summary>
+        /// 注入NATS分布式消息
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="url">NATS连接字符串</param>
+        /// <returns></returns>
+        public static IServiceCollection AddNats(this IServiceCollection @this, string url)
+        {
+            return @this.AddSingleton(x => new NatsHelper(url));
+        }
+
+        /// <summary>
+        /// 注入NATS分布式消息
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="options">NATS配置</param>
+        /// <returns></returns>
+        public static IServiceCollection AddNats(this IServiceCollection @this, NatsOptions options)
+        {
+            return @this.AddSingleton(x => new NatsHelper(options));
+        }
+
+        /// <summary>
+        /// 注入NATS分布式消息
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="configuration">section为"NatsConfig"的配置信息</param>
+        /// <returns></returns>
+        public static IServiceCollection AddNats(this IServiceCollection @this, IConfiguration configuration)
+        {
+            var options = configuration.GetSection("NatsConfig").Get<NatsOptions>();
+
+            return @this.AddNats(options);
         }
         #endregion
 
