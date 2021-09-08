@@ -40,14 +40,12 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// RabbitMQ建议客户端线程之间不要共用Model，至少要保证共用Model的线程发送消息必须是串行的，但是建议尽量共用Connection。
         /// </summary>
-        private static readonly ConcurrentDictionary<string, IModel> _channelDic =
-            new ConcurrentDictionary<string, IModel>();
+        private static readonly ConcurrentDictionary<string, IModel> _channelDic = new();
 
         /// <summary>
         /// 用于缓存路由键数据
         /// </summary>
-        private static readonly ConcurrentDictionary<string, (string exchange, string queue, string routeKey)> _routeDic =
-            new ConcurrentDictionary<string, (string exchange, string queue, string routeKey)>();
+        private static readonly ConcurrentDictionary<string, (string exchange, string queue, string routeKey)> _routeDic = new();
 
         /// <summary>
         /// RabbitMq连接
@@ -57,7 +55,7 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 线程对象，线程锁使用
         /// </summary>
-        private static readonly object _locker = new object();
+        private static readonly object _locker = new();
         #endregion
 
         #region 公有属性
