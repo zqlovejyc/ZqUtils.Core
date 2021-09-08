@@ -161,11 +161,16 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public IConnection EnsureAvailabled(IConnection connection)
         {
+            var reassign = connection == null || connection.IsClosed();
+
             if (connection == null)
                 connection = new ConnectionFactory().CreateConnection(_options);
 
             if (connection.IsClosed())
                 connection = new ConnectionFactory().CreateConnection(connection.Opts);
+
+            if (reassign && ReferenceEquals(connection, NatsConnection))
+                NatsConnection = connection;
 
             return connection;
         }
