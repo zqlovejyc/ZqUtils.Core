@@ -170,12 +170,7 @@ namespace ZqUtils.Core.Helpers
             {
                 lock (_locker)
                 {
-                    var newConnection = new ConnectionFactory().CreateConnection(connection?.Opts ?? _options);
-
-                    if (ReferenceEquals(connection, _connection))
-                        _connection = newConnection;
-
-                    return connection = newConnection;
+                    return connection = new ConnectionFactory().CreateConnection(connection?.Opts ?? _options);
                 }
             }
 
