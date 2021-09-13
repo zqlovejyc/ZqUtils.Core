@@ -601,7 +601,7 @@ namespace ZqUtils.Core.Extensions
                 }
             }
 
-            return (T)@this;
+            return default;
         }
 
         /// <summary>
