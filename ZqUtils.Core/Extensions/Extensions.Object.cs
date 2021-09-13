@@ -601,7 +601,7 @@ namespace ZqUtils.Core.Extensions
                 }
             }
 
-            return default;
+            return @this == null ? default : (T)@this;
         }
 
         /// <summary>
@@ -678,7 +678,7 @@ namespace ZqUtils.Core.Extensions
         ///       }
         /// </code>
         /// </example>
-        public static object To(this Object @this, Type type)
+        public static object To(this object @this, Type type)
         {
             if (@this != null)
             {
