@@ -16,18 +16,19 @@
  */
 #endregion
 
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Caching.Memory;
+using ZqUtils.Core.Extensions;
 /****************************
- * [Author] 张强
- * [Date] 2016-04-26
- * [Describe] 缓存工具类
- * **************************/
+* [Author] 张强
+* [Date] 2016-04-26
+* [Describe] 缓存工具类
+* **************************/
 namespace ZqUtils.Core.Helpers
 {
     /// <summary>
@@ -39,14 +40,14 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 私有字段
         /// </summary>
-        private static MemoryCache Cache;
+        private static readonly MemoryCache _cache;
 
         /// <summary>
         /// 静态构造函数
         /// </summary>
         static CacheHelper()
         {
-            Cache = new MemoryCache(new MemoryCacheOptions());
+            _cache = new MemoryCache(new MemoryCacheOptions());
         }
         #endregion
 
@@ -61,7 +62,7 @@ namespace ZqUtils.Core.Helpers
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
 
-            return Cache.TryGetValue(key, out _);
+            return _cache.TryGetValue(key, out _);
         }
 
         /// <summary>
@@ -69,12 +70,12 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">缓存Key</param>
         /// <returns></returns>
-        public static T Get<T>(string key) where T : class
+        public static T Get<T>(string key)
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
 
-            return Cache.Get(key) as T;
+            return _cache.Get(key).To<T>();
         }
 
         /// <summary>
@@ -87,7 +88,7 @@ namespace ZqUtils.Core.Helpers
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
 
-            return Cache.Get(key);
+            return _cache.Get(key);
         }
 
         /// <summary>
@@ -101,7 +102,8 @@ namespace ZqUtils.Core.Helpers
                 throw new ArgumentNullException(nameof(keys));
 
             var dict = new Dictionary<string, object>();
-            keys.ToList().ForEach(item => dict.Add(item, Cache.Get(item)));
+            keys.ToList().ForEach(item => dict.Add(item, _cache.Get(item)));
+
             return dict;
         }
 
@@ -113,8 +115,9 @@ namespace ZqUtils.Core.Helpers
         public static IList<string> SearchCacheRegex(string pattern)
         {
             var cacheKeys = GetCacheKeys();
-            var l = cacheKeys.Where(k => Regex.IsMatch(k, pattern)).ToList();
-            return l.AsReadOnly();
+            var caches = cacheKeys.Where(k => Regex.IsMatch(k, pattern)).ToList();
+
+            return caches.AsReadOnly();
         }
 
         /// <summary>
@@ -124,18 +127,40 @@ namespace ZqUtils.Core.Helpers
         public static List<string> GetCacheKeys()
         {
             const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
-            var entries = Cache.GetType().GetField("_entries", flags).GetValue(Cache);
+            var entries = _cache.GetType().GetField("_entries", flags).GetValue(_cache);
             var keys = new List<string>();
-            if (!(entries is IDictionary cacheItems)) return keys;
+            if (entries is not IDictionary cacheItems)
+                return keys;
+
             foreach (DictionaryEntry cacheItem in cacheItems)
             {
                 keys.Add(cacheItem.Key.ToString());
             }
+
             return keys;
         }
         #endregion
 
         #region 添加缓存
+        /// <summary>
+        /// 添加缓存
+        /// </summary>
+        /// <param name="key">缓存Key</param>
+        /// <param name="value">缓存Value</param>
+        /// <returns></returns>
+        public static bool Set(string key, object value)
+        {
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            _cache.Set(key, value);
+
+            return Exists(key);
+        }
+
         /// <summary>
         /// 添加缓存
         /// </summary>
@@ -148,12 +173,15 @@ namespace ZqUtils.Core.Helpers
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
+
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            Cache.Set(key, value,
-                new MemoryCacheEntryOptions().SetSlidingExpiration(expiresSliding)
+            _cache.Set(key, value,
+                new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(expiresSliding)
                     .SetAbsoluteExpiration(expiressAbsoulte));
+
             return Exists(key);
         }
 
@@ -172,7 +200,7 @@ namespace ZqUtils.Core.Helpers
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            Cache.Set(key, value,
+            _cache.Set(key, value,
                 isSliding
                     ? new MemoryCacheEntryOptions().SetSlidingExpiration(expiresIn)
                     : new MemoryCacheEntryOptions().SetAbsoluteExpiration(expiresIn));
@@ -192,7 +220,7 @@ namespace ZqUtils.Core.Helpers
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
 
-            Cache.Remove(key);
+            _cache.Remove(key);
         }
 
         /// <summary>
@@ -204,7 +232,7 @@ namespace ZqUtils.Core.Helpers
             if (keys == null)
                 throw new ArgumentNullException(nameof(keys));
 
-            keys.ToList().ForEach(item => Cache.Remove(item));
+            keys.ToList().ForEach(item => _cache.Remove(item));
         }
 
         /// <summary>
@@ -212,11 +240,13 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         public static void RemoveCacheAll()
         {
-            var l = GetCacheKeys();
-            foreach (var s in l)
-            {
-                Remove(s);
-            }
+            var keys = GetCacheKeys();
+
+            if (keys.IsNotNullOrEmpty())
+                foreach (var key in keys)
+                {
+                    Remove(key);
+                }
         }
 
         /// <summary>
@@ -226,11 +256,13 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static void RemoveCacheRegex(string pattern)
         {
-            IList<string> l = SearchCacheRegex(pattern);
-            foreach (var s in l)
-            {
-                Remove(s);
-            }
+            var keys = SearchCacheRegex(pattern);
+
+            if (keys.IsNotNullOrEmpty())
+                foreach (var key in keys)
+                {
+                    Remove(key);
+                }
         }
         #endregion
     }
