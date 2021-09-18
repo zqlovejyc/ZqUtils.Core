@@ -16,10 +16,13 @@
  */
 #endregion
 
+using AgileConfig.Client;
 using Com.Ctrip.Framework.Apollo;
 using Com.Ctrip.Framework.Apollo.Enums;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
@@ -54,17 +57,22 @@ namespace ZqUtils.Core.Helpers
             if (environment.IsNotNullOrEmpty())
                 jsonFile = $"appsettings.{environment}.json";
 
-            SetConfigurationFile(jsonFile);
+            //添加appsettings自定义环境变量
+            var env = Environment.GetEnvironmentVariable("APPSETTINGS_ENVIRONMENT");
+            if (env.IsNotNullOrWhiteSpace())
+                jsonFile = $"appsettings.{env}.json";
+
+            SetConfiguration(jsonFile);
         }
         #endregion
 
-        #region SetConfigurationFile
+        #region SetConfiguration
         /// <summary>
-        /// 设置app配置
+        /// 设置app配置(json文件)
         /// </summary>
         /// <param name="fileName">文件名</param>
         /// <param name="basePath">文件路径，默认：Directory.GetCurrentDirectory()</param>
-        public static void SetConfigurationFile(string fileName, string basePath = null)
+        public static void SetConfiguration(string fileName, string basePath = null)
         {
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(string.IsNullOrEmpty(basePath) ? Directory.GetCurrentDirectory() : basePath)
@@ -73,12 +81,12 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
-        /// 设置app配置
+        /// 设置app配置(Apollo)
         /// </summary>
         /// <param name="appId">Apollo的AppId</param>
         /// <param name="metaServer">Apollo的配置中心地址</param>
         /// <param name="nameSpace">Apollo命名空间</param>
-        public static void SetConfigurationFile(string appId, string metaServer, string nameSpace)
+        public static void SetConfiguration(string appId, string metaServer, string nameSpace)
         {
             Configuration = new ConfigurationBuilder()
                 .AddApollo(appId, metaServer)
@@ -87,12 +95,12 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
-        /// 设置app配置
+        /// 设置app配置(Apollo)
         /// </summary>
         /// <param name="appId">Apollo的AppId</param>
         /// <param name="metaServer">Apollo的配置中心地址</param>
         /// <param name="action">Apollo自定义委托</param>
-        public static void SetConfigurationFile(string appId, string metaServer, Action<IApolloConfigurationBuilder> action)
+        public static void SetConfiguration(string appId, string metaServer, Action<IApolloConfigurationBuilder> action)
         {
             var builder = new ConfigurationBuilder()
                 .AddApollo(appId, metaServer);
@@ -100,6 +108,35 @@ namespace ZqUtils.Core.Helpers
             action?.Invoke(builder);
 
             Configuration = builder.Build();
+        }
+
+        /// <summary>
+        /// 设置app配置(AgileConfig)
+        /// </summary>
+        /// <param name="client">AgileConfig客户端配置</param>
+        /// <param name="action">AgileConfig自定义委托</param>
+        public static void SetConfiguration(ConfigClient client, Action<ConfigChangedArg> action)
+        {
+            Configuration = new ConfigurationBuilder()
+                .AddAgileConfig(client, action)
+                .Build();
+        }
+
+        /// <summary>
+        /// 设置app配置(AgileConfig)
+        /// </summary>
+        /// <param name="appId">AgileConfig客户端appId</param>
+        /// <param name="secret">AgileConfig客户端secret</param>
+        /// <param name="serverNodes">AgileConfig客户端serverNodes</param>
+        /// <param name="action">AgileConfig自定义委托</param>
+        /// <param name="logger">ILogger日志</param>
+        public static void SetConfiguration(string appId, string secret, string serverNodes, Action<ConfigChangedArg> action, ILogger logger = null)
+        {
+            var client = new ConfigClient(appId, secret, serverNodes, logger);
+
+            Configuration = new ConfigurationBuilder()
+                .AddAgileConfig(client, action)
+                .Build();
         }
         #endregion
 
