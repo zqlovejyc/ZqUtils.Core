@@ -28,6 +28,7 @@ using RabbitMQ.Client;
 using Scrutor;
 using StackExchange.Redis;
 using System;
+using System.IO;
 using System.Linq;
 using ZqUtils.Core.Helpers;
 using NatsConnectionFactory = NATS.Client.ConnectionFactory;
@@ -177,11 +178,13 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this">IServiceCollection</param>
         /// <param name="configuration">json配置</param>
         /// <param name="action">IConnectionMultiplexer自定义委托</param>
+        /// <param name="log">记录redis连接日志</param>
         /// <returns></returns>
         public static IServiceCollection AddStackExchangeRedis(
             this IServiceCollection @this,
             IConfiguration configuration,
-            Action<IConnectionMultiplexer> action = null)
+            Action<IConnectionMultiplexer> action = null,
+            TextWriter log = null)
         {
             //判断是否禁用Redis
             if (configuration.GetValue<bool?>("Redis:Enabled") == false)
@@ -194,7 +197,7 @@ namespace ZqUtils.Core.Extensions
             if (connectionString.IsNullOrEmpty())
                 throw new ArgumentNullException("Redis连接字符串配置为null");
 
-            @this.AddTransient(x => new RedisHelper(connectionString, action));
+            @this.AddTransient(x => new RedisHelper(connectionString, action, log));
 
             @this.AddSingleton(x => x.GetRequiredService<RedisHelper>().IConnectionMultiplexer);
 
