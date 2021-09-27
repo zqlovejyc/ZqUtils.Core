@@ -43,7 +43,7 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// app配置
         /// </summary>
-        public static IConfigurationRoot Configuration { get; private set; }
+        public static IConfiguration Configuration { get; private set; }
         #endregion
 
         #region Constructor
@@ -67,6 +67,15 @@ namespace ZqUtils.Core.Helpers
         #endregion
 
         #region SetConfiguration
+        /// <summary>
+        /// 设置app配置
+        /// </summary>
+        /// <param name="configuration">配置</param>
+        public static void SetConfiguration(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
         /// <summary>
         /// 设置app配置(json文件)
         /// </summary>
