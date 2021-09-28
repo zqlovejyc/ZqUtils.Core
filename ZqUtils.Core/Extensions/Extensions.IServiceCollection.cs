@@ -245,7 +245,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new MongodbHelper());
+                    @this.AddSingleton(x => new MongodbHelper());
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped(x => new MongodbHelper());
@@ -276,7 +276,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new MongodbHelper(databaseName, settings));
+                    @this.AddSingleton(x => new MongodbHelper(databaseName, settings));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped(x => new MongodbHelper(databaseName, settings));
@@ -309,7 +309,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new MongodbHelper(databaseName, connectionString, isMongoClientSettings));
+                    @this.AddSingleton(x => new MongodbHelper(databaseName, connectionString, isMongoClientSettings));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped(x => new MongodbHelper(databaseName, connectionString, isMongoClientSettings));
@@ -343,7 +343,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton<IMongoClient>(new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
+                    @this.AddSingleton<IMongoClient>(x => new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped<IMongoClient>(x => new MongoClient(configuration.GetValue<string>("Mongodb:ConnectionString")));
@@ -372,7 +372,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton<IMongoClient>(new MongoClient(connectionString));
+                    @this.AddSingleton<IMongoClient>(x => new MongoClient(connectionString));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped<IMongoClient>(x => new MongoClient(connectionString));
@@ -401,7 +401,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton<IMongoClient>(new MongoClient(url));
+                    @this.AddSingleton<IMongoClient>(x => new MongoClient(url));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped<IMongoClient>(x => new MongoClient(url));
@@ -430,7 +430,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton<IMongoClient>(new MongoClient(settings));
+                    @this.AddSingleton<IMongoClient>(x => new MongoClient(settings));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped<IMongoClient>(x => new MongoClient(settings));
@@ -461,7 +461,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new RabbitMqHelper(factory));
+                    @this.AddSingleton(x => new RabbitMqHelper(factory));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped(x => new RabbitMqHelper(factory));
@@ -490,7 +490,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new RabbitMqHelper(config));
+                    @this.AddSingleton(x => new RabbitMqHelper(config));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped(x => new RabbitMqHelper(config));
@@ -522,7 +522,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new RabbitMqHelper(configuration.GetSection("RabbitMq").Get<MqConfig>()));
+                    @this.AddSingleton(x => new RabbitMqHelper(configuration.GetSection("RabbitMq").Get<MqConfig>()));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped(x => new RabbitMqHelper(configuration.GetSection("RabbitMq").Get<MqConfig>()));
@@ -554,7 +554,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new KafkaHelper());
+                    @this.AddSingleton(x => new KafkaHelper());
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped(x => new KafkaHelper());
@@ -583,7 +583,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new KafkaHelper(config));
+                    @this.AddSingleton(x => new KafkaHelper(config));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped(x => new KafkaHelper(config));
@@ -614,7 +614,7 @@ namespace ZqUtils.Core.Extensions
             switch (lifeTime)
             {
                 case ServiceLifetime.Singleton:
-                    @this.AddSingleton(new KafkaHelper(producerConfig, consumerConfig));
+                    @this.AddSingleton(x => new KafkaHelper(producerConfig, consumerConfig));
                     break;
                 case ServiceLifetime.Scoped:
                     @this.AddScoped(x => new KafkaHelper(producerConfig, consumerConfig));
