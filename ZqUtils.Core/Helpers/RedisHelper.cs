@@ -35,7 +35,7 @@ namespace ZqUtils.Core.Helpers
     /// <summary>
     /// Redis帮助工具类
     /// </summary>
-    public class RedisHelper
+    public class RedisHelper : IDisposable
     {
         #region 私有字段
         /// <summary>
@@ -52,6 +52,16 @@ namespace ZqUtils.Core.Helpers
         /// redis连接对象
         /// </summary>
         private static IConnectionMultiplexer _connectionMultiplexer;
+
+        /// <summary>
+        /// redis连接池
+        /// </summary>
+        private readonly IRedisCacheConnectionPoolManager _poolManager;
+
+        /// <summary>
+        /// 是否释放
+        /// </summary>
+        private bool _disposed;
         #endregion
 
         #region 公有属性
@@ -64,6 +74,11 @@ namespace ZqUtils.Core.Helpers
         /// IConnectionMultiplexer对象
         /// </summary>
         public IConnectionMultiplexer IConnectionMultiplexer => _connectionMultiplexer;
+
+        /// <summary>
+        /// Redis连接池
+        /// </summary>
+        public IRedisCacheConnectionPoolManager RedisConnectionPoolManager => _poolManager;
 
         /// <summary>
         /// 数据库，注意单例对象不建议修改
@@ -163,7 +178,7 @@ namespace ZqUtils.Core.Helpers
         public RedisHelper(
             IRedisCacheConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null) =>
-            Database = GetConnectionMultiplexer(poolManager, action).GetDatabase();
+            Database = GetConnectionMultiplexer(_poolManager = poolManager, action).GetDatabase();
 
         /// <summary>
         /// 构造函数
@@ -175,7 +190,7 @@ namespace ZqUtils.Core.Helpers
             int defaultDatabase,
             IRedisCacheConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null) =>
-            Database = GetConnectionMultiplexer(poolManager, action).GetDatabase(defaultDatabase);
+            Database = GetConnectionMultiplexer(_poolManager = poolManager, action).GetDatabase(defaultDatabase);
         #endregion 构造函数
 
         #region 连接对象
@@ -2789,7 +2804,7 @@ namespace ZqUtils.Core.Helpers
         #endregion
         #endregion
 
-        #region  发布/订阅[当作消息代理中间件使用 一般使用更专业的消息队列来处理这种业务场景]
+        #region  发布/订阅
         /// <summary>
         /// 当作消息代理中间件使用
         /// 消息组建中,重要的概念便是生产者,消费者,消息中间件
@@ -2804,6 +2819,19 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
+        /// 当作消息代理中间件使用
+        /// 消息组建中,重要的概念便是生产者,消费者,消息中间件
+        /// </summary>
+        /// <param name="channel">通道</param>
+        /// <param name="message">消息</param>
+        /// <returns>返回收到消息的客户端数量</returns>
+        public async Task<long> PublishAsync(string channel, string message)
+        {
+            var sub = GetConnectionMultiplexer().GetSubscriber();
+            return await sub.PublishAsync(channel, message);
+        }
+
+        /// <summary>
         /// 在消费者端得到该消息并输出
         /// </summary>
         /// <param name="channelFrom">通道来源</param>
@@ -2812,6 +2840,38 @@ namespace ZqUtils.Core.Helpers
         {
             var sub = GetConnectionMultiplexer().GetSubscriber();
             sub.Subscribe(channelFrom, (channel, message) => subscribeFn?.Invoke(message));
+        }
+
+        /// <summary>
+        /// 在消费者端得到该消息并输出
+        /// </summary>
+        /// <param name="channelFrom">通道来源</param>
+        /// <param name="subscribeFn">订阅处理委托</param>
+        public async Task SubscribeAsync(string channelFrom, Action<RedisValue> subscribeFn)
+        {
+            var sub = GetConnectionMultiplexer().GetSubscriber();
+            await sub.SubscribeAsync(channelFrom, (channel, message) => subscribeFn?.Invoke(message));
+        }
+        #endregion
+
+        #region 释放资源
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+
+            if (_poolManager != null)
+                _poolManager.Dispose();
+
+            else if (_connectionMultiplexer != null)
+                _connectionMultiplexer.Dispose();
+
+            GC.SuppressFinalize(this);
+
+            _disposed = true;
         }
         #endregion
         #endregion
