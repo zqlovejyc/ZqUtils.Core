@@ -57,11 +57,6 @@ namespace ZqUtils.Core.Helpers
         /// redis连接池
         /// </summary>
         private readonly IRedisCacheConnectionPoolManager _poolManager;
-
-        /// <summary>
-        /// 是否释放
-        /// </summary>
-        private bool _disposed;
         #endregion
 
         #region 公有属性
