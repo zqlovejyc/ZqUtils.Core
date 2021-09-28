@@ -26,13 +26,16 @@ using Nest;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Scrutor;
-using StackExchange.Redis;
 using System;
 using System.IO;
 using System.Linq;
+using StackExchange.Redis;
+using StackExchange.Redis.Extensions.Core.Abstractions;
+using StackExchange.Redis.Extensions.Core.Configuration;
+using StackExchange.Redis.Extensions.Core.Implementations;
 using ZqUtils.Core.Helpers;
-using NatsConnectionFactory = NATS.Client.ConnectionFactory;
 using NatsOptions = NATS.Client.Options;
+using NatsConnectionFactory = NATS.Client.ConnectionFactory;
 /****************************
 * [Author] 张强
 * [Date] 2018-05-17
@@ -173,18 +176,20 @@ namespace ZqUtils.Core.Extensions
 
         #region AddStackExchangeRedis
         /// <summary>
-        /// 注入RedisHelper、IConnectionMultiplexer
+        /// 注入RedisHelper、IConnectionMultiplexer、IRedisCacheConnectionPoolManager
         /// </summary>
         /// <param name="this">IServiceCollection</param>
         /// <param name="configuration">json配置</param>
         /// <param name="action">IConnectionMultiplexer自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
+        /// <param name="useConnectionPool">是否使用redis连接池</param>
         /// <returns></returns>
         public static IServiceCollection AddStackExchangeRedis(
             this IServiceCollection @this,
             IConfiguration configuration,
             Action<IConnectionMultiplexer> action = null,
-            TextWriter log = null)
+            TextWriter log = null,
+            bool useConnectionPool = true)
         {
             //判断是否禁用Redis
             if (configuration.GetValue<bool?>("Redis:Enabled") == false)
@@ -197,7 +202,25 @@ namespace ZqUtils.Core.Extensions
             if (connectionString.IsNullOrEmpty())
                 throw new ArgumentNullException("Redis连接字符串配置为null");
 
-            @this.AddTransient(x => new RedisHelper(connectionString, action, log));
+            ConfigHelper.SetConfiguration(configuration);
+
+            if (!useConnectionPool)
+                @this.AddTransient(x => new RedisHelper(connectionString, action, log));
+            else
+            {
+                //注入redis连接池配置
+                @this.AddSingleton(x => new RedisConfiguration
+                {
+                    ConnectionString = connectionString,
+                    PoolSize = configuration.GetValue<int?>("Redis:PoolSize") ?? 10
+                });
+
+                //注入redis连接池
+                @this.AddSingleton<IRedisCacheConnectionPoolManager, RedisCacheConnectionPoolManager>();
+
+                //注入RedisHelper
+                @this.AddTransient(x => new RedisHelper(x.GetRequiredService<IRedisCacheConnectionPoolManager>(), action));
+            }
 
             @this.AddSingleton(x => x.GetRequiredService<RedisHelper>().IConnectionMultiplexer);
 

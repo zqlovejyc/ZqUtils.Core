@@ -17,6 +17,7 @@
 #endregion
 
 using StackExchange.Redis;
+using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -135,6 +136,28 @@ namespace ZqUtils.Core.Helpers
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null) =>
             Database = GetConnectionRedisMultiplexer(configurationOptions, action, log).GetDatabase();
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="poolManager">redis连接池</param>
+        /// <param name="action">自定义委托</param>
+        public RedisHelper(
+            IRedisCacheConnectionPoolManager poolManager,
+            Action<IConnectionMultiplexer> action = null) =>
+            Database = GetConnectionRedisMultiplexer(poolManager, action).GetDatabase();
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="defaultDatabase">数据库索引</param>
+        /// <param name="poolManager">redis连接池</param>
+        /// <param name="action">自定义委托</param>
+        public RedisHelper(
+            int defaultDatabase,
+            IRedisCacheConnectionPoolManager poolManager,
+            Action<IConnectionMultiplexer> action = null) =>
+            Database = GetConnectionRedisMultiplexer(poolManager, action).GetDatabase(defaultDatabase);
         #endregion 构造函数
 
         #region 连接对象
@@ -175,20 +198,21 @@ namespace ZqUtils.Core.Helpers
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null)
         {
-            if (_connectionMultiplexer == null || !_connectionMultiplexer.IsConnected)
+            if (_connectionMultiplexer != null && _connectionMultiplexer.IsConnected)
+                return _connectionMultiplexer;
+
+            lock (_lock)
             {
-                lock (_lock)
-                {
-                    if (_connectionMultiplexer == null || !_connectionMultiplexer.IsConnected)
-                    {
-                        _connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString, log);
+                if (_connectionMultiplexer != null && _connectionMultiplexer.IsConnected)
+                    return _connectionMultiplexer;
 
-                        action?.Invoke(_connectionMultiplexer);
+                _connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString, log);
 
-                        AddRegisterEvent();
-                    }
-                }
+                action?.Invoke(_connectionMultiplexer);
+
+                AddRegisterEvent();
             }
+
             return _connectionMultiplexer;
         }
 
@@ -204,20 +228,41 @@ namespace ZqUtils.Core.Helpers
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null)
         {
-            if (_connectionMultiplexer == null || !_connectionMultiplexer.IsConnected)
+            if (_connectionMultiplexer != null && _connectionMultiplexer.IsConnected)
+                return _connectionMultiplexer;
+
+            lock (_lock)
             {
-                lock (_lock)
-                {
-                    if (_connectionMultiplexer == null || !_connectionMultiplexer.IsConnected)
-                    {
-                        _connectionMultiplexer = ConnectionMultiplexer.Connect(configurationOptions, log);
+                if (_connectionMultiplexer != null && _connectionMultiplexer.IsConnected)
+                    return _connectionMultiplexer;
 
-                        action?.Invoke(_connectionMultiplexer);
+                _connectionMultiplexer = ConnectionMultiplexer.Connect(configurationOptions, log);
 
-                        AddRegisterEvent();
-                    }
-                }
+                action?.Invoke(_connectionMultiplexer);
+
+                AddRegisterEvent();
             }
+
+            return _connectionMultiplexer;
+        }
+
+        /// <summary>
+        /// 获取redis连接对象
+        /// </summary>
+        /// <param name="poolManager">redis连接池</param>
+        /// <param name="action">自定义委托</param>
+        /// <returns>返回IConnectionMultiplexer</returns>
+        public static IConnectionMultiplexer GetConnectionRedisMultiplexer(
+            IRedisCacheConnectionPoolManager poolManager,
+            Action<IConnectionMultiplexer> action = null)
+        {
+            if (_connectionMultiplexer != null && _connectionMultiplexer.IsConnected)
+                return _connectionMultiplexer;
+
+            _connectionMultiplexer = poolManager.GetConnection();
+
+            action?.Invoke(_connectionMultiplexer);
+
             return _connectionMultiplexer;
         }
         #endregion
@@ -259,29 +304,29 @@ namespace ZqUtils.Core.Helpers
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null)
         {
-            if (_connectionMultiplexer == null || !_connectionMultiplexer.IsConnected)
+            if (_connectionMultiplexer != null && _connectionMultiplexer.IsConnected)
+                return _connectionMultiplexer;
+
+            try
             {
-                try
-                {
-                    await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
+                await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
 
-                    if (_connectionMultiplexer == null || !_connectionMultiplexer.IsConnected)
-                    {
-                        _connectionMultiplexer = await ConnectionMultiplexer.ConnectAsync(redisConnectionString, log);
+                if (_connectionMultiplexer != null && _connectionMultiplexer.IsConnected)
+                    return _connectionMultiplexer;
 
-                        action?.Invoke(_connectionMultiplexer);
+                _connectionMultiplexer = await ConnectionMultiplexer.ConnectAsync(redisConnectionString, log);
 
-                        AddRegisterEvent();
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                finally
-                {
-                    _semaphoreSlim.Release();
-                }
+                action?.Invoke(_connectionMultiplexer);
+
+                AddRegisterEvent();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
             }
 
             return _connectionMultiplexer;
@@ -299,29 +344,29 @@ namespace ZqUtils.Core.Helpers
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null)
         {
-            if (_connectionMultiplexer == null || !_connectionMultiplexer.IsConnected)
+            if (_connectionMultiplexer != null && _connectionMultiplexer.IsConnected)
+                return _connectionMultiplexer;
+
+            try
             {
-                try
-                {
-                    await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
+                await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
 
-                    if (_connectionMultiplexer == null || !_connectionMultiplexer.IsConnected)
-                    {
-                        _connectionMultiplexer = await ConnectionMultiplexer.ConnectAsync(configurationOptions, log);
+                if (_connectionMultiplexer != null && _connectionMultiplexer.IsConnected)
+                    return _connectionMultiplexer;
 
-                        action?.Invoke(_connectionMultiplexer);
+                _connectionMultiplexer = await ConnectionMultiplexer.ConnectAsync(configurationOptions, log);
 
-                        AddRegisterEvent();
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                finally
-                {
-                    _semaphoreSlim.Release();
-                }
+                action?.Invoke(_connectionMultiplexer);
+
+                AddRegisterEvent();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
             }
 
             return _connectionMultiplexer;
