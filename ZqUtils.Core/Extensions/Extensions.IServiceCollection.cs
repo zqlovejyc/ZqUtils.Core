@@ -183,13 +183,15 @@ namespace ZqUtils.Core.Extensions
         /// <param name="action">IConnectionMultiplexer自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
         /// <param name="useConnectionPool">是否使用redis连接池</param>
+        /// <param name="redisConfiguration">redis连接池配置</param>
         /// <returns></returns>
         public static IServiceCollection AddStackExchangeRedis(
             this IServiceCollection @this,
             IConfiguration configuration,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null,
-            bool useConnectionPool = true)
+            bool useConnectionPool = true,
+            RedisConfiguration redisConfiguration = null)
         {
             //判断是否禁用Redis
             if (configuration.GetValue<bool?>("Redis:Enabled") == false)
@@ -209,7 +211,7 @@ namespace ZqUtils.Core.Extensions
             else
             {
                 //注入redis连接池配置
-                @this.AddSingleton(x => new RedisConfiguration
+                @this.AddSingleton(x => redisConfiguration ?? new RedisConfiguration
                 {
                     ConnectionString = connectionString,
                     PoolSize = configuration.GetValue<int?>("Redis:PoolSize") ?? 10
