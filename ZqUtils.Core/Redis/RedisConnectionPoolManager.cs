@@ -104,7 +104,7 @@ namespace ZqUtils.Core.Redis
         }
 
         /// <summary>
-        ///     Gets the information about the connection pool
+        /// Gets the information about the connection pool
         /// </summary>
         public ConnectionPoolInformation GetConnectionInformations()
         {

@@ -33,7 +33,7 @@ namespace ZqUtils.Core.Redis
         IConnectionMultiplexer GetConnection();
 
         /// <summary>
-        ///     Gets the information about the connection pool
+        /// Gets the information about the connection pool
         /// </summary>
         ConnectionPoolInformation GetConnectionInformations();
     }
