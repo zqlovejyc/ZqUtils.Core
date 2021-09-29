@@ -17,7 +17,6 @@
 #endregion
 
 using StackExchange.Redis;
-using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,6 +24,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ZqUtils.Core.Extensions;
+using ZqUtils.Core.Redis;
 /****************************
 * [Author] 张强
 * [Date] 2018-03-21
@@ -56,7 +56,7 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// redis连接池
         /// </summary>
-        private readonly IRedisCacheConnectionPoolManager _poolManager;
+        private readonly IRedisConnectionPoolManager _poolManager;
 
         /// <summary>
         /// redis连接池创建的连接对象
@@ -79,7 +79,7 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// Redis连接池
         /// </summary>
-        public IRedisCacheConnectionPoolManager RedisConnectionPoolManager => _poolManager;
+        public IRedisConnectionPoolManager RedisConnectionPoolManager => _poolManager;
 
         /// <summary>
         /// 数据库，注意单例对象不建议修改
@@ -177,7 +177,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="poolManager">redis连接池</param>
         /// <param name="action">自定义委托</param>
         public RedisHelper(
-            IRedisCacheConnectionPoolManager poolManager,
+            IRedisConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null) =>
             Database = (_poolMultiplexer = GetConnectionMultiplexer(_poolManager = poolManager, action)).GetDatabase();
 
@@ -189,7 +189,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">自定义委托</param>
         public RedisHelper(
             int defaultDatabase,
-            IRedisCacheConnectionPoolManager poolManager,
+            IRedisConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null) =>
             Database = (_poolMultiplexer = GetConnectionMultiplexer(_poolManager = poolManager, action)).GetDatabase(defaultDatabase);
         #endregion 构造函数
@@ -287,7 +287,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">自定义委托</param>
         /// <returns>返回IConnectionMultiplexer</returns>
         public static IConnectionMultiplexer GetConnectionMultiplexer(
-            IRedisCacheConnectionPoolManager poolManager,
+            IRedisConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null)
         {
             var connection = poolManager.GetConnection();

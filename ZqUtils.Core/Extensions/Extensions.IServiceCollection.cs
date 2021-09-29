@@ -27,15 +27,13 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Scrutor;
 using StackExchange.Redis;
-using StackExchange.Redis.Extensions.Core.Abstractions;
-using StackExchange.Redis.Extensions.Core.Configuration;
-using StackExchange.Redis.Extensions.Core.Implementations;
 using System;
 using System.IO;
 using System.Linq;
 using ZqUtils.Core.Helpers;
-using NatsConnectionFactory = NATS.Client.ConnectionFactory;
+using ZqUtils.Core.Redis;
 using NatsOptions = NATS.Client.Options;
+using NatsConnectionFactory = NATS.Client.ConnectionFactory;
 /****************************
 * [Author] 张强
 * [Date] 2018-05-17
@@ -207,7 +205,7 @@ namespace ZqUtils.Core.Extensions
             ConfigHelper.SetConfiguration(configuration);
 
             //redis数据库索引
-            var database = redisConfiguration?.Database ?? configuration.GetValue<int?>("Redis:Database") ?? 0;
+            var database = configuration.GetValue<int?>("Redis:Database") ?? 0;
 
             if (!useConnectionPool)
                 @this.AddTransient(x => new RedisHelper(connectionString, database, action, log));
@@ -217,14 +215,16 @@ namespace ZqUtils.Core.Extensions
                 @this.AddSingleton(x => redisConfiguration ?? new RedisConfiguration
                 {
                     ConnectionString = connectionString,
-                    PoolSize = configuration.GetValue<int?>("Redis:PoolSize") ?? 10
+                    PoolSize = configuration.GetValue<int?>("Redis:PoolSize") ?? 10,
+                    ConnectLogger = log,
+                    Action = action
                 });
 
                 //注入redis连接池
-                @this.AddSingleton<IRedisCacheConnectionPoolManager, RedisCacheConnectionPoolManager>();
+                @this.AddSingleton<IRedisConnectionPoolManager, RedisConnectionPoolManager>();
 
                 //注入RedisHelper
-                @this.AddTransient(x => new RedisHelper(database, x.GetRequiredService<IRedisCacheConnectionPoolManager>(), action));
+                @this.AddTransient(x => new RedisHelper(database, x.GetRequiredService<IRedisConnectionPoolManager>(), action));
             }
 
             @this.AddSingleton(x => x.GetRequiredService<RedisHelper>().IConnectionMultiplexer);
