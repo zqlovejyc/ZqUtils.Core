@@ -49,7 +49,7 @@ namespace ZqUtils.Core.Helpers
         private static readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
         /// <summary>
-        /// redis连接对象
+        /// redis单例连接对象
         /// </summary>
         private static IConnectionMultiplexer _connectionMultiplexer;
 
@@ -57,6 +57,11 @@ namespace ZqUtils.Core.Helpers
         /// redis连接池
         /// </summary>
         private readonly IRedisCacheConnectionPoolManager _poolManager;
+
+        /// <summary>
+        /// redis连接池创建的连接对象
+        /// </summary>
+        private readonly IConnectionMultiplexer _poolMultiplexer;
         #endregion
 
         #region 公有属性
@@ -68,7 +73,8 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// IConnectionMultiplexer对象
         /// </summary>
-        public IConnectionMultiplexer IConnectionMultiplexer => _connectionMultiplexer;
+        public IConnectionMultiplexer IConnectionMultiplexer =>
+            _poolManager != null ? _poolMultiplexer : _connectionMultiplexer;
 
         /// <summary>
         /// Redis连接池
@@ -173,7 +179,7 @@ namespace ZqUtils.Core.Helpers
         public RedisHelper(
             IRedisCacheConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null) =>
-            Database = GetConnectionMultiplexer(_poolManager = poolManager, action).GetDatabase();
+            Database = (_poolMultiplexer = GetConnectionMultiplexer(_poolManager = poolManager, action)).GetDatabase();
 
         /// <summary>
         /// 构造函数
@@ -185,7 +191,7 @@ namespace ZqUtils.Core.Helpers
             int defaultDatabase,
             IRedisCacheConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null) =>
-            Database = GetConnectionMultiplexer(_poolManager = poolManager, action).GetDatabase(defaultDatabase);
+            Database = (_poolMultiplexer = GetConnectionMultiplexer(_poolManager = poolManager, action)).GetDatabase(defaultDatabase);
         #endregion 构造函数
 
         #region 连接对象
@@ -284,14 +290,11 @@ namespace ZqUtils.Core.Helpers
             IRedisCacheConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null)
         {
-            if (_connectionMultiplexer != null && _connectionMultiplexer.IsConnected)
-                return _connectionMultiplexer;
+            var connection = poolManager.GetConnection();
 
-            _connectionMultiplexer = poolManager.GetConnection();
+            action?.Invoke(connection);
 
-            action?.Invoke(_connectionMultiplexer);
-
-            return _connectionMultiplexer;
+            return connection;
         }
         #endregion
 

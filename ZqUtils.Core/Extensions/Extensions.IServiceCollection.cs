@@ -26,16 +26,16 @@ using Nest;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Scrutor;
-using System;
-using System.IO;
-using System.Linq;
 using StackExchange.Redis;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.Core.Implementations;
+using System;
+using System.IO;
+using System.Linq;
 using ZqUtils.Core.Helpers;
-using NatsOptions = NATS.Client.Options;
 using NatsConnectionFactory = NATS.Client.ConnectionFactory;
+using NatsOptions = NATS.Client.Options;
 /****************************
 * [Author] 张强
 * [Date] 2018-05-17
@@ -206,8 +206,11 @@ namespace ZqUtils.Core.Extensions
 
             ConfigHelper.SetConfiguration(configuration);
 
+            //redis数据库索引
+            var database = redisConfiguration?.Database ?? configuration.GetValue<int?>("Redis:Database") ?? 0;
+
             if (!useConnectionPool)
-                @this.AddTransient(x => new RedisHelper(connectionString, action, log));
+                @this.AddTransient(x => new RedisHelper(connectionString, database, action, log));
             else
             {
                 //注入redis连接池配置
@@ -221,7 +224,7 @@ namespace ZqUtils.Core.Extensions
                 @this.AddSingleton<IRedisCacheConnectionPoolManager, RedisCacheConnectionPoolManager>();
 
                 //注入RedisHelper
-                @this.AddTransient(x => new RedisHelper(x.GetRequiredService<IRedisCacheConnectionPoolManager>(), action));
+                @this.AddTransient(x => new RedisHelper(database, x.GetRequiredService<IRedisCacheConnectionPoolManager>(), action));
             }
 
             @this.AddSingleton(x => x.GetRequiredService<RedisHelper>().IConnectionMultiplexer);
