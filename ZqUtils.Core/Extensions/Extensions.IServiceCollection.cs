@@ -215,7 +215,7 @@ namespace ZqUtils.Core.Extensions
                 @this.AddSingleton(x => redisConfiguration ?? new RedisConfiguration
                 {
                     ConnectionString = connectionString,
-                    PoolSize = configuration.GetValue<int?>("Redis:PoolSize") ?? 10,
+                    PoolSize = configuration.GetValue<int?>("Redis:PoolSize") ?? 5,
                     ConnectLogger = log,
                     Action = action
                 });
