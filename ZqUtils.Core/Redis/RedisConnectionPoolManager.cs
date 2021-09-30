@@ -20,6 +20,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using ZqUtils.Core.Extensions;
@@ -111,22 +112,30 @@ namespace ZqUtils.Core.Redis
             var activeConnections = 0;
             var invalidConnections = 0;
 
+            var activeConnectionHashCodes = new List<int>();
+            var invalidConnectionHashCodes = new List<int>();
+
             foreach (var connection in _connections)
             {
                 if (!connection.IsConnected)
                 {
                     invalidConnections++;
+                    invalidConnectionHashCodes.Add(connection.GetHashCode());
+
                     continue;
                 }
 
                 activeConnections++;
+                activeConnectionHashCodes.Add(connection.GetHashCode());
             }
 
             return new ConnectionPoolInformation()
             {
                 RequiredPoolSize = _redisConfiguration.PoolSize,
                 ActiveConnections = activeConnections,
-                InvalidConnections = invalidConnections
+                InvalidConnections = invalidConnections,
+                ActiveConnectionHashCodes = activeConnectionHashCodes,
+                InvalidConnectionHashCodes = invalidConnectionHashCodes
             };
         }
 
@@ -150,21 +159,21 @@ namespace ZqUtils.Core.Redis
                         this._redisConfiguration.ConnectLogger);
 
                 if (connection == null)
-                    throw new Exception($"Create `IConnectionMultiplexer` fail");
+                    throw new Exception($"Create the {i + 1} `IConnectionMultiplexer` connection fail");
 
                 if (this._redisConfiguration.RegisterConnectionEvent)
                 {
                     connection.ConnectionFailed +=
-                     (s, e) => _logger.LogError(e.Exception, $"Redis connection error {e.FailureType}.");
+                        (s, e) => _logger.LogError(e.Exception, $"Redis(hash:{connection.GetHashCode()}) connection error {e.FailureType}.");
 
                     connection.ConnectionRestored +=
-                        (s, e) => _logger.LogError("Redis connection error restored.");
+                        (s, e) => _logger.LogError($"Redis(hash:{connection.GetHashCode()}) connection error restored.");
 
                     connection.InternalError +=
-                        (s, e) => _logger.LogError(e.Exception, $"Redis internal error {e.Origin}.");
+                        (s, e) => _logger.LogError(e.Exception, $"Redis(hash:{connection.GetHashCode()}) internal error {e.Origin}.");
 
                     connection.ErrorMessage +=
-                        (s, e) => _logger.LogError("Redis error: " + e.Message);
+                        (s, e) => _logger.LogError($"Redis(hash:{connection.GetHashCode()}) error: {e.Message}");
                 }
 
                 this._redisConfiguration.Action?.Invoke(connection);

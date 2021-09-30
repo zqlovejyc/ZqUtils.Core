@@ -16,6 +16,8 @@
  */
 #endregion
 
+using System.Collections.Generic;
+
 namespace ZqUtils.Core.Redis
 {
     /// <summary>
@@ -34,8 +36,18 @@ namespace ZqUtils.Core.Redis
         public int ActiveConnections { get; set; }
 
         /// <summary>
+        /// Gets or sets the hash code of active connections in the connection pool.
+        /// </summary>
+        public List<int> ActiveConnectionHashCodes { get; set; }
+
+        /// <summary>
         /// Gets or sets the number of invalid connections in the connection pool.
         /// </summary>
         public int InvalidConnections { get; set; }
+
+        /// <summary>
+        /// Gets or sets the hash code of invalid connections in the connection pool.
+        /// </summary>
+        public List<int> InvalidConnectionHashCodes { get; set; }
     }
 }
