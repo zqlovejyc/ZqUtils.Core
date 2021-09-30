@@ -66,20 +66,19 @@ namespace ZqUtils.Core.Helpers
 
         #region 公有属性
         /// <summary>
-        /// 静态单例，注意单例对象慎重修改对象公有属性，建议不进行修改操作
+        /// 静态单例
         /// </summary>
         public static RedisHelper Instance => SingletonHelper<RedisHelper>.GetInstance();
 
         /// <summary>
-        /// IConnectionMultiplexer对象
+        /// 当前Redis连接对象
         /// </summary>
-        public IConnectionMultiplexer IConnectionMultiplexer =>
-            _poolManager != null ? _poolConnection : _singleConnection;
+        public IConnectionMultiplexer RedisConnection => _poolConnection ?? _singleConnection;
 
         /// <summary>
         /// Redis连接池
         /// </summary>
-        public IRedisConnectionPoolManager RedisConnectionPoolManager => _poolManager;
+        public IRedisConnectionPoolManager ConnectionPoolManager => _poolManager;
 
         /// <summary>
         /// 数据库，注意单例对象不建议修改
@@ -517,7 +516,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public RedisHelper UseDatabase(int database)
         {
-            Database = (_poolConnection ?? _singleConnection).GetDatabase(database);
+            Database = RedisConnection.GetDatabase(database);
 
             return this;
         }
@@ -2347,7 +2346,7 @@ namespace ZqUtils.Core.Helpers
         public List<string> Keys(string pattern, int database = 0, bool configuredOnly = false)
         {
             var result = new List<string>();
-            var connection = _poolConnection ?? _singleConnection;
+            var connection = RedisConnection;
 
             var points = connection.GetEndPoints(configuredOnly);
             if (points?.Length > 0)
@@ -2400,7 +2399,7 @@ namespace ZqUtils.Core.Helpers
         public long KeyDeleteByPattern(string pattern, int database = 0, bool configuredOnly = false)
         {
             var result = 0L;
-            var connection = _poolConnection ?? _singleConnection;
+            var connection = RedisConnection;
 
             var points = connection.GetEndPoints(configuredOnly);
             if (points?.Length > 0)
@@ -2485,7 +2484,7 @@ namespace ZqUtils.Core.Helpers
         public async Task<List<string>> KeysAsync(string pattern, int database = 0, bool configuredOnly = false)
         {
             var result = new List<string>();
-            var connection = _poolConnection ?? _singleConnection;
+            var connection = RedisConnection;
 
             var points = connection.GetEndPoints(configuredOnly);
             if (points?.Length > 0)
@@ -2541,7 +2540,7 @@ namespace ZqUtils.Core.Helpers
         public async Task<long> KeyDeleteByPatternAsync(string pattern, int database = 0, bool configuredOnly = false)
         {
             var result = 0L;
-            var connection = _poolConnection ?? _singleConnection;
+            var connection = RedisConnection;
 
             var points = connection.GetEndPoints(configuredOnly);
             if (points?.Length > 0)
@@ -2629,7 +2628,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="configuredOnly">默认：false</param>
         public void Clear(bool configuredOnly = false)
         {
-            var connection = _poolConnection ?? _singleConnection;
+            var connection = RedisConnection;
 
             var points = connection.GetEndPoints(configuredOnly);
             foreach (var point in points)
@@ -2646,7 +2645,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="port">端口号</param>
         public void Clear(string host, int port)
         {
-            var server = (_poolConnection ?? _singleConnection).GetServer(host, port);
+            var server = RedisConnection.GetServer(host, port);
             server.FlushAllDatabases();
         }
 
@@ -2658,7 +2657,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="database">数据库</param>
         public void Clear(string host, int port, int database)
         {
-            var server = (_poolConnection ?? _singleConnection).GetServer(host, port);
+            var server = RedisConnection.GetServer(host, port);
             server.FlushDatabase(database);
         }
         #endregion
@@ -2670,7 +2669,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="configuredOnly">默认：false</param>
         public async Task ClearAsync(bool configuredOnly = false)
         {
-            var connection = _poolConnection ?? _singleConnection;
+            var connection = RedisConnection;
             var points = connection.GetEndPoints(configuredOnly);
             foreach (var point in points)
             {
@@ -2686,7 +2685,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="port">端口号</param>
         public async Task ClearAsync(string host, int port)
         {
-            var server = (_poolConnection ?? _singleConnection).GetServer(host, port);
+            var server = RedisConnection.GetServer(host, port);
             await server.FlushAllDatabasesAsync();
         }
 
@@ -2698,7 +2697,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="database">数据库</param>
         public async Task ClearAsync(string host, int port, int database)
         {
-            var server = (_poolConnection ?? _singleConnection).GetServer(host, port);
+            var server = RedisConnection.GetServer(host, port);
             await server.FlushDatabaseAsync(database);
         }
         #endregion
@@ -2774,7 +2773,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns>返回收到消息的客户端数量</returns>
         public long Publish(string channel, string message)
         {
-            var sub = (_poolConnection ?? _singleConnection).GetSubscriber();
+            var sub = RedisConnection.GetSubscriber();
             return sub.Publish(channel, message);
         }
 
@@ -2787,7 +2786,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns>返回收到消息的客户端数量</returns>
         public async Task<long> PublishAsync(string channel, string message)
         {
-            var sub = (_poolConnection ?? _singleConnection).GetSubscriber();
+            var sub = RedisConnection.GetSubscriber();
             return await sub.PublishAsync(channel, message);
         }
 
@@ -2798,7 +2797,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="subscribeFn">订阅处理委托</param>
         public void Subscribe(string channelFrom, Action<RedisValue> subscribeFn)
         {
-            var sub = (_poolConnection ?? _singleConnection).GetSubscriber();
+            var sub = RedisConnection.GetSubscriber();
             sub.Subscribe(channelFrom, (channel, message) => subscribeFn?.Invoke(message));
         }
 
@@ -2809,7 +2808,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="subscribeFn">订阅处理委托</param>
         public async Task SubscribeAsync(string channelFrom, Action<RedisValue> subscribeFn)
         {
-            var sub = (_poolConnection ?? _singleConnection).GetSubscriber();
+            var sub = RedisConnection.GetSubscriber();
             await sub.SubscribeAsync(channelFrom, (channel, message) => subscribeFn?.Invoke(message));
         }
         #endregion
