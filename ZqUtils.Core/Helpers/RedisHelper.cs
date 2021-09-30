@@ -2346,14 +2346,12 @@ namespace ZqUtils.Core.Helpers
         public List<string> Keys(string pattern, int database = 0, bool configuredOnly = false)
         {
             var result = new List<string>();
-            var connection = RedisConnection;
-
-            var points = connection.GetEndPoints(configuredOnly);
+            var points = RedisConnection.GetEndPoints(configuredOnly);
             if (points?.Length > 0)
             {
                 foreach (var point in points)
                 {
-                    var server = connection.GetServer(point);
+                    var server = RedisConnection.GetServer(point);
                     var keys = server.Keys(database: database, pattern: pattern);
                     result.AddRange(keys.Select(x => (string)x));
                 }
@@ -2399,14 +2397,12 @@ namespace ZqUtils.Core.Helpers
         public long KeyDeleteByPattern(string pattern, int database = 0, bool configuredOnly = false)
         {
             var result = 0L;
-            var connection = RedisConnection;
-
-            var points = connection.GetEndPoints(configuredOnly);
+            var points = RedisConnection.GetEndPoints(configuredOnly);
             if (points?.Length > 0)
             {
                 foreach (var point in points)
                 {
-                    var server = connection.GetServer(point);
+                    var server = RedisConnection.GetServer(point);
                     var keys = server.Keys(database: database, pattern: pattern);
 
                     if (keys.IsNotNullOrEmpty())
@@ -2484,14 +2480,12 @@ namespace ZqUtils.Core.Helpers
         public async Task<List<string>> KeysAsync(string pattern, int database = 0, bool configuredOnly = false)
         {
             var result = new List<string>();
-            var connection = RedisConnection;
-
-            var points = connection.GetEndPoints(configuredOnly);
+            var points = RedisConnection.GetEndPoints(configuredOnly);
             if (points?.Length > 0)
             {
                 foreach (var point in points)
                 {
-                    var server = connection.GetServer(point);
+                    var server = RedisConnection.GetServer(point);
                     var keys = server.KeysAsync(database: database, pattern: pattern);
                     await foreach (var key in keys)
                     {
@@ -2540,14 +2534,12 @@ namespace ZqUtils.Core.Helpers
         public async Task<long> KeyDeleteByPatternAsync(string pattern, int database = 0, bool configuredOnly = false)
         {
             var result = 0L;
-            var connection = RedisConnection;
-
-            var points = connection.GetEndPoints(configuredOnly);
+            var points = RedisConnection.GetEndPoints(configuredOnly);
             if (points?.Length > 0)
             {
                 foreach (var point in points)
                 {
-                    var server = connection.GetServer(point);
+                    var server = RedisConnection.GetServer(point);
                     var keys = server.KeysAsync(database: database, pattern: pattern);
                     var keyDeletes = new List<RedisKey>();
                     await foreach (var key in keys)
@@ -2628,12 +2620,10 @@ namespace ZqUtils.Core.Helpers
         /// <param name="configuredOnly">默认：false</param>
         public void Clear(bool configuredOnly = false)
         {
-            var connection = RedisConnection;
-
-            var points = connection.GetEndPoints(configuredOnly);
+            var points = RedisConnection.GetEndPoints(configuredOnly);
             foreach (var point in points)
             {
-                var server = connection.GetServer(point);
+                var server = RedisConnection.GetServer(point);
                 server.FlushAllDatabases();
             }
         }
@@ -2669,11 +2659,10 @@ namespace ZqUtils.Core.Helpers
         /// <param name="configuredOnly">默认：false</param>
         public async Task ClearAsync(bool configuredOnly = false)
         {
-            var connection = RedisConnection;
-            var points = connection.GetEndPoints(configuredOnly);
+            var points = RedisConnection.GetEndPoints(configuredOnly);
             foreach (var point in points)
             {
-                var server = connection.GetServer(point);
+                var server = RedisConnection.GetServer(point);
                 await server.FlushAllDatabasesAsync();
             }
         }
