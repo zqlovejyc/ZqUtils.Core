@@ -119,7 +119,7 @@ namespace ZqUtils.Core.Helpers
         public RedisHelper(
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null) =>
-            Database = GetConnectionMultiplexer(action, log).GetDatabase();
+            Database = GetConnection(action, log).GetDatabase();
 
         /// <summary>
         /// 构造函数
@@ -131,7 +131,7 @@ namespace ZqUtils.Core.Helpers
             int defaultDatabase,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null) =>
-            Database = GetConnectionMultiplexer(action, log).GetDatabase(defaultDatabase);
+            Database = GetConnection(action, log).GetDatabase(defaultDatabase);
 
         /// <summary>
         /// 构造函数
@@ -143,7 +143,7 @@ namespace ZqUtils.Core.Helpers
             string redisConnectionString,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null) =>
-            Database = GetConnectionMultiplexer(redisConnectionString, action, log).GetDatabase();
+            Database = GetConnection(redisConnectionString, action, log).GetDatabase();
 
         /// <summary>
         /// 构造函数
@@ -157,7 +157,7 @@ namespace ZqUtils.Core.Helpers
             int defaultDatabase,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null) =>
-            Database = GetConnectionMultiplexer(redisConnectionString, action, log).GetDatabase(defaultDatabase);
+            Database = GetConnection(redisConnectionString, action, log).GetDatabase(defaultDatabase);
 
         /// <summary>
         /// 构造函数
@@ -169,7 +169,7 @@ namespace ZqUtils.Core.Helpers
             ConfigurationOptions configurationOptions,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null) =>
-            Database = GetConnectionMultiplexer(configurationOptions, action, log).GetDatabase();
+            Database = GetConnection(configurationOptions, action, log).GetDatabase();
 
         /// <summary>
         /// 构造函数
@@ -179,7 +179,7 @@ namespace ZqUtils.Core.Helpers
         public RedisHelper(
             IRedisConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null) =>
-            Database = (_poolMultiplexer = GetConnectionMultiplexer(_poolManager = poolManager, action)).GetDatabase();
+            Database = (_poolMultiplexer = GetConnection(_poolManager = poolManager, action)).GetDatabase();
 
         /// <summary>
         /// 构造函数
@@ -191,18 +191,18 @@ namespace ZqUtils.Core.Helpers
             int defaultDatabase,
             IRedisConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null) =>
-            Database = (_poolMultiplexer = GetConnectionMultiplexer(_poolManager = poolManager, action)).GetDatabase(defaultDatabase);
+            Database = (_poolMultiplexer = GetConnection(_poolManager = poolManager, action)).GetDatabase(defaultDatabase);
         #endregion 构造函数
 
         #region 连接对象
-        #region GetConnectionMultiplexer
+        #region GetConnection
         /// <summary>
         /// 获取redis连接对象
         /// </summary>
         /// <param name="action">自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
         /// <returns>返回IConnectionMultiplexer</returns>
-        public static IConnectionMultiplexer GetConnectionMultiplexer(
+        public static IConnectionMultiplexer GetConnection(
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null)
         {
@@ -217,7 +217,7 @@ namespace ZqUtils.Core.Helpers
             if (connectionStr.IsNullOrEmpty())
                 throw new Exception("Redis连接字符串配置为null");
 
-            return GetConnectionMultiplexer(connectionStr, action, log);
+            return GetConnection(connectionStr, action, log);
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
         /// <returns>返回IConnectionMultiplexer</returns>
-        public static IConnectionMultiplexer GetConnectionMultiplexer(
+        public static IConnectionMultiplexer GetConnection(
             string redisConnectionString,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null)
@@ -257,7 +257,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
         /// <returns>返回IConnectionMultiplexer</returns>
-        public static IConnectionMultiplexer GetConnectionMultiplexer(
+        public static IConnectionMultiplexer GetConnection(
             ConfigurationOptions configurationOptions,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null)
@@ -286,7 +286,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="poolManager">redis连接池</param>
         /// <param name="action">自定义委托</param>
         /// <returns>返回IConnectionMultiplexer</returns>
-        public static IConnectionMultiplexer GetConnectionMultiplexer(
+        public static IConnectionMultiplexer GetConnection(
             IRedisConnectionPoolManager poolManager,
             Action<IConnectionMultiplexer> action = null)
         {
@@ -298,14 +298,14 @@ namespace ZqUtils.Core.Helpers
         }
         #endregion
 
-        #region GetConnectionMultiplexerAsync
+        #region GetConnectionAsync
         /// <summary>
         /// 获取redis连接对象
         /// </summary>
         /// <param name="action">自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
         /// <returns>返回IConnectionMultiplexer</returns>
-        public static async Task<IConnectionMultiplexer> GetConnectionMultiplexerAsync(
+        public static async Task<IConnectionMultiplexer> GetConnectionAsync(
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null)
         {
@@ -320,7 +320,7 @@ namespace ZqUtils.Core.Helpers
             if (connectionStr.IsNullOrEmpty())
                 throw new Exception("Redis连接字符串配置为null");
 
-            return await GetConnectionMultiplexerAsync(connectionStr, action, log);
+            return await GetConnectionAsync(connectionStr, action, log);
         }
 
         /// <summary>
@@ -330,7 +330,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
         /// <returns>返回IConnectionMultiplexer</returns>
-        public static async Task<IConnectionMultiplexer> GetConnectionMultiplexerAsync(
+        public static async Task<IConnectionMultiplexer> GetConnectionAsync(
             string redisConnectionString,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null)
@@ -370,7 +370,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
         /// <returns>返回IConnectionMultiplexer</returns>
-        public static async Task<IConnectionMultiplexer> GetConnectionMultiplexerAsync(
+        public static async Task<IConnectionMultiplexer> GetConnectionAsync(
             ConfigurationOptions configurationOptions,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null)
@@ -404,43 +404,43 @@ namespace ZqUtils.Core.Helpers
         }
         #endregion
 
-        #region SetConnectionMultiplexerAsync
+        #region SetConnectionAsync
         /// <summary>
-        /// 初始化IConnectionMultiplexer
+        /// 设置IConnectionMultiplexer
         /// </summary>
         /// <param name="action">自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
         /// <returns></returns>
-        public static async Task SetConnectionMultiplexerAsync(
+        public static async Task SetConnectionAsync(
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null) =>
-            _connectionMultiplexer = await GetConnectionMultiplexerAsync(action, log);
+            _connectionMultiplexer = await GetConnectionAsync(action, log);
 
         /// <summary>
-        /// 初始化IConnectionMultiplexer
+        /// 设置IConnectionMultiplexer
         /// </summary>
         /// <param name="redisConnectionString">连接字符串</param>
         /// <param name="action">自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
         /// <returns></returns>
-        public static async Task SetConnectionMultiplexerAsync(
+        public static async Task SetConnectionAsync(
             string redisConnectionString,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null) =>
-            _connectionMultiplexer = await GetConnectionMultiplexerAsync(redisConnectionString, action, log);
+            _connectionMultiplexer = await GetConnectionAsync(redisConnectionString, action, log);
 
         /// <summary>
-        /// 初始化IConnectionMultiplexer
+        /// 设置IConnectionMultiplexer
         /// </summary>
         /// <param name="configurationOptions">连接配置</param>
         /// <param name="action">自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
         /// <returns></returns>
-        public static async Task SetConnectionMultiplexerAsync(
+        public static async Task SetConnectionAsync(
             ConfigurationOptions configurationOptions,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null) =>
-            _connectionMultiplexer = await GetConnectionMultiplexerAsync(configurationOptions, action, log);
+            _connectionMultiplexer = await GetConnectionAsync(configurationOptions, action, log);
         #endregion
         #endregion
 
@@ -2764,7 +2764,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns>返回收到消息的客户端数量</returns>
         public long Publish(string channel, string message)
         {
-            var sub = GetConnectionMultiplexer().GetSubscriber();
+            var sub = GetConnection().GetSubscriber();
             return sub.Publish(channel, message);
         }
 
@@ -2777,7 +2777,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns>返回收到消息的客户端数量</returns>
         public async Task<long> PublishAsync(string channel, string message)
         {
-            var sub = GetConnectionMultiplexer().GetSubscriber();
+            var sub = GetConnection().GetSubscriber();
             return await sub.PublishAsync(channel, message);
         }
 
@@ -2788,7 +2788,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="subscribeFn">订阅处理委托</param>
         public void Subscribe(string channelFrom, Action<RedisValue> subscribeFn)
         {
-            var sub = GetConnectionMultiplexer().GetSubscriber();
+            var sub = GetConnection().GetSubscriber();
             sub.Subscribe(channelFrom, (channel, message) => subscribeFn?.Invoke(message));
         }
 
@@ -2799,7 +2799,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="subscribeFn">订阅处理委托</param>
         public async Task SubscribeAsync(string channelFrom, Action<RedisValue> subscribeFn)
         {
-            var sub = GetConnectionMultiplexer().GetSubscriber();
+            var sub = GetConnection().GetSubscriber();
             await sub.SubscribeAsync(channelFrom, (channel, message) => subscribeFn?.Invoke(message));
         }
         #endregion
