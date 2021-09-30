@@ -180,7 +180,7 @@ namespace ZqUtils.Core.Extensions
         /// <param name="configuration">json配置</param>
         /// <param name="action">IConnectionMultiplexer自定义委托</param>
         /// <param name="log">记录redis连接日志</param>
-        /// <param name="useConnectionPool">是否使用redis连接池</param>
+        /// <param name="useConnectionPool">是否使用连接池，若为null，则读取配置Redis:UseConnectionPool，若两者均为null，则默认为true</param>
         /// <param name="redisConfiguration">redis连接池配置</param>
         /// <returns></returns>
         public static IServiceCollection AddStackExchangeRedis(
@@ -188,7 +188,7 @@ namespace ZqUtils.Core.Extensions
             IConfiguration configuration,
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null,
-            bool useConnectionPool = true,
+            bool? useConnectionPool = null,
             RedisConfiguration redisConfiguration = null)
         {
             //判断是否禁用Redis
@@ -207,7 +207,10 @@ namespace ZqUtils.Core.Extensions
             //redis数据库索引
             var database = configuration.GetValue<int?>("Redis:Database") ?? 0;
 
-            if (!useConnectionPool)
+            //是否使用连接池
+            useConnectionPool ??= (configuration.GetValue<bool?>("Redis:UseConnectionPool") ?? true);
+
+            if (!useConnectionPool.Value)
                 @this.AddTransient(x => new RedisHelper(connectionString, database, action, log));
             else
             {
