@@ -60,14 +60,19 @@ namespace ZqUtils.Core.Extensions
         /// 使用Reids信息中间件
         /// </summary>
         /// <param name="this"></param>
+        /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IApplicationBuilder UseRedisInformation(this IApplicationBuilder @this)
+        public static IApplicationBuilder UseRedisInformation(
+            this IApplicationBuilder @this,
+            IConfiguration configuration)
         {
             return @this.Use(async (context, next) =>
             {
+                var pathPrefix = configuration.GetValue<string>("Redis:RedisInformationPathPrefix");
+
                 if (context.Request.Method.EqualIgnoreCase("get") &&
                     context.Request.Path.HasValue &&
-                    context.Request.Path.Value.EqualIgnoreCase("/redis/info", "/redis/connectionInfo"))
+                    context.Request.Path.Value.EqualIgnoreCase($"{pathPrefix}/redis/info", $"{pathPrefix}/redis/connectionInfo"))
                 {
                     var services = @this.ApplicationServices;
 
@@ -76,7 +81,7 @@ namespace ZqUtils.Core.Extensions
                         await next();
 
                     //connectionInfo
-                    if (context.Request.Path.Value.EqualIgnoreCase("/redis/connectionInfo"))
+                    if (context.Request.Path.Value.EqualIgnoreCase($"{pathPrefix}/redis/connectionInfo"))
                     {
                         var data = poolManger.GetConnectionInformations();
 
@@ -84,9 +89,9 @@ namespace ZqUtils.Core.Extensions
                     }
 
                     //info
-                    if (context.Request.Path.Value.EqualIgnoreCase("/redis/info"))
+                    if (context.Request.Path.Value.EqualIgnoreCase($"{pathPrefix}/redis/info"))
                     {
-                        var database = services.GetRequiredService<IConfiguration>().GetValue<int?>("Redis:Database") ?? 0;
+                        var database = configuration.GetValue<int?>("Redis:Database") ?? 0;
 
                         var redisDatabase = poolManger.GetConnection().GetDatabase(database);
 
