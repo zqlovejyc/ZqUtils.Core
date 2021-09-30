@@ -174,7 +174,7 @@ namespace ZqUtils.Core.Extensions
 
         #region AddStackExchangeRedis
         /// <summary>
-        /// 注入RedisHelper、IConnectionMultiplexer、IRedisCacheConnectionPoolManager
+        /// 注入RedisHelper、IRedisCacheConnectionPoolManager
         /// </summary>
         /// <param name="this">IServiceCollection</param>
         /// <param name="configuration">json配置</param>
@@ -227,8 +227,6 @@ namespace ZqUtils.Core.Extensions
                 //注入RedisHelper
                 @this.AddTransient(x => new RedisHelper(database, x.GetRequiredService<IRedisConnectionPoolManager>(), action));
             }
-
-            @this.AddSingleton(x => x.GetRequiredService<RedisHelper>().RedisConnection);
 
             return @this;
         }
