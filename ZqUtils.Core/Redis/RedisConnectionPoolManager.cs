@@ -163,17 +163,19 @@ namespace ZqUtils.Core.Redis
 
                 if (this._redisConfiguration.RegisterConnectionEvent)
                 {
+                    var hashCode = connection.GetHashCode();
+
                     connection.ConnectionFailed +=
-                        (s, e) => _logger.LogError(e.Exception, $"Redis(hash:{connection.GetHashCode()}) connection error {e.FailureType}.");
+                        (s, e) => _logger.LogError(e.Exception, $"Redis(hash:{hashCode}) connection error {e.FailureType}.");
 
                     connection.ConnectionRestored +=
-                        (s, e) => _logger.LogError($"Redis(hash:{connection.GetHashCode()}) connection error restored.");
+                        (s, e) => _logger.LogError($"Redis(hash:{hashCode}) connection error restored.");
 
                     connection.InternalError +=
-                        (s, e) => _logger.LogError(e.Exception, $"Redis(hash:{connection.GetHashCode()}) internal error {e.Origin}.");
+                        (s, e) => _logger.LogError(e.Exception, $"Redis(hash:{hashCode}) internal error {e.Origin}.");
 
                     connection.ErrorMessage +=
-                        (s, e) => _logger.LogError($"Redis(hash:{connection.GetHashCode()}) error: {e.Message}");
+                        (s, e) => _logger.LogError($"Redis(hash:{hashCode}) error: {e.Message}");
                 }
 
                 this._redisConfiguration.Action?.Invoke(connection);
