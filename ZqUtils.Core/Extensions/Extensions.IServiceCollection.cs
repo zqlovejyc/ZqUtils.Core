@@ -214,10 +214,11 @@ namespace ZqUtils.Core.Extensions
                 //注入redis连接池配置
                 @this.AddSingleton(x => redisConfiguration ?? new RedisConfiguration
                 {
+                    Action = action,
+                    ConnectLogger = log,
                     ConnectionString = connectionString,
                     PoolSize = configuration.GetValue<int?>("Redis:PoolSize") ?? 5,
-                    ConnectLogger = log,
-                    Action = action
+                    RegisterConnectionEvent = configuration.GetValue<bool?>("Redis:RegisterEvent") ?? true
                 });
 
                 //注入redis连接池
