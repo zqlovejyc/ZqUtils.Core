@@ -77,31 +77,32 @@ namespace ZqUtils.Core.Extensions
                     var services = @this.ApplicationServices;
 
                     var poolManger = services.GetService<IRedisConnectionPoolManager>();
-                    if (poolManger == null)
-                        await next();
 
-                    //connectionInfo
-                    if (context.Request.Path.Value.EqualIgnoreCase($"{pathPrefix}/redis/connectionInfo"))
+                    if (poolManger != null)
                     {
-                        var data = poolManger.GetConnectionInformations();
+                        //connectionInfo
+                        if (context.Request.Path.Value.EqualIgnoreCase($"{pathPrefix}/redis/connectionInfo"))
+                        {
+                            var data = poolManger.GetConnectionInformations();
 
-                        await context.Response.WriteAsync(data.ToJson(), Encoding.UTF8);
+                            await context.Response.WriteAsync(data.ToJson(), Encoding.UTF8);
+                        }
+
+                        //info
+                        if (context.Request.Path.Value.EqualIgnoreCase($"{pathPrefix}/redis/info"))
+                        {
+                            var database = configuration.GetValue<int?>("Redis:Database") ?? 0;
+
+                            var redisDatabase = poolManger.GetConnection().GetDatabase(database);
+
+                            var data = (await redisDatabase.ScriptEvaluateAsync("return redis.call('INFO')").ConfigureAwait(false)).ToString();
+
+                            context.Response.ContentType = "text/html; charset=utf-8";
+                            await context.Response.WriteAsync(data.Replace("\r\n", "<br/>"), Encoding.UTF8);
+                        }
+
+                        return;
                     }
-
-                    //info
-                    if (context.Request.Path.Value.EqualIgnoreCase($"{pathPrefix}/redis/info"))
-                    {
-                        var database = configuration.GetValue<int?>("Redis:Database") ?? 0;
-
-                        var redisDatabase = poolManger.GetConnection().GetDatabase(database);
-
-                        var data = (await redisDatabase.ScriptEvaluateAsync("return redis.call('INFO')").ConfigureAwait(false)).ToString();
-
-                        context.Response.ContentType = "text/html; charset=utf-8";
-                        await context.Response.WriteAsync(data.Replace("\r\n", "<br/>"), Encoding.UTF8);
-                    }
-
-                    return;
                 }
 
                 await next();
