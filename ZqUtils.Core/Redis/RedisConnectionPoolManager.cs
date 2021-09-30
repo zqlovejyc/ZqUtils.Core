@@ -137,36 +137,39 @@ namespace ZqUtils.Core.Redis
         {
             for (var i = 0; i < this._redisConfiguration.PoolSize; i++)
             {
-                IConnectionMultiplexer connectionMultiplexer = null;
+                IConnectionMultiplexer connection = null;
 
                 if (this._redisConfiguration.ConnectionString.IsNotNullOrEmpty())
-                    connectionMultiplexer = ConnectionMultiplexer.Connect(
+                    connection = ConnectionMultiplexer.Connect(
                         this._redisConfiguration.ConnectionString,
                         this._redisConfiguration.ConnectLogger);
 
                 if (this._redisConfiguration.ConfigurationOptions != null)
-                    connectionMultiplexer = ConnectionMultiplexer.Connect(
+                    connection = ConnectionMultiplexer.Connect(
                         this._redisConfiguration.ConfigurationOptions,
                         this._redisConfiguration.ConnectLogger);
 
-                if (connectionMultiplexer == null)
+                if (connection == null)
                     throw new Exception($"Create `IConnectionMultiplexer` fail");
 
-                connectionMultiplexer.ConnectionFailed +=
-                    (s, e) => _logger.LogError(e.Exception, $"Redis connection error {e.FailureType}.");
+                if (this._redisConfiguration.RegisterConnectionEvent)
+                {
+                    connection.ConnectionFailed +=
+                     (s, e) => _logger.LogError(e.Exception, $"Redis connection error {e.FailureType}.");
 
-                connectionMultiplexer.ConnectionRestored +=
-                    (s, e) => _logger.LogError("Redis connection error restored.");
+                    connection.ConnectionRestored +=
+                        (s, e) => _logger.LogError("Redis connection error restored.");
 
-                connectionMultiplexer.InternalError +=
-                    (s, e) => _logger.LogError(e.Exception, $"Redis internal error {e.Origin}.");
+                    connection.InternalError +=
+                        (s, e) => _logger.LogError(e.Exception, $"Redis internal error {e.Origin}.");
 
-                connectionMultiplexer.ErrorMessage +=
-                    (s, e) => _logger.LogError("Redis error: " + e.Message);
+                    connection.ErrorMessage +=
+                        (s, e) => _logger.LogError("Redis error: " + e.Message);
+                }
 
-                this._redisConfiguration.Action?.Invoke(connectionMultiplexer);
+                this._redisConfiguration.Action?.Invoke(connection);
 
-                this._connections[i] = connectionMultiplexer;
+                this._connections[i] = connection;
             }
         }
     }

@@ -52,5 +52,10 @@ namespace ZqUtils.Core.Redis
         /// Gets or sets redis `ConnectionMultiplexer.Connect` log parameter
         /// </summary>
         public TextWriter ConnectLogger { get; set; }
+
+        /// <summary>
+        /// Gets or sets IConnectionMultiplexer event
+        /// </summary>
+        public bool RegisterConnectionEvent { get; set; } = true;
     }
 }
