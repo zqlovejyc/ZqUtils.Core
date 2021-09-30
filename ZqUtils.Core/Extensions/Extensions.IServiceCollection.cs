@@ -225,7 +225,7 @@ namespace ZqUtils.Core.Extensions
                 @this.AddSingleton<IRedisConnectionPoolManager, RedisConnectionPoolManager>();
 
                 //注入RedisHelper
-                @this.AddTransient(x => new RedisHelper(database, x.GetRequiredService<IRedisConnectionPoolManager>(), action));
+                @this.AddTransient(x => new RedisHelper(database, x.GetRequiredService<IRedisConnectionPoolManager>()));
             }
 
             return @this;

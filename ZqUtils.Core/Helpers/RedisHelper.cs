@@ -174,23 +174,19 @@ namespace ZqUtils.Core.Helpers
         /// 构造函数
         /// </summary>
         /// <param name="poolManager">redis连接池</param>
-        /// <param name="action">自定义委托</param>
         public RedisHelper(
-            IRedisConnectionPoolManager poolManager,
-            Action<IConnectionMultiplexer> action = null) =>
-            Database = (_poolConnection = GetConnection(_poolManager = poolManager, action)).GetDatabase();
+            IRedisConnectionPoolManager poolManager) =>
+            Database = (_poolConnection = (_poolManager = poolManager).GetConnection()).GetDatabase();
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="defaultDatabase">数据库索引</param>
         /// <param name="poolManager">redis连接池</param>
-        /// <param name="action">自定义委托</param>
         public RedisHelper(
             int defaultDatabase,
-            IRedisConnectionPoolManager poolManager,
-            Action<IConnectionMultiplexer> action = null) =>
-            Database = (_poolConnection = GetConnection(_poolManager = poolManager, action)).GetDatabase(defaultDatabase);
+            IRedisConnectionPoolManager poolManager) =>
+            Database = (_poolConnection = (_poolManager = poolManager).GetConnection()).GetDatabase(defaultDatabase);
         #endregion 构造函数
 
         #region 连接对象
@@ -277,23 +273,6 @@ namespace ZqUtils.Core.Helpers
             }
 
             return _singleConnection;
-        }
-
-        /// <summary>
-        /// 获取redis连接对象
-        /// </summary>
-        /// <param name="poolManager">redis连接池</param>
-        /// <param name="action">自定义委托</param>
-        /// <returns>返回IConnectionMultiplexer</returns>
-        public static IConnectionMultiplexer GetConnection(
-            IRedisConnectionPoolManager poolManager,
-            Action<IConnectionMultiplexer> action = null)
-        {
-            var connection = poolManager.GetConnection();
-
-            action?.Invoke(connection);
-
-            return connection;
         }
         #endregion
 
