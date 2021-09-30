@@ -244,7 +244,7 @@ namespace ZqUtils.Core.Helpers
 
                 action?.Invoke(_connectionMultiplexer);
 
-                AddRegisterEvent();
+                RegisterEvents(_connectionMultiplexer);
             }
 
             return _connectionMultiplexer;
@@ -274,7 +274,7 @@ namespace ZqUtils.Core.Helpers
 
                 action?.Invoke(_connectionMultiplexer);
 
-                AddRegisterEvent();
+                RegisterEvents(_connectionMultiplexer);
             }
 
             return _connectionMultiplexer;
@@ -349,7 +349,7 @@ namespace ZqUtils.Core.Helpers
 
                 action?.Invoke(_connectionMultiplexer);
 
-                AddRegisterEvent();
+                RegisterEvents(_connectionMultiplexer);
             }
             catch (Exception)
             {
@@ -389,7 +389,7 @@ namespace ZqUtils.Core.Helpers
 
                 action?.Invoke(_connectionMultiplexer);
 
-                AddRegisterEvent();
+                RegisterEvents(_connectionMultiplexer);
             }
             catch (Exception)
             {
@@ -457,90 +457,42 @@ namespace ZqUtils.Core.Helpers
 
         #region 注册事件
         /// <summary>
-        /// 添加注册事件
+        /// 注册IConnectionMultiplexer事件
         /// </summary>
-        private static void AddRegisterEvent()
+        private static void RegisterEvents(IConnectionMultiplexer connection)
         {
             if (ConfigHelper.GetValue<bool>("Redis:RegisterEvent"))
             {
-                _connectionMultiplexer.ConnectionRestored += ConnMultiplexer_ConnectionRestored;
-                _connectionMultiplexer.ConnectionFailed += ConnMultiplexer_ConnectionFailed;
-                _connectionMultiplexer.ErrorMessage += ConnMultiplexer_ErrorMessage;
-                _connectionMultiplexer.ConfigurationChanged += ConnMultiplexer_ConfigurationChanged;
-                _connectionMultiplexer.HashSlotMoved += ConnMultiplexer_HashSlotMoved;
-                _connectionMultiplexer.InternalError += ConnMultiplexer_InternalError;
-                _connectionMultiplexer.ConfigurationChangedBroadcast += ConnMultiplexer_ConfigurationChangedBroadcast;
+                var hashCode = connection.GetHashCode();
+
+                //物理连接恢复时
+                connection.ConnectionRestored +=
+                    (s, e) => LogHelper.Error(e.Exception, $"Redis(hash:{hashCode}) -> `ConnectionRestored`: {e.Exception?.Message}");
+
+                //物理连接失败时
+                connection.ConnectionFailed +=
+                    (s, e) => LogHelper.Error(e.Exception, $"Redis(hash:{hashCode}) -> `ConnectionFailed`: {e.Exception?.Message}");
+
+                //发生错误时
+                connection.ErrorMessage +=
+                    (s, e) => LogHelper.Error($"Redis(hash:{hashCode}) -> `ErrorMessage`: {e.Message}");
+
+                //配置更改时
+                connection.ConfigurationChanged +=
+                    (s, e) => LogHelper.Info($"Redis(hash:{hashCode}) -> `ConfigurationChanged`: {e.EndPoint}");
+
+                //更改集群时
+                connection.HashSlotMoved +=
+                    (s, e) => LogHelper.Info($"Redis(hash:{hashCode}) -> `HashSlotMoved`: {nameof(e.OldEndPoint)}-{e.OldEndPoint} To {nameof(e.NewEndPoint)}-{e.NewEndPoint}, ");
+
+                //发生内部错误时（主要用于调试）
+                connection.InternalError +=
+                    (s, e) => LogHelper.Error(e.Exception, $"Redis(hash:{hashCode}) -> `InternalError`: {e.Exception?.Message}");
+
+                //重新配置广播时（通常意味着主从同步更改）
+                connection.ConfigurationChangedBroadcast +=
+                    (s, e) => LogHelper.Info($"Redis(hash:{hashCode}) -> `ConfigurationChangedBroadcast`: {e.EndPoint}");
             }
-        }
-
-        /// <summary>
-        /// 重新配置广播时（通常意味着主从同步更改）
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void ConnMultiplexer_ConfigurationChangedBroadcast(object sender, EndPointEventArgs e)
-        {
-            LogHelper.Info($"{nameof(ConnMultiplexer_ConfigurationChangedBroadcast)}: {e.EndPoint}");
-        }
-
-        /// <summary>
-        /// 发生内部错误时（主要用于调试）
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void ConnMultiplexer_InternalError(object sender, InternalErrorEventArgs e)
-        {
-            LogHelper.Error(e.Exception, $"{nameof(ConnMultiplexer_InternalError)}: {e.Exception?.Message}");
-        }
-
-        /// <summary>
-        /// 更改集群时
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void ConnMultiplexer_HashSlotMoved(object sender, HashSlotMovedEventArgs e)
-        {
-            LogHelper.Info($"{nameof(ConnMultiplexer_HashSlotMoved)}: {nameof(e.OldEndPoint)}-{e.OldEndPoint} To {nameof(e.NewEndPoint)}-{e.NewEndPoint}, ");
-        }
-
-        /// <summary>
-        /// 配置更改时
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void ConnMultiplexer_ConfigurationChanged(object sender, EndPointEventArgs e)
-        {
-            LogHelper.Info($"{nameof(ConnMultiplexer_ConfigurationChanged)}: {e.EndPoint}");
-        }
-
-        /// <summary>
-        /// 发生错误时
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void ConnMultiplexer_ErrorMessage(object sender, RedisErrorEventArgs e)
-        {
-            LogHelper.Error($"{nameof(ConnMultiplexer_ErrorMessage)}: {e.Message}");
-        }
-
-        /// <summary>
-        /// 物理连接失败时
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void ConnMultiplexer_ConnectionFailed(object sender, ConnectionFailedEventArgs e)
-        {
-            LogHelper.Error(e.Exception, $"{nameof(ConnMultiplexer_ConnectionFailed)}: {e.Exception?.Message}");
-        }
-
-        /// <summary>
-        /// 建立物理连接时
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void ConnMultiplexer_ConnectionRestored(object sender, ConnectionFailedEventArgs e)
-        {
-            LogHelper.Error(e.Exception, $"{nameof(ConnMultiplexer_ConnectionRestored)}: {e.Exception?.Message}");
         }
         #endregion
 
