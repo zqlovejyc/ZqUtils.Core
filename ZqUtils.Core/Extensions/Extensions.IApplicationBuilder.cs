@@ -1,5 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Text;
+using ZqUtils.Core.Redis;
 /****************************
 * [Author] 张强
 * [Date] 2021-05-12
@@ -47,6 +52,55 @@ namespace ZqUtils.Core.Extensions
                 action(@this.ApplicationServices, @this);
 
             return @this;
+        }
+        #endregion
+
+        #region UseRedisInformation
+        /// <summary>
+        /// 使用Reids信息中间件
+        /// </summary>
+        /// <param name="this"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseRedisInformation(this IApplicationBuilder @this)
+        {
+            return @this.Use(async (context, next) =>
+            {
+                if (context.Request.Method.EqualIgnoreCase("get") &&
+                    context.Request.Path.HasValue &&
+                    context.Request.Path.Value.EqualIgnoreCase("/redis/info", "/redis/connectionInfo"))
+                {
+                    var services = @this.ApplicationServices;
+
+                    var poolManger = services.GetService<IRedisConnectionPoolManager>();
+                    if (poolManger == null)
+                        await next();
+
+                    //connectionInfo
+                    if (context.Request.Path.Value.EqualIgnoreCase("/redis/connectionInfo"))
+                    {
+                        var data = poolManger.GetConnectionInformations();
+
+                        await context.Response.WriteAsync(data.ToJson(), Encoding.UTF8);
+                    }
+
+                    //info
+                    if (context.Request.Path.Value.EqualIgnoreCase("/redis/info"))
+                    {
+                        var database = services.GetRequiredService<IConfiguration>().GetValue<int?>("Redis:Database") ?? 0;
+
+                        var redisDatabase = poolManger.GetConnection().GetDatabase(database);
+
+                        var data = (await redisDatabase.ScriptEvaluateAsync("return redis.call('INFO')").ConfigureAwait(false)).ToString();
+
+                        context.Response.ContentType = "text/html; charset=utf-8";
+                        await context.Response.WriteAsync(data.Replace("\r\n", "<br/>"), Encoding.UTF8);
+                    }
+
+                    return;
+                }
+
+                await next();
+            });
         }
         #endregion
     }
