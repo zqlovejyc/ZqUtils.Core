@@ -81,12 +81,12 @@ namespace ZqUtils.Core.Helpers
         public IRedisConnectionPoolManager ConnectionPoolManager => _poolManager;
 
         /// <summary>
-        /// 数据库，注意单例对象不建议修改
+        /// 数据库
         /// </summary>
         public IDatabase Database { get; set; }
 
         /// <summary>
-        /// RedisKey的前缀，注意单例对象不建议修改
+        /// RedisKey的前缀
         /// </summary>
         public string KeyPrefix { get; set; } = ConfigHelper.GetValue<string>("Redis:KeyPrefix");
         #endregion
