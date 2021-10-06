@@ -681,12 +681,35 @@ namespace ZqUtils.Core.Helpers
         /// <param name="expiration">单个消息过期时间，单位ms</param>
         /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
         /// <returns></returns>
-        public bool Publish<T>(T command, bool confirm = false, string expiration = null, byte? priority = null) where T : class
+        public bool Publish<T>(
+            T command,
+            bool confirm = false,
+            string expiration = null,
+            byte? priority = null) where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
                 throw new ArgumentException("RabbitMqAttribute Is Null!");
 
+            return Publish(attribute, command, confirm, expiration, priority);
+        }
+
+        /// <summary>
+        /// 发布消息
+        /// </summary>
+        /// <param name="attribute">RabbitMq特性配置</param>
+        /// <param name="command">消息指令</param>
+        /// <param name="confirm">消息发送确认</param>
+        /// <param name="expiration">单个消息过期时间，单位ms</param>
+        /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
+        /// <returns></returns>
+        public bool Publish<T>(
+            RabbitMqAttribute attribute,
+            T command,
+            bool confirm = false,
+            string expiration = null,
+            byte? priority = null) where T : class
+        {
             //消息内容
             var body = command.ToJson();
 
@@ -757,12 +780,35 @@ namespace ZqUtils.Core.Helpers
         /// <param name="expiration">单个消息过期时间，单位ms</param>
         /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
         /// <returns></returns>
-        public bool Publish<T>(IEnumerable<T> command, bool confirm = false, string expiration = null, byte? priority = null) where T : class
+        public bool Publish<T>(
+            IEnumerable<T> command,
+            bool confirm = false,
+            string expiration = null,
+            byte? priority = null) where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
                 throw new ArgumentException("RabbitMqAttribute Is Null!");
 
+            return Publish(attribute, command, confirm, expiration, priority);
+        }
+
+        /// <summary>
+        /// 发布消息
+        /// </summary>
+        /// <param name="attribute">RabbitMq特性配置</param>
+        /// <param name="command">消息指令</param>
+        /// <param name="confirm">消息发送确认</param>
+        /// <param name="expiration">单个消息过期时间，单位ms</param>
+        /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
+        /// <returns></returns>
+        public bool Publish<T>(
+            RabbitMqAttribute attribute,
+            IEnumerable<T> command,
+            bool confirm = false,
+            string expiration = null,
+            byte? priority = null) where T : class
+        {
             //消息内容
             var body = command.Select(x => x.ToJson());
 
@@ -1042,6 +1088,27 @@ namespace ZqUtils.Core.Helpers
             if (attribute == null)
                 throw new ArgumentException("RabbitMqAttribute Is Null!");
 
+            Subscribe(attribute, subscriber, handler, registered, unregistered, shutdown);
+        }
+
+        /// <summary>
+        /// 订阅消息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="attribute">RabbitMq特性配置</param>
+        /// <param name="subscriber">消费处理委托</param>
+        /// <param name="handler">异常处理委托</param>
+        /// <param name="registered">注册事件</param>
+        /// <param name="unregistered">取消注册事件</param>
+        /// <param name="shutdown">关闭事件</param>
+        public void Subscribe<T>(
+            RabbitMqAttribute attribute,
+            Func<T, BasicDeliverEventArgs, bool> subscriber,
+            Action<string, int, Exception> handler,
+            EventHandler<ConsumerEventArgs> registered = null,
+            EventHandler<ConsumerEventArgs> unregistered = null,
+            EventHandler<ShutdownEventArgs> shutdown = null) where T : class
+        {
             //自定义参数
             var arguments = new Dictionary<string, object>();
 
@@ -1124,6 +1191,27 @@ namespace ZqUtils.Core.Helpers
             if (attribute == null)
                 throw new ArgumentException("RabbitMqAttribute Is Null!");
 
+            Subscribe(attribute, subscriber, handler, registered, unregistered, shutdown);
+        }
+
+        /// <summary>
+        /// 订阅消息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="attribute">RabbitMq特性配置</param>
+        /// <param name="subscriber">消费处理委托</param>
+        /// <param name="handler">异常处理委托</param>
+        /// <param name="registered">注册事件</param>
+        /// <param name="unregistered">取消注册事件</param>
+        /// <param name="shutdown">关闭事件</param>
+        public void Subscribe<T>(
+            RabbitMqAttribute attribute,
+            Func<T, BasicDeliverEventArgs, Task<bool>> subscriber,
+            Func<string, int, Exception, Task> handler,
+            EventHandler<ConsumerEventArgs> registered = null,
+            EventHandler<ConsumerEventArgs> unregistered = null,
+            EventHandler<ShutdownEventArgs> shutdown = null) where T : class
+        {
             //自定义参数
             var arguments = new Dictionary<string, object>();
 
