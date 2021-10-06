@@ -685,7 +685,8 @@ namespace ZqUtils.Core.Helpers
             T command,
             bool confirm = false,
             string expiration = null,
-            byte? priority = null) where T : class
+            byte? priority = null) 
+            where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
@@ -708,7 +709,8 @@ namespace ZqUtils.Core.Helpers
             T command,
             bool confirm = false,
             string expiration = null,
-            byte? priority = null) where T : class
+            byte? priority = null) 
+            where T : class
         {
             //消息内容
             var body = command.ToJson();
@@ -784,7 +786,8 @@ namespace ZqUtils.Core.Helpers
             IEnumerable<T> command,
             bool confirm = false,
             string expiration = null,
-            byte? priority = null) where T : class
+            byte? priority = null) 
+            where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
@@ -807,7 +810,8 @@ namespace ZqUtils.Core.Helpers
             IEnumerable<T> command,
             bool confirm = false,
             string expiration = null,
-            byte? priority = null) where T : class
+            byte? priority = null) 
+            where T : class
         {
             //消息内容
             var body = command.Select(x => x.ToJson());
@@ -1082,7 +1086,8 @@ namespace ZqUtils.Core.Helpers
             Action<string, int, Exception> handler,
             EventHandler<ConsumerEventArgs> registered = null,
             EventHandler<ConsumerEventArgs> unregistered = null,
-            EventHandler<ShutdownEventArgs> shutdown = null) where T : class
+            EventHandler<ShutdownEventArgs> shutdown = null) 
+            where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
@@ -1107,7 +1112,8 @@ namespace ZqUtils.Core.Helpers
             Action<string, int, Exception> handler,
             EventHandler<ConsumerEventArgs> registered = null,
             EventHandler<ConsumerEventArgs> unregistered = null,
-            EventHandler<ShutdownEventArgs> shutdown = null) where T : class
+            EventHandler<ShutdownEventArgs> shutdown = null)
+            where T : class
         {
             //自定义参数
             var arguments = new Dictionary<string, object>();
@@ -1185,7 +1191,8 @@ namespace ZqUtils.Core.Helpers
             Func<string, int, Exception, Task> handler,
             EventHandler<ConsumerEventArgs> registered = null,
             EventHandler<ConsumerEventArgs> unregistered = null,
-            EventHandler<ShutdownEventArgs> shutdown = null) where T : class
+            EventHandler<ShutdownEventArgs> shutdown = null) 
+            where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
@@ -1210,7 +1217,8 @@ namespace ZqUtils.Core.Helpers
             Func<string, int, Exception, Task> handler,
             EventHandler<ConsumerEventArgs> registered = null,
             EventHandler<ConsumerEventArgs> unregistered = null,
-            EventHandler<ShutdownEventArgs> shutdown = null) where T : class
+            EventHandler<ShutdownEventArgs> shutdown = null) 
+            where T : class
         {
             //自定义参数
             var arguments = new Dictionary<string, object>();
@@ -1310,7 +1318,8 @@ namespace ZqUtils.Core.Helpers
             IDictionary<string, object> exchangeArguments = null,
             EventHandler<ConsumerEventArgs> registered = null,
             EventHandler<ConsumerEventArgs> unregistered = null,
-            EventHandler<ShutdownEventArgs> shutdown = null) where T : class
+            EventHandler<ShutdownEventArgs> shutdown = null)
+            where T : class
         {
             //获取管道
             var channel = GetChannel(queue);
@@ -1436,7 +1445,8 @@ namespace ZqUtils.Core.Helpers
             IDictionary<string, object> exchangeArguments = null,
             EventHandler<ConsumerEventArgs> registered = null,
             EventHandler<ConsumerEventArgs> unregistered = null,
-            EventHandler<ShutdownEventArgs> shutdown = null) where T : class
+            EventHandler<ShutdownEventArgs> shutdown = null)
+            where T : class
         {
             //获取管道
             var channel = GetChannel(queue);
@@ -1537,7 +1547,9 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler">消费处理委托</param>
-        public void Pull<T>(Action<T, BasicGetResult> handler) where T : class
+        public void Pull<T>(
+            Action<T, BasicGetResult> handler)
+            where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
@@ -1558,7 +1570,8 @@ namespace ZqUtils.Core.Helpers
             string exchange,
             string queue,
             string routingKey,
-            Action<T, BasicGetResult> handler) where T : class
+            Action<T, BasicGetResult> handler)
+            where T : class
         {
             //获取管道
             var channel = GetChannel(queue);
@@ -1598,7 +1611,9 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler">消费处理委托</param>
-        public async Task PullAsync<T>(Func<T, BasicGetResult, Task> handler) where T : class
+        public async Task PullAsync<T>(
+            Func<T, BasicGetResult, Task> handler)
+            where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
@@ -1619,7 +1634,8 @@ namespace ZqUtils.Core.Helpers
             string exchange,
             string queue,
             string routingKey,
-            Func<T, BasicGetResult, Task> handler) where T : class
+            Func<T, BasicGetResult, Task> handler) 
+            where T : class
         {
             //获取管道
             var channel = GetChannel(queue);
@@ -1661,7 +1677,9 @@ namespace ZqUtils.Core.Helpers
         /// <param name="channel">管道</param>
         /// <param name="queue">队列名称</param>
         /// <returns></returns>
-        public uint GetMessageCount(IModel channel, string queue)
+        public uint GetMessageCount(
+            IModel channel,
+            string queue)
         {
             return (channel ?? GetChannel(queue)).MessageCount(queue);
         }
@@ -1677,6 +1695,7 @@ namespace ZqUtils.Core.Helpers
             {
                 item.Value?.Dispose();
             }
+
             _connection?.Dispose();
             _channelDic?.Clear();
         }
