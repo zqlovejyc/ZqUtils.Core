@@ -19,6 +19,8 @@
 using Confluent.Kafka;
 using Elasticsearch.Net;
 using FreeRedis;
+using Medallion.Threading.Redis;
+using Medallion.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -232,6 +234,44 @@ namespace ZqUtils.Core.Extensions
             }
 
             return @this;
+        }
+        #endregion
+
+        #region AddDistributedLock
+        /// <summary>
+        /// 注入基于Redis的分布式锁(IDistributedLockProvider)
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="database"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddDistributedLock(
+            this IServiceCollection @this,
+            IDatabase database,
+            Action<RedisDistributedSynchronizationOptionsBuilder> options = null)
+        {
+            return @this.AddSingleton<IDistributedLockProvider>(
+                x => new RedisDistributedSynchronizationProvider(database, options));
+        }
+
+        /// <summary>
+        /// 注入基于Redis的分布式锁(IDistributedLockProvider)，注意：此方法需要先注入AddStackExchangeRedis
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="defaultDatabase"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddDistributedLock(
+            this IServiceCollection @this,
+            int defaultDatabase = 0,
+            Action<RedisDistributedSynchronizationOptionsBuilder> options = null)
+        {
+            return @this.AddSingleton<IDistributedLockProvider>(
+                x => new RedisDistributedSynchronizationProvider(x
+                    .GetRequiredService<RedisHelper>()
+                    .RedisConnection
+                    .GetDatabase(defaultDatabase),
+                    options));
         }
         #endregion
 

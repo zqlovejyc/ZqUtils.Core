@@ -67,6 +67,7 @@
         <PackageReference Include="Confluent.Kafka" Version="1.8.0" />
         <PackageReference Include="Dapper" Version="2.0.90" />
         <PackageReference Include="DeepCloner" Version="0.10.2" />
+        <PackageReference Include="DistributedLock.Redis" Version="1.0.1" />
         <PackageReference Include="DnsClient" Version="1.5.0" />
         <PackageReference Include="EPPlus" Version="5.7.4" />
         <PackageReference Include="FreeRedis" Version="0.3.7" />
