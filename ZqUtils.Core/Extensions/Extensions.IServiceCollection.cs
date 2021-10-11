@@ -237,7 +237,7 @@ namespace ZqUtils.Core.Extensions
         }
         #endregion
 
-        #region AddDistributedLock
+        #region AddRedisDistributedLock
         /// <summary>
         /// 注入基于Redis的分布式锁(IDistributedLockProvider)
         /// </summary>
@@ -245,7 +245,7 @@ namespace ZqUtils.Core.Extensions
         /// <param name="database"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static IServiceCollection AddDistributedLock(
+        public static IServiceCollection AddRedisDistributedLock(
             this IServiceCollection @this,
             IDatabase database,
             Action<RedisDistributedSynchronizationOptionsBuilder> options = null)
@@ -261,7 +261,7 @@ namespace ZqUtils.Core.Extensions
         /// <param name="defaultDatabase"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static IServiceCollection AddDistributedLock(
+        public static IServiceCollection AddRedisDistributedLock(
             this IServiceCollection @this,
             int defaultDatabase = 0,
             Action<RedisDistributedSynchronizationOptionsBuilder> options = null)
