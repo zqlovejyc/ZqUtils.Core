@@ -18,6 +18,7 @@
 
 using Microsoft.Extensions.Configuration;
 using NATS.Client;
+using NATS.Client.JetStream;
 using System;
 using System.Threading.Tasks;
 using ZqUtils.Core.Extensions;
@@ -43,6 +44,12 @@ namespace ZqUtils.Core.Helpers
         /// NATS连接配置
         /// </summary>
         private readonly Options _options;
+
+        /// <summary>
+        /// 默认JetStreamOpetions
+        /// </summary>
+        private readonly JetStreamOptions _jetStreamOptions =
+            JetStreamOptions.Builder().WithPublishNoAck(false).WithRequestTimeout(3000).Build();
 
         /// <summary>
         /// 线程对象，线程锁使用
@@ -163,7 +170,7 @@ namespace ZqUtils.Core.Helpers
         /// 确保NATS连接可用
         /// </summary>
         /// <param name="connection">NATS连接对象</param>
-        /// <returns></returns>
+        /// <returns><see cref="IConnection"/></returns>
         public IConnection EnsureAvailabled(ref IConnection connection)
         {
             if (connection == null || connection.IsClosed())
@@ -176,6 +183,14 @@ namespace ZqUtils.Core.Helpers
 
             return connection;
         }
+
+        /// <summary>
+        /// 创建IJetStream
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns><see cref="IJetStream"/></returns>
+        public IJetStream CreateJetStream(JetStreamOptions options) =>
+            EnsureAvailabled(ref _connection).CreateJetStreamContext(options ?? _jetStreamOptions);
         #endregion
 
         #region 发送请求
@@ -187,7 +202,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="subject">消息主题</param>
         /// <param name="data">请求数据</param>
         /// <param name="timeout">超时时长，单位：ms</param>
-        /// <returns></returns>
+        /// <returns><see cref="Msg"/></returns>
         public Msg Request<T>(string subject, T data, int timeout) =>
             EnsureAvailabled(ref _connection).Request(subject, data.SerializeToUtf8Bytes(), timeout);
 
@@ -200,7 +215,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="offset">消息字节偏移量，从0开始</param>
         /// <param name="count">消息字节长度</param>
         /// <param name="timeout">超时时长，单位：ms</param>
-        /// <returns></returns>
+        /// <returns><see cref="Msg"/></returns>
         public Msg Request<T>(string subject, T data, int offset, int count, int timeout) =>
             EnsureAvailabled(ref _connection).Request(subject, data.SerializeToUtf8Bytes(), offset, count, timeout);
 
@@ -210,7 +225,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="subject">消息主题</param>
         /// <param name="data">请求数据</param>
-        /// <returns></returns>
+        /// <returns><see cref="Msg"/></returns>
         public Msg Request<T>(string subject, T data) =>
             EnsureAvailabled(ref _connection).Request(subject, data.SerializeToUtf8Bytes());
 
@@ -222,7 +237,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="data">请求数据</param>
         /// <param name="offset">消息字节偏移量，从0开始</param>
         /// <param name="count">消息字节长度</param>
-        /// <returns></returns>
+        /// <returns><see cref="Msg"/></returns>
         public Msg Request<T>(string subject, T data, int offset, int count) =>
             EnsureAvailabled(ref _connection).Request(subject, data.SerializeToUtf8Bytes(), offset, count);
 
@@ -230,7 +245,7 @@ namespace ZqUtils.Core.Helpers
         /// 发送请求
         /// </summary>
         /// <param name="message">请求消息</param>
-        /// <returns></returns>
+        /// <returns><see cref="Msg"/></returns>
         public Msg Request(Msg message) =>
             EnsureAvailabled(ref _connection).Request(message);
 
@@ -239,7 +254,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="message">请求消息</param>
         /// <param name="timeout">超时时长，单位：ms</param>
-        /// <returns></returns>
+        /// <returns><see cref="Msg"/></returns>
         public Msg Request(Msg message, int timeout) =>
             EnsureAvailabled(ref _connection).Request(message, timeout);
         #endregion
@@ -252,7 +267,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="subject">消息主题</param>
         /// <param name="data">请求数据</param>
         /// <param name="timeout">超时时长，单位：ms</param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Msg}"/></returns>
         public async Task<Msg> RequestAsync<T>(string subject, T data, int timeout) =>
             await EnsureAvailabled(ref _connection).RequestAsync(subject, data.SerializeToUtf8Bytes(), timeout);
 
@@ -265,7 +280,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="offset">消息字节偏移量，从0开始</param>
         /// <param name="count">消息字节长度</param>
         /// <param name="timeout">超时时长，单位：ms</param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Msg}"/></returns>
         public async Task<Msg> RequestAsync<T>(string subject, T data, int offset, int count, int timeout) =>
             await EnsureAvailabled(ref _connection).RequestAsync(subject, data.SerializeToUtf8Bytes(), offset, count, timeout);
 
@@ -275,7 +290,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="subject">消息主题</param>
         /// <param name="data">请求数据</param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Msg}"/></returns>
         public async Task<Msg> RequestAsync<T>(string subject, T data) =>
             await EnsureAvailabled(ref _connection).RequestAsync(subject, data.SerializeToUtf8Bytes());
 
@@ -287,7 +302,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="data">请求数据</param>
         /// <param name="offset">消息字节偏移量，从0开始</param>
         /// <param name="count">消息字节长度</param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Msg}"/></returns>
         public async Task<Msg> RequestAsync<T>(string subject, T data, int offset, int count) =>
             await EnsureAvailabled(ref _connection).RequestAsync(subject, data.SerializeToUtf8Bytes(), offset, count);
 
@@ -295,7 +310,7 @@ namespace ZqUtils.Core.Helpers
         /// 发送请求
         /// </summary>
         /// <param name="message">请求消息</param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Msg}"/></returns>
         public async Task<Msg> RequestAsync(Msg message) =>
             await EnsureAvailabled(ref _connection).RequestAsync(message);
 
@@ -304,13 +319,14 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="message">请求消息</param>
         /// <param name="timeout">超时时长，单位：ms</param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Msg}"/></returns>
         public async Task<Msg> RequestAsync(Msg message, int timeout) =>
             await EnsureAvailabled(ref _connection).RequestAsync(message, timeout);
         #endregion
         #endregion
 
         #region 发布消息
+        #region Sync
         /// <summary>
         /// 发布消息
         /// </summary>
@@ -359,6 +375,131 @@ namespace ZqUtils.Core.Helpers
         /// <param name="count">消息字节长度</param>
         public void Publish<T>(string subject, string reply, T data, int offset, int count) =>
             EnsureAvailabled(ref _connection).Publish(subject, reply, data.SerializeToUtf8Bytes(), offset, count);
+
+        /// <summary>
+        /// 发布消息，详情：<see cref="IJetStream.Publish(string, byte[])"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="subject">消息主题</param>
+        /// <param name="data">消息数据</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="PublishAck"/></returns>
+        public PublishAck Publish<T>(string subject, T data, JetStreamOptions options = null) =>
+            CreateJetStream(options).Publish(subject, data.SerializeToUtf8Bytes());
+
+        /// <summary>
+        /// 发布消息，详情：<see cref="IJetStream.Publish(string, byte[], PublishOptions)"/>
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="data">消息数据</param>
+        /// <param name="publishOptions">发布配置</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="PublishAck"/></returns>
+        /// <example>
+        ///     <code>
+        ///         var publishOptions = PublishOptions
+        ///             .Builder()
+        ///             .WithExpectedStream("subject")
+        ///             .WithMessageId("messageId")
+        ///             .Build();
+        ///         
+        ///     </code>
+        /// </example>
+        public PublishAck Publish<T>(string subject, T data, PublishOptions publishOptions, JetStreamOptions options = null) =>
+            CreateJetStream(options).Publish(subject, data.SerializeToUtf8Bytes(), publishOptions);
+
+        /// <summary>
+        /// 发布消息，详情：<see cref="IJetStream.PublishAsync(Msg)"/>
+        /// </summary>
+        /// <param name="message">消息内容</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="PublishAck"/></returns>
+        public PublishAck Publish(Msg message, JetStreamOptions options = null) =>
+            CreateJetStream(options).Publish(message);
+
+        /// <summary>
+        /// 发布消息，详情：<see cref="IJetStream.PublishAsync(Msg, PublishOptions)"/>
+        /// </summary>
+        /// <param name="message">消息内容</param>
+        /// <param name="publishOptions">发布配置</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="PublishAck"/></returns>
+        /// <example>
+        ///     <code>
+        ///         var publishOptions = PublishOptions
+        ///             .Builder()
+        ///             .WithExpectedStream("subject")
+        ///             .WithMessageId("messageId")
+        ///             .Build();
+        ///         
+        ///     </code>
+        /// </example>
+        public PublishAck Publish(Msg message, PublishOptions publishOptions, JetStreamOptions options = null) =>
+            CreateJetStream(options).Publish(message, publishOptions);
+        #endregion
+
+        #region Async
+        /// <summary>
+        /// 发布消息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="subject">消息主题</param>
+        /// <param name="data">消息数据</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="Task{PublishAck}"/></returns>
+        public async Task<PublishAck> PublishAsync<T>(string subject, T data, JetStreamOptions options = null) =>
+            await CreateJetStream(options).PublishAsync(subject, data.SerializeToUtf8Bytes());
+
+        /// <summary>
+        /// 发布消息
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="data">消息数据</param>
+        /// <param name="publishOptions">发布配置</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="Task{PublishAck}"/></returns>
+        /// <example>
+        ///     <code>
+        ///         var publishOptions = PublishOptions
+        ///             .Builder()
+        ///             .WithExpectedStream("subject")
+        ///             .WithMessageId("messageId")
+        ///             .Build();
+        ///         
+        ///     </code>
+        /// </example>
+        public async Task<PublishAck> PublishAsync<T>(string subject, T data, PublishOptions publishOptions, JetStreamOptions options = null) =>
+            await CreateJetStream(options).PublishAsync(subject, data.SerializeToUtf8Bytes(), publishOptions);
+
+        /// <summary>
+        /// 发布消息
+        /// </summary>
+        /// <param name="message">消息内容</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="Task{PublishAck}"/></returns>
+        public async Task<PublishAck> PublishAsync(Msg message, JetStreamOptions options = null) =>
+            await CreateJetStream(options).PublishAsync(message);
+
+        /// <summary>
+        /// 发布消息
+        /// </summary>
+        /// <param name="message">消息内容</param>
+        /// <param name="publishOptions">发布配置</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="Task{PublishAck}"/></returns>
+        /// <example>
+        ///     <code>
+        ///         var publishOptions = PublishOptions
+        ///             .Builder()
+        ///             .WithExpectedStream("subject")
+        ///             .WithMessageId("messageId")
+        ///             .Build();
+        ///         
+        ///     </code>
+        /// </example>
+        public async Task<PublishAck> PublishAsync(Msg message, PublishOptions publishOptions, JetStreamOptions options = null) =>
+            await CreateJetStream(options).PublishAsync(message, publishOptions);
+        #endregion
         #endregion
 
         #region 订阅消息
@@ -366,7 +507,7 @@ namespace ZqUtils.Core.Helpers
         /// 异步订阅消息
         /// </summary>
         /// <param name="subject">消息主题</param>
-        /// <returns></returns>
+        /// <returns><see cref="IAsyncSubscription"/></returns>
         public IAsyncSubscription SubscribeAsync(string subject) =>
             EnsureAvailabled(ref _connection).SubscribeAsync(subject);
 
@@ -376,7 +517,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="subject">消息主题</param>
         /// <param name="queue">队列组名称</param>
         /// <param name="handler">订阅消息事件委托</param>
-        /// <returns></returns>
+        /// <returns><see cref="IAsyncSubscription"/></returns>
         public IAsyncSubscription SubscribeAsync(string subject, string queue, EventHandler<MsgHandlerEventArgs> handler) =>
             EnsureAvailabled(ref _connection).SubscribeAsync(subject, queue, handler);
 
@@ -385,7 +526,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="subject">消息主题</param>
         /// <param name="queue">队列组名称</param>
-        /// <returns></returns>
+        /// <returns><see cref="IAsyncSubscription"/></returns>
         public IAsyncSubscription SubscribeAsync(string subject, string queue) =>
             EnsureAvailabled(ref _connection).SubscribeAsync(subject, queue);
 
@@ -394,7 +535,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="subject">消息主题</param>
         /// <param name="handler">订阅消息事件委托</param>
-        /// <returns></returns>
+        /// <returns><see cref="IAsyncSubscription"/></returns>
         public IAsyncSubscription SubscribeAsync(string subject, EventHandler<MsgHandlerEventArgs> handler) =>
             EnsureAvailabled(ref _connection).SubscribeAsync(subject, handler);
 
@@ -403,7 +544,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="subject">消息主题</param>
         /// <param name="queue">队列组名称</param>
-        /// <returns></returns>
+        /// <returns><see cref="ISyncSubscription"/></returns>
         public ISyncSubscription SubscribeSync(string subject, string queue) =>
              EnsureAvailabled(ref _connection).SubscribeSync(subject, queue);
 
@@ -411,9 +552,143 @@ namespace ZqUtils.Core.Helpers
         /// 同步订阅消息
         /// </summary>
         /// <param name="subject">消息主题</param>
-        /// <returns></returns>
+        /// <returns><see cref="ISyncSubscription"/></returns>
         public ISyncSubscription SubscribeSync(string subject) =>
             EnsureAvailabled(ref _connection).SubscribeSync(subject);
+
+        /// <summary>
+        /// 拉取订阅，详情：<see cref="IJetStream.PullSubscribe(string, PullSubscribeOptions)"/>
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="pullSubscribeOptions">拉取订阅配置</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="IJetStreamPullSubscription"/></returns>
+        public IJetStreamPullSubscription PullSubscribe(string subject, PullSubscribeOptions pullSubscribeOptions, JetStreamOptions options = null) =>
+            CreateJetStream(options).PullSubscribe(subject, pullSubscribeOptions);
+
+        /// <summary>
+        /// 异步推送订阅，详情：<see cref="IJetStream.PushSubscribeAsync(string, EventHandler{MsgHandlerEventArgs}, bool)"/>
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="handler">订阅消息事件委托</param>
+        /// <param name="autoAck">是否自动确认</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="IJetStreamPushAsyncSubscription"/></returns>
+        public IJetStreamPushAsyncSubscription PushSubscribeAsync(string subject, EventHandler<MsgHandlerEventArgs> handler, bool autoAck, JetStreamOptions options = null) =>
+            CreateJetStream(options).PushSubscribeAsync(subject, handler, autoAck);
+
+        /// <summary>
+        /// 异步推送订阅，详情：<see cref="IJetStream.PushSubscribeAsync(string, EventHandler{MsgHandlerEventArgs}, bool, PushSubscribeOptions)"/>
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="handler">订阅消息事件委托</param>
+        /// <param name="autoAck">是否自动确认</param>
+        /// <param name="pushSubscribeOptions">推送订阅配置</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="IJetStreamPushAsyncSubscription"/></returns>
+        /// <example>
+        ///     <code>
+        ///         var pso = PushSubscribeOptions.Builder()
+        ///             .WithStream("subject")
+        ///             .WithConfiguration(ConsumerConfiguration.Builder().WithDeliverPolicy(DeliverPolicy.New).Build())
+        ///             .WithDeliverGroup("groupId")
+        ///             .Build();
+        ///     </code>
+        /// </example>
+        public IJetStreamPushAsyncSubscription PushSubscribeAsync(string subject, EventHandler<MsgHandlerEventArgs> handler, bool autoAck, PushSubscribeOptions pushSubscribeOptions, JetStreamOptions options = null) =>
+            CreateJetStream(options).PushSubscribeAsync(subject, handler, autoAck, pushSubscribeOptions);
+
+        /// <summary>
+        /// 异步推送订阅，详情：<see cref="IJetStream.PushSubscribeAsync(string, string, EventHandler{MsgHandlerEventArgs}, bool)"/>
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="queue">队列组名称</param>
+        /// <param name="handler">订阅消息事件委托</param>
+        /// <param name="autoAck">是否自动确认</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="IJetStreamPushAsyncSubscription"/></returns>
+        public IJetStreamPushAsyncSubscription PushSubscribeAsync(string subject, string queue, EventHandler<MsgHandlerEventArgs> handler, bool autoAck, JetStreamOptions options = null) =>
+            CreateJetStream(options).PushSubscribeAsync(subject, queue, handler, autoAck);
+
+        /// <summary>
+        /// 异步推送订阅，详情：<see cref="IJetStream.PushSubscribeAsync(string, string, EventHandler{MsgHandlerEventArgs}, bool, PushSubscribeOptions)"/>
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="queue">队列组名称</param>
+        /// <param name="handler">订阅消息事件委托</param>
+        /// <param name="autoAck">是否自动确认</param>
+        /// <param name="pushSubscribeOptions">推送订阅配置</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="IJetStreamPushAsyncSubscription"/></returns>
+        /// <example>
+        ///     <code>
+        ///         var pso = PushSubscribeOptions.Builder()
+        ///             .WithStream("subject")
+        ///             .WithConfiguration(ConsumerConfiguration.Builder().WithDeliverPolicy(DeliverPolicy.New).Build())
+        ///             .WithDeliverGroup("groupId")
+        ///             .Build();
+        ///     </code>
+        /// </example>
+        public IJetStreamPushAsyncSubscription PushSubscribeAsync(string subject, string queue, EventHandler<MsgHandlerEventArgs> handler, bool autoAck, PushSubscribeOptions pushSubscribeOptions, JetStreamOptions options = null) =>
+            CreateJetStream(options).PushSubscribeAsync(subject, queue, handler, autoAck, pushSubscribeOptions);
+
+        /// <summary>
+        /// 同步推送订阅，详情：<see cref="IJetStream.PushSubscribeSync(string)"/>
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="IJetStreamPushSyncSubscription"/></returns>
+        public IJetStreamPushSyncSubscription PushSubscribeSync(string subject, JetStreamOptions options = null) =>
+            CreateJetStream(options).PushSubscribeSync(subject);
+
+        /// <summary>
+        /// 同步推送订阅，详情：<see cref="IJetStream.PushSubscribeSync(string, PushSubscribeOptions)"/>
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="pushSubscribeOptions">推送订阅配置</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="IJetStreamPushSyncSubscription"/></returns>
+        /// <example>
+        ///     <code>
+        ///         var pso = PushSubscribeOptions.Builder()
+        ///             .WithStream("subject")
+        ///             .WithConfiguration(ConsumerConfiguration.Builder().WithDeliverPolicy(DeliverPolicy.New).Build())
+        ///             .WithDeliverGroup("groupId")
+        ///             .Build();
+        ///     </code>
+        /// </example>
+        public IJetStreamPushSyncSubscription PushSubscribeSync(string subject, PushSubscribeOptions pushSubscribeOptions, JetStreamOptions options = null) =>
+            CreateJetStream(options).PushSubscribeSync(subject, pushSubscribeOptions);
+
+        /// <summary>
+        /// 同步推送订阅，详情：<see cref="IJetStream.PushSubscribeSync(string, string)"/>
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="queue">队列组名称</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="IJetStreamPushSyncSubscription"/></returns>
+        public IJetStreamPushSyncSubscription PushSubscribeSync(string subject, string queue, JetStreamOptions options = null) =>
+            CreateJetStream(options).PushSubscribeSync(subject, queue);
+
+        /// <summary>
+        /// 同步推送订阅，详情：<see cref="IJetStream.PushSubscribeSync(string, string, PushSubscribeOptions)"/>
+        /// </summary>
+        /// <param name="subject">消息主题</param>
+        /// <param name="queue">队列组名称</param>
+        /// <param name="pushSubscribeOptions">推送订阅配置</param>
+        /// <param name="options">JetStream配置</param>
+        /// <returns><see cref="IJetStreamPushSyncSubscription"/></returns>
+        /// <example>
+        ///     <code>
+        ///         var pso = PushSubscribeOptions.Builder()
+        ///             .WithStream("subject")
+        ///             .WithConfiguration(ConsumerConfiguration.Builder().WithDeliverPolicy(DeliverPolicy.New).Build())
+        ///             .WithDeliverGroup("groupId")
+        ///             .Build();
+        ///     </code>
+        /// </example>
+        public IJetStreamPushSyncSubscription PushSubscribeSync(string subject, string queue, PushSubscribeOptions pushSubscribeOptions, JetStreamOptions options = null) =>
+            CreateJetStream(options).PushSubscribeSync(subject, queue, pushSubscribeOptions);
         #endregion
 
         #region 释放资源
