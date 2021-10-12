@@ -2332,7 +2332,7 @@ namespace ZqUtils.Core.Helpers
                 {
                     var server = RedisConnection.GetServer(point);
                     var keys = server.Keys(database: database, pattern: pattern);
-                    result.AddRange(keys.Select(x => (string)x));
+                    result.AddRangeIfNotContains(keys.Select(x => (string)x).ToArray());
                 }
             }
 
@@ -2470,7 +2470,7 @@ namespace ZqUtils.Core.Helpers
                     var keys = server.KeysAsync(database: database, pattern: pattern);
                     await foreach (var key in keys)
                     {
-                        result.Add(key);
+                        result.AddIfNotContains(key);
                     }
                 }
             }
