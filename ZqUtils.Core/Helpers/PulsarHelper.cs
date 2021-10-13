@@ -91,7 +91,7 @@ namespace ZqUtils.Core.Helpers
 
         #region 公有属性
         /// <summary>
-        /// Pulsar客户端
+        /// Pulsar客户端，参考：<see cref="Pulsar.Client.Api.PulsarClient"/>
         /// </summary>
         public PulsarClient PulsarClient => _client;
         #endregion
@@ -101,10 +101,10 @@ namespace ZqUtils.Core.Helpers
         /// 创建生产者
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="topic"></param>
-        /// <param name="schema"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
+        /// <param name="topic">消息主题</param>
+        /// <param name="schema">消息模式，例如：Schema.STRING()</param>
+        /// <param name="action">自定义委托</param>
+        /// <returns><see cref="Task{IProducer}"/></returns>
         public async Task<IProducer<T>> CreateProducerAsync<T>(string topic, ISchema<T> schema, Action<ProducerBuilder<T>> action = null)
         {
             var builder = _client.NewProducer(schema).Topic(topic);
@@ -117,9 +117,9 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 创建string生产者
         /// </summary>
-        /// <param name="topic"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
+        /// <param name="topic">消息主题</param>
+        /// <param name="action">自定义委托</param>
+        /// <returns><see cref="Task{IProducer}"/></returns>
         public async Task<IProducer<string>> CreateStringProducerAsync(string topic, Action<ProducerBuilder<string>> action = null)
         {
             return await this.CreateProducerAsync(topic, Schema.STRING(), action);
@@ -128,9 +128,9 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 创建byte生产者
         /// </summary>
-        /// <param name="topic"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
+        /// <param name="topic">消息主题</param>
+        /// <param name="action">自定义委托</param>
+        /// <returns><see cref="Task{IProducer}"/></returns>
         public async Task<IProducer<byte[]>> CreateByteProducerAsync(string topic, Action<ProducerBuilder<byte[]>> action = null)
         {
             return await this.CreateProducerAsync(topic, Schema.BYTES(), action);
@@ -142,9 +142,9 @@ namespace ZqUtils.Core.Helpers
         /// 创建消费者
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="schema"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
+        /// <param name="schema">消息模式，例如：Schema.STRING()</param>
+        /// <param name="action">自定义委托</param>
+        /// <returns><see cref="Task{IConsumer}"/></returns>
         public async Task<IConsumer<T>> CreateConsumerAsync<T>(ISchema<T> schema, Action<ConsumerBuilder<T>> action = null)
         {
             var builder = _client.NewConsumer(schema);
@@ -157,9 +157,26 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 创建string消费者
         /// </summary>
-        /// <param name="topic"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
+        /// <param name="topic">消息主题</param>
+        /// <param name="action">自定义委托</param>
+        /// <returns><see cref="Task{IConsumer}"/></returns>
+        /// <remarks>
+        ///     <code>
+        ///         var serviceUrl = "pulsar://my-pulsar-cluster:32268";
+        ///         var subscriptionName = "my-subscription";
+        ///         var topicName = $"my-topic-{DateTime.Now.Ticks}";
+        ///         var serviceName = Assembly.GetEntryAssembly()?.GetName().Name.ToLower();
+        ///         
+        ///         var pulsar = new PulsarHelper(serviceUrl);
+        ///         var consumer = await pulsar.CreateStringConsumerAsync(topicName,builder => 
+        ///         {
+        ///             builder
+        ///                 .SubscriptionName(subscriptionName)
+        ///                 .ConsumerName(serviceName)
+        ///                 .SubscriptionType(SubscriptionType.Shared)
+        ///         });
+        ///     </code>
+        /// </remarks>
         public async Task<IConsumer<string>> CreateStringConsumerAsync(string topic, Action<ConsumerBuilder<string>> action = null)
         {
             return await this.CreateConsumerAsync(Schema.STRING(), builder =>
@@ -173,9 +190,9 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 创建string消费者
         /// </summary>
-        /// <param name="topics"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
+        /// <param name="topics">消息主题</param>
+        /// <param name="action">自定义委托</param>
+        /// <returns><see cref="Task{IConsumer}"/></returns>
         public async Task<IConsumer<string>> CreateStringConsumerAsync(IEnumerable<string> topics, Action<ConsumerBuilder<string>> action = null)
         {
             return await this.CreateConsumerAsync(Schema.STRING(), builder =>
@@ -191,7 +208,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="topic"></param>
         /// <param name="action"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{IConsumer}"/></returns>
         public async Task<IConsumer<byte[]>> CreateByteConsumerAsync(string topic, Action<ConsumerBuilder<byte[]>> action = null)
         {
             return await this.CreateConsumerAsync(Schema.BYTES(), builder =>
@@ -207,7 +224,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="topics"></param>
         /// <param name="action"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{IConsumer}"/></returns>
         public async Task<IConsumer<byte[]>> CreateByteConsumerAsync(IEnumerable<string> topics, Action<ConsumerBuilder<byte[]>> action = null)
         {
             return await this.CreateConsumerAsync(Schema.BYTES(), builder =>
@@ -224,9 +241,9 @@ namespace ZqUtils.Core.Helpers
         /// 创建读取者
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="schema"></param>
+        /// <param name="schema">消息模式，例如：Schema.STRING()</param>
         /// <param name="action"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{IReader}"/></returns>
         public async Task<IReader<T>> CreateReaderAsync<T>(ISchema<T> schema, Action<ReaderBuilder<T>> action = null)
         {
             var builder = _client.NewReader(schema);
@@ -241,9 +258,9 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="topic"></param>
-        /// <param name="schema"></param>
+        /// <param name="schema">消息模式，例如：Schema.STRING()</param>
         /// <param name="action"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{IReader}"/></returns>
         public async Task<IReader<T>> CreateReaderAsync<T>(string topic, ISchema<T> schema, Action<ReaderBuilder<T>> action = null)
         {
             return await this.CreateReaderAsync(schema, builder =>
@@ -259,7 +276,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="topic"></param>
         /// <param name="action"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{IReader}"/></returns>
         public async Task<IReader<string>> CreateStringReaderAsync(string topic, Action<ReaderBuilder<string>> action = null)
         {
             return await this.CreateReaderAsync(Schema.STRING(), builder =>
@@ -275,7 +292,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="topic"></param>
         /// <param name="action"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{IReader}"/></returns>
         public async Task<IReader<byte[]>> CreateByteReaderAsync(string topic, Action<ReaderBuilder<byte[]>> action = null)
         {
             return await this.CreateReaderAsync(Schema.BYTES(), builder =>
@@ -292,7 +309,7 @@ namespace ZqUtils.Core.Helpers
         /// 创建事务
         /// </summary>
         /// <param name="action"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Transaction}"/></returns>
         public async Task<Transaction> CreateTransactionAsync(Action<TransactionBuilder> action = null)
         {
             var builder = _client.NewTransaction();
@@ -310,7 +327,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="producer"></param>
         /// <param name="message"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{MessageId}"/></returns>
         public async Task<MessageId> SendMessageAsync<T>(IProducer<T> producer, T message)
         {
             return await producer.SendAsync(message);
@@ -322,7 +339,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="producer"></param>
         /// <param name="messageBuilder"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{MessageId}"/></returns>
         public async Task<MessageId> SendMessageAsync<T>(IProducer<T> producer, MessageBuilder<T> messageBuilder)
         {
             return await producer.SendAsync(messageBuilder);
@@ -334,7 +351,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="producer"></param>
         /// <param name="message"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Unit}"/></returns>
         public async Task<Unit> SendForgetMessageAsync<T>(IProducer<T> producer, T message)
         {
             return await producer.SendAndForgetAsync(message);
@@ -346,7 +363,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="producer"></param>
         /// <param name="messageBuilder"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Unit}"/></returns>
         public async Task<Unit> SendForgetMessageAsync<T>(IProducer<T> producer, MessageBuilder<T> messageBuilder)
         {
             return await producer.SendAndForgetAsync(messageBuilder);
@@ -359,7 +376,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="consumer"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Message}"/></returns>
         public async Task<Message<T>> ReceiveMessageAsync<T>(IConsumer<T> consumer)
         {
             return await consumer.ReceiveAsync();
@@ -370,7 +387,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="consumer"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Messages}"/></returns>
         public async Task<Messages<T>> BatchReceiveMessageAsync<T>(IConsumer<T> consumer)
         {
             return await consumer.BatchReceiveAsync();
@@ -384,7 +401,6 @@ namespace ZqUtils.Core.Helpers
         /// <param name="receiveHandler"></param>
         /// <param name="retry"></param>
         /// <param name="exceptionHandler"></param>
-        /// <returns></returns>
         public void ReceiveMessage<T>(IConsumer<T> consumer, Func<Message<T>, bool> receiveHandler = null, int retry = 5, Action<Message<T>, int, Exception> exceptionHandler = null)
         {
             Task.Run(async () =>
@@ -406,6 +422,11 @@ namespace ZqUtils.Core.Helpers
 
                             result = receiveHandler?.Invoke(message);
 
+                            if (result == true)
+                                await this.AcknowledgeAsync(consumer, message.MessageId);
+                            else
+                                await this.NegativeAcknowledgeAsync(consumer, message.MessageId);
+
                             //异常置空
                             exception = null;
 
@@ -419,12 +440,8 @@ namespace ZqUtils.Core.Helpers
                         }
                     }
 
-                    if (!(result == true) || exception != null)
+                    if (exception != null)
                         await this.NegativeAcknowledgeAsync(consumer, message.MessageId);
-                    else
-                        await this.AcknowledgeAsync(consumer, message.MessageId);
-
-                    await Task.Delay(10);
                 }
             });
         }
@@ -437,7 +454,6 @@ namespace ZqUtils.Core.Helpers
         /// <param name="receiveHandler"></param>
         /// <param name="retry"></param>
         /// <param name="exceptionHandler"></param>
-        /// <returns></returns>
         public void BatchReceiveMessage<T>(IConsumer<T> consumer, Func<Messages<T>, bool> receiveHandler = null, int retry = 5, Action<Messages<T>, int, Exception> exceptionHandler = null)
         {
             Task.Run(async () =>
@@ -459,6 +475,11 @@ namespace ZqUtils.Core.Helpers
 
                             result = receiveHandler?.Invoke(messages);
 
+                            if (result == true)
+                                await this.AcknowledgeAsync(consumer, messages);
+                            else
+                                await this.NegativeAcknowledgeAsync(consumer, messages);
+
                             //异常置空
                             exception = null;
 
@@ -472,12 +493,8 @@ namespace ZqUtils.Core.Helpers
                         }
                     }
 
-                    if (!(result == true) || exception != null)
+                    if (exception != null)
                         await this.NegativeAcknowledgeAsync(consumer, messages);
-                    else
-                        await this.AcknowledgeAsync(consumer, messages);
-
-                    await Task.Delay(10);
                 }
             });
         }
@@ -490,7 +507,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="consumer"></param>
         /// <param name="messageId"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Unit}"/></returns>
         public async Task<Unit> AcknowledgeAsync<T>(IConsumer<T> consumer, MessageId messageId)
         {
             return await consumer.AcknowledgeAsync(messageId);
@@ -503,7 +520,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="consumer"></param>
         /// <param name="messageId"></param>
         /// <param name="txn"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Unit}"/></returns>
         public async Task<Unit> AcknowledgeAsync<T>(IConsumer<T> consumer, MessageId messageId, Transaction txn)
         {
             return await consumer.AcknowledgeAsync(messageId, txn);
@@ -515,7 +532,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="consumer"></param>
         /// <param name="messages"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Unit}"/></returns>
         public async Task<Unit> AcknowledgeAsync<T>(IConsumer<T> consumer, Messages<T> messages)
         {
             return await consumer.AcknowledgeAsync(messages);
@@ -527,7 +544,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="consumer"></param>
         /// <param name="messages"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Unit}"/></returns>
         public async Task<Unit> AcknowledgeAsync<T>(IConsumer<T> consumer, IEnumerable<MessageId> messages)
         {
             return await consumer.AcknowledgeAsync(messages);
@@ -541,7 +558,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="consumer"></param>
         /// <param name="messageId"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Unit}"/></returns>
         public async Task<Unit> NegativeAcknowledgeAsync<T>(IConsumer<T> consumer, MessageId messageId)
         {
             return await consumer.NegativeAcknowledge(messageId);
@@ -553,7 +570,7 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="consumer"></param>
         /// <param name="messages"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Unit}"/></returns>
         public async Task<Unit> NegativeAcknowledgeAsync<T>(IConsumer<T> consumer, Messages<T> messages)
         {
             return await consumer.NegativeAcknowledge(messages);
@@ -566,7 +583,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="reader"></param>
-        /// <returns></returns>
+        /// <returns><see cref="Task{Message}"/></returns>
         public async Task<Message<T>> ReaderMessageAsync<T>(IReader<T> reader)
         {
             return await reader.ReadNextAsync();
