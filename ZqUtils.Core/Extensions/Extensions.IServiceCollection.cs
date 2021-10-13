@@ -19,13 +19,14 @@
 using Confluent.Kafka;
 using Elasticsearch.Net;
 using FreeRedis;
-using Medallion.Threading.Redis;
 using Medallion.Threading;
+using Medallion.Threading.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Nest;
 using Newtonsoft.Json;
+using Pulsar.Client.Api;
 using RabbitMQ.Client;
 using Scrutor;
 using StackExchange.Redis;
@@ -694,7 +695,7 @@ namespace ZqUtils.Core.Extensions
         /// 注入ElasticSearch
         /// </summary>
         /// <param name="this"></param>
-        /// <param name="configuration"></param>
+        /// <param name="configuration">appsettings配置</param>
         /// <returns></returns>
         public static IServiceCollection AddElasticSearch(
             this IServiceCollection @this,
@@ -722,7 +723,9 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this"></param>
         /// <param name="url">NATS连接字符串</param>
         /// <returns></returns>
-        public static IServiceCollection AddNats(this IServiceCollection @this, string url)
+        public static IServiceCollection AddNats(
+            this IServiceCollection @this,
+            string url)
         {
             return @this.AddSingleton(x => new NatsHelper(url));
         }
@@ -733,7 +736,9 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this"></param>
         /// <param name="options">NATS配置</param>
         /// <returns></returns>
-        public static IServiceCollection AddNats(this IServiceCollection @this, NatsOptions options)
+        public static IServiceCollection AddNats(
+            this IServiceCollection @this,
+            NatsOptions options)
         {
             return @this.AddSingleton(x => new NatsHelper(options));
         }
@@ -744,12 +749,48 @@ namespace ZqUtils.Core.Extensions
         /// <param name="this"></param>
         /// <param name="configuration">section为"NatsConfig"的配置信息</param>
         /// <returns></returns>
-        public static IServiceCollection AddNats(this IServiceCollection @this, IConfiguration configuration)
+        public static IServiceCollection AddNats(
+            this IServiceCollection @this,
+            IConfiguration configuration)
         {
             var options = NatsConnectionFactory.GetDefaultOptions();
             configuration.GetSection("NatsConfig").Bind(options);
 
             return @this.AddNats(options);
+        }
+        #endregion
+
+        #region AddPulsar
+        /// <summary>
+        /// 注入Pulsar
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="serviceUrl">Pulsar服务地址</param>
+        /// <param name="action">PulsarClientBuilder委托，用于Pulsar客户端自定义配置</param>
+        /// <returns></returns>
+        public static IServiceCollection AddPulsar(
+            this IServiceCollection @this,
+            string serviceUrl,
+            Action<PulsarClientBuilder> action = null)
+        {
+            return @this.AddSingleton(x => new PulsarHelper(serviceUrl, action));
+        }
+
+        /// <summary>
+        /// 注入Pulsar
+        /// </summary>
+        /// <param name="this"></param>
+        /// <param name="configuration">appsettings配置</param>
+        /// <param name="action">PulsarClientBuilder委托，用于Pulsar客户端自定义配置</param>
+        /// <returns></returns>
+        public static IServiceCollection AddPulsar(
+            this IServiceCollection @this,
+            IConfiguration configuration,
+            Action<PulsarClientBuilder> action = null)
+        {
+            var serviceUrl = configuration.GetValue<string>("Pulsar:ServiceUrl");
+
+            return @this.AddSingleton(x => new PulsarHelper(serviceUrl, action));
         }
         #endregion
 

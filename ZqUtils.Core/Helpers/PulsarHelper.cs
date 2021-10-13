@@ -33,7 +33,7 @@ namespace ZqUtils.Core.Helpers
     /// <summary>
     /// Pulsar工具类
     /// </summary>
-    public class PulsarHelper
+    public class PulsarHelper : IDisposable
     {
         #region 私有字段
         /// <summary>
@@ -45,6 +45,11 @@ namespace ZqUtils.Core.Helpers
         /// Pulsar客户端
         /// </summary>
         private readonly PulsarClient _client;
+
+        /// <summary>
+        /// 是否释放
+        /// </summary>
+        private bool _disposed;
         #endregion
 
         #region 构造函数
@@ -587,6 +592,25 @@ namespace ZqUtils.Core.Helpers
         public async Task<Message<T>> ReaderMessageAsync<T>(IReader<T> reader)
         {
             return await reader.ReadNextAsync();
+        }
+        #endregion
+
+        #region 资源释放
+        /// <summary>
+        /// 资源释放
+        /// </summary>
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+
+            _client?
+                .CloseAsync()
+                .ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult();
+
+            _disposed = true;
         }
         #endregion
     }
