@@ -395,7 +395,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="publishOptions">发布配置</param>
         /// <param name="options">JetStream配置</param>
         /// <returns><see cref="PublishAck"/></returns>
-        /// <example>
+        /// <remarks>
         ///     <code>
         ///         var publishOptions = PublishOptions
         ///             .Builder()
@@ -404,7 +404,7 @@ namespace ZqUtils.Core.Helpers
         ///             .Build();
         ///         
         ///     </code>
-        /// </example>
+        /// </remarks>
         public PublishAck Publish<T>(string subject, T data, PublishOptions publishOptions, JetStreamOptions options = null) =>
             CreateJetStream(options).Publish(subject, data.SerializeToUtf8Bytes(), publishOptions);
 
@@ -424,7 +424,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="publishOptions">发布配置</param>
         /// <param name="options">JetStream配置</param>
         /// <returns><see cref="PublishAck"/></returns>
-        /// <example>
+        /// <remarks>
         ///     <code>
         ///         var publishOptions = PublishOptions
         ///             .Builder()
@@ -433,7 +433,7 @@ namespace ZqUtils.Core.Helpers
         ///             .Build();
         ///         
         ///     </code>
-        /// </example>
+        /// </remarks>
         public PublishAck Publish(Msg message, PublishOptions publishOptions, JetStreamOptions options = null) =>
             CreateJetStream(options).Publish(message, publishOptions);
         #endregion
@@ -458,7 +458,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="publishOptions">发布配置</param>
         /// <param name="options">JetStream配置</param>
         /// <returns><see cref="Task{PublishAck}"/></returns>
-        /// <example>
+        /// <remarks>
         ///     <code>
         ///         var publishOptions = PublishOptions
         ///             .Builder()
@@ -467,7 +467,7 @@ namespace ZqUtils.Core.Helpers
         ///             .Build();
         ///         
         ///     </code>
-        /// </example>
+        /// </remarks>
         public async Task<PublishAck> PublishAsync<T>(string subject, T data, PublishOptions publishOptions, JetStreamOptions options = null) =>
             await CreateJetStream(options).PublishAsync(subject, data.SerializeToUtf8Bytes(), publishOptions);
 
@@ -487,7 +487,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="publishOptions">发布配置</param>
         /// <param name="options">JetStream配置</param>
         /// <returns><see cref="Task{PublishAck}"/></returns>
-        /// <example>
+        /// <remarks>
         ///     <code>
         ///         var publishOptions = PublishOptions
         ///             .Builder()
@@ -496,7 +496,7 @@ namespace ZqUtils.Core.Helpers
         ///             .Build();
         ///         
         ///     </code>
-        /// </example>
+        /// </remarks>
         public async Task<PublishAck> PublishAsync(Msg message, PublishOptions publishOptions, JetStreamOptions options = null) =>
             await CreateJetStream(options).PublishAsync(message, publishOptions);
         #endregion
@@ -586,7 +586,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="pushSubscribeOptions">推送订阅配置</param>
         /// <param name="options">JetStream配置</param>
         /// <returns><see cref="IJetStreamPushAsyncSubscription"/></returns>
-        /// <example>
+        /// <remarks>
         ///     <code>
         ///         var pso = PushSubscribeOptions.Builder()
         ///             .WithStream("subject")
@@ -594,7 +594,7 @@ namespace ZqUtils.Core.Helpers
         ///             .WithDeliverGroup("groupId")
         ///             .Build();
         ///     </code>
-        /// </example>
+        /// </remarks>
         public IJetStreamPushAsyncSubscription PushSubscribeAsync(string subject, EventHandler<MsgHandlerEventArgs> handler, bool autoAck, PushSubscribeOptions pushSubscribeOptions, JetStreamOptions options = null) =>
             CreateJetStream(options).PushSubscribeAsync(subject, handler, autoAck, pushSubscribeOptions);
 
@@ -620,7 +620,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="pushSubscribeOptions">推送订阅配置</param>
         /// <param name="options">JetStream配置</param>
         /// <returns><see cref="IJetStreamPushAsyncSubscription"/></returns>
-        /// <example>
+        /// <remarks>
         ///     <code>
         ///         var pso = PushSubscribeOptions.Builder()
         ///             .WithStream("subject")
@@ -628,7 +628,7 @@ namespace ZqUtils.Core.Helpers
         ///             .WithDeliverGroup("groupId")
         ///             .Build();
         ///     </code>
-        /// </example>
+        /// </remarks>
         public IJetStreamPushAsyncSubscription PushSubscribeAsync(string subject, string queue, EventHandler<MsgHandlerEventArgs> handler, bool autoAck, PushSubscribeOptions pushSubscribeOptions, JetStreamOptions options = null) =>
             CreateJetStream(options).PushSubscribeAsync(subject, queue, handler, autoAck, pushSubscribeOptions);
 
@@ -648,7 +648,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="pushSubscribeOptions">推送订阅配置</param>
         /// <param name="options">JetStream配置</param>
         /// <returns><see cref="IJetStreamPushSyncSubscription"/></returns>
-        /// <example>
+        /// <remarks>
         ///     <code>
         ///         var pso = PushSubscribeOptions.Builder()
         ///             .WithStream("subject")
@@ -656,7 +656,7 @@ namespace ZqUtils.Core.Helpers
         ///             .WithDeliverGroup("groupId")
         ///             .Build();
         ///     </code>
-        /// </example>
+        /// </remarks>
         public IJetStreamPushSyncSubscription PushSubscribeSync(string subject, PushSubscribeOptions pushSubscribeOptions, JetStreamOptions options = null) =>
             CreateJetStream(options).PushSubscribeSync(subject, pushSubscribeOptions);
 
@@ -678,7 +678,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="pushSubscribeOptions">推送订阅配置</param>
         /// <param name="options">JetStream配置</param>
         /// <returns><see cref="IJetStreamPushSyncSubscription"/></returns>
-        /// <example>
+        /// <remarks>
         ///     <code>
         ///         var pso = PushSubscribeOptions.Builder()
         ///             .WithStream("subject")
@@ -686,7 +686,7 @@ namespace ZqUtils.Core.Helpers
         ///             .WithDeliverGroup("groupId")
         ///             .Build();
         ///     </code>
-        /// </example>
+        /// </remarks>
         public IJetStreamPushSyncSubscription PushSubscribeSync(string subject, string queue, PushSubscribeOptions pushSubscribeOptions, JetStreamOptions options = null) =>
             CreateJetStream(options).PushSubscribeSync(subject, queue, pushSubscribeOptions);
         #endregion
