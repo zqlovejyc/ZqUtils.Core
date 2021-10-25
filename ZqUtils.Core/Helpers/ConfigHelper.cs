@@ -137,11 +137,12 @@ namespace ZqUtils.Core.Helpers
         /// <param name="appId">AgileConfig客户端appId</param>
         /// <param name="secret">AgileConfig客户端secret</param>
         /// <param name="serverNodes">AgileConfig客户端serverNodes</param>
+        /// <param name="env">AgileConfig开发环境</param>
         /// <param name="action">AgileConfig自定义委托</param>
         /// <param name="logger">ILogger日志</param>
-        public static void SetConfiguration(string appId, string secret, string serverNodes, Action<ConfigChangedArg> action, ILogger logger = null)
+        public static void SetConfiguration(string appId, string secret, string serverNodes, string env, Action<ConfigChangedArg> action, ILogger logger = null)
         {
-            var client = new ConfigClient(appId, secret, serverNodes, logger);
+            var client = new ConfigClient(appId, secret, serverNodes, env, logger);
 
             Configuration = new ConfigurationBuilder()
                 .AddAgileConfig(client, action)
@@ -335,7 +336,7 @@ namespace ZqUtils.Core.Helpers
                 .BuildServiceProvider()
                 .GetService<IOptionsMonitor<T>>();
 
-            if (listener != null) 
+            if (listener != null)
                 options?.OnChange(listener);
 
             return options?.CurrentValue;
@@ -354,7 +355,7 @@ namespace ZqUtils.Core.Helpers
                 .BuildServiceProvider()
                 .GetService<IOptionsMonitor<T>>();
 
-            if (listener != null) 
+            if (listener != null)
                 options?.OnChange(listener);
 
             return options?.CurrentValue;
@@ -374,7 +375,7 @@ namespace ZqUtils.Core.Helpers
                 .BuildServiceProvider()
                 .GetService<IOptionsMonitor<T>>();
 
-            if (listener != null) 
+            if (listener != null)
                 options?.OnChange(listener);
 
             return options?.CurrentValue;
@@ -394,7 +395,7 @@ namespace ZqUtils.Core.Helpers
                 .BuildServiceProvider()
                 .GetService<IOptionsMonitor<T>>();
 
-            if (listener != null) 
+            if (listener != null)
                 options?.OnChange(listener);
 
             return options?.CurrentValue;
