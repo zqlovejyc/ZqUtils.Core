@@ -316,7 +316,7 @@ namespace ZqUtils.Core.Console
                 new Claim(JwtRegisteredClaimNames.Sub,"zhang"),//Subject,
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),//JWT ID,JWT的唯一标识
                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(), ClaimValueTypes.Integer64),//Issued At，JWT颁发的时间，采用标准unix时间，用于验证过期
-            }, 3600, secret);
+            }, DateTime.UtcNow.AddSeconds(7200), secret);
             //读取token
             try
             {

@@ -119,6 +119,10 @@ namespace ZqUtils.Core.Helpers
                     res = ip.ToString();
             }
 
+            //去除"::ffff:"
+            if (res.StartsWithIgnoreCase("::ffff:"))
+                res = res.Substring(7, res.Length - 7);
+
             return res;
         }
     }
