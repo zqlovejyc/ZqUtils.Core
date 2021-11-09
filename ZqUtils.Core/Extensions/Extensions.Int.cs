@@ -76,25 +76,23 @@ namespace ZqUtils.Core.Extensions
             if (byteSize < allowedCharSet.Length)
                 throw new ArgumentException($"allowedChars may contain no more than {byteSize} characters.");
 
-            using (var rng = new RNGCryptoServiceProvider())
+            using var rng = new RNGCryptoServiceProvider();
+            var result = new StringBuilder();
+            byte[] buf = new byte[128];
+
+            while (result.Length < @this)
             {
-                var result = new StringBuilder();
-                byte[] buf = new byte[128];
-
-                while (result.Length < @this)
+                rng.GetBytes(buf);
+                for (int i = 0; i < buf.Length && result.Length < @this; ++i)
                 {
-                    rng.GetBytes(buf);
-                    for (int i = 0; i < buf.Length && result.Length < @this; ++i)
-                    {
-                        int outOfRangeStart = byteSize - (byteSize % allowedCharSet.Length);
-                        if (outOfRangeStart <= buf[i])
-                            continue;
-                        result.Append(allowedCharSet[buf[i] % allowedCharSet.Length]);
-                    }
+                    int outOfRangeStart = byteSize - (byteSize % allowedCharSet.Length);
+                    if (outOfRangeStart <= buf[i])
+                        continue;
+                    result.Append(allowedCharSet[buf[i] % allowedCharSet.Length]);
                 }
-
-                return result.ToString();
             }
+
+            return result.ToString();
         }
         #endregion
 
