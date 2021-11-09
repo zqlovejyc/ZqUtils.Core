@@ -13,8 +13,8 @@
 		<FileVersion>1.1.9</FileVersion>
         <PackageId>Zq.Utils.Core</PackageId>
         <Authors>张强</Authors>
-        <Description>.NET Standard2.0、.NET Standard2.1、.NET5版本工具类</Description>
-        <Copyright>Copyright © 2018-2021 , 张强 943620963@qq.com</Copyright>
+        <Description>.NET Standard2.0、.NET Standard2.1、.NET5、.NET6版本工具类</Description>
+        <Copyright>Copyright © 2018-2022 , 张强 943620963@qq.com</Copyright>
         <PackageLicenseUrl></PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/zqlovejyc/ZqUtils.Core</PackageProjectUrl>
         <PackageReleaseNotes>1.优化RedisHelper的Keys、KeyDeleteByPattern；
