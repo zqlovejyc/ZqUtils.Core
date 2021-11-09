@@ -32,6 +32,7 @@
         <RepositoryType>git</RepositoryType>
         <PackageTags>utility;utils;helper;extensions</PackageTags>
         <LangVersion>latest</LangVersion>
+		<NoWarn>$(NoWarn);SYSLIB0001;SYSLIB0014;SYSLIB0021;SYSLIB0022;SYSLIB0023</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
