@@ -169,7 +169,7 @@ namespace ZqUtils.Core.Helpers
                     {
                         timestamp = LastTimestamp + 1;   //直接进位到下一个毫秒                          
                     }
-                    //throw new Exception(string.Format("Clock moved backwards.  Refusing to generate id for {0} milliseconds", lastTimestamp - timestamp));
+                    //throw new Exception($"InvalidSystemClock: Clock moved backwards, Refusing to generate id for {LastTimestamp - timestamp} milliseconds");
                 }
 
                 LastTimestamp = timestamp;       //上次生成ID的时间截
