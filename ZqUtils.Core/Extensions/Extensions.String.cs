@@ -674,6 +674,11 @@ namespace ZqUtils.Core.Extensions
         /// <returns>T</returns>
         public static T ToObject<T>(this string @this, bool isJsonNet = true)
         {
+            if (@this.IsNullOrEmpty())
+                return default;
+
+            @this = @this.Trim(new[] { ' ', '\r', '\n', '\t' });
+
             if (typeof(T) == typeof(string))
             {
                 return @this.ToOrDefault<T>();
@@ -705,6 +710,11 @@ namespace ZqUtils.Core.Extensions
         /// <returns>object</returns>
         public static object ToObject(this string @this, Type type, bool isJsonNet = true)
         {
+            if (@this.IsNullOrEmpty())
+                return default;
+
+            @this = @this.Trim(new[] { ' ', '\r', '\n', '\t' });
+
             if (isJsonNet)
                 return JsonConvert.DeserializeObject(@this, type);
             else
@@ -802,14 +812,15 @@ namespace ZqUtils.Core.Extensions
         /// <returns>JObject</returns>
         public static JObject ToJObject(this string @this)
         {
+            if (@this.IsNullOrEmpty())
+                return default;
+
+            @this = @this.Trim(new[] { ' ', '\r', '\n', '\t' });
+
             if (@this.IsJsonObjectString())
-            {
                 return JObject.Parse(@this);
-            }
-            else
-            {
-                return null;
-            }
+
+            return default;
         }
         #endregion
 
@@ -821,14 +832,15 @@ namespace ZqUtils.Core.Extensions
         /// <returns>JArray</returns>
         public static JArray ToJArray(this string @this)
         {
+            if (@this.IsNullOrEmpty())
+                return default;
+
+            @this = @this.Trim(new[] { ' ', '\r', '\n', '\t' });
+
             if (@this.IsJsonArrayString())
-            {
                 return JArray.Parse(@this);
-            }
-            else
-            {
-                return null;
-            }
+
+            return default;
         }
         #endregion
 
@@ -841,6 +853,11 @@ namespace ZqUtils.Core.Extensions
         /// <returns></returns>
         public static JsonDocument ToJsonDocument(this string @this, JsonDocumentOptions options = default(JsonDocumentOptions))
         {
+            if (@this.IsNullOrEmpty())
+                return default;
+
+            @this = @this.Trim(new[] { ' ', '\r', '\n', '\t' });
+
             return JsonDocument.Parse(@this, options);
         }
         #endregion
