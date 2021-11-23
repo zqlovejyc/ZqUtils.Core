@@ -205,7 +205,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="decompressionMethods">解压缩方式，默认：GZip</param>
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
         /// <returns>返回HttpClient</returns>
         public static HttpClient CreateHttpClient(
             string url,
@@ -213,7 +213,7 @@ namespace ZqUtils.Core.Helpers
             DecompressionMethods decompressionMethods = DecompressionMethods.GZip,
             string accept = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null)
+            Action<HttpClient> httpClientAction = null)
         {
             HttpClient httpClient = null;
             if (HttpClientFactory != null)
@@ -248,7 +248,7 @@ namespace ZqUtils.Core.Helpers
             }
 
             //自定义委托处理HttpClient
-            @delegate?.Invoke(httpClient);
+            httpClientAction?.Invoke(httpClient);
 
             return httpClient;
         }
@@ -517,7 +517,8 @@ namespace ZqUtils.Core.Helpers
         /// <param name="decompressionMethods">解压缩方式，默认：GZip</param>
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
+        /// <param name="httpRequestMessageAction">HttpRequestMessage自定义委托</param>
         /// <param name="httpClientName">HttpClient注入的名称，此名称用于HttpClientFactory创建HttpClient使用</param>
         /// <returns>返回请求结果和状态结果</returns>
         public static async Task<(string result, HttpStatusCode code)> SendAsync(
@@ -527,14 +528,17 @@ namespace ZqUtils.Core.Helpers
             DecompressionMethods decompressionMethods = DecompressionMethods.GZip,
             string accept = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null,
+            Action<HttpClient> httpClientAction = null,
+            Action<HttpRequestMessage> httpRequestMessageAction = null,
             string httpClientName = null)
         {
-            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
+            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, httpClientAction);
 
             var req = new HttpRequestMessage(method, url);
             if (content != null)
                 req.Content = content;
+
+            httpRequestMessageAction?.Invoke(req);
 
             (string result, HttpStatusCode code) result;
             using (var response = await httpClient.SendAsync(req))
@@ -563,7 +567,8 @@ namespace ZqUtils.Core.Helpers
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="contentType">客户端发送的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
+        /// <param name="httpRequestMessageAction">HttpRequestMessage自定义委托</param>
         /// <param name="httpClientName">HttpClient注入的名称，此名称用于HttpClientFactory创建HttpClient使用</param>
         /// <returns>返回请求结果和状态结果</returns>
         public static async Task<(string result, HttpStatusCode code)> SendAsync(
@@ -574,10 +579,11 @@ namespace ZqUtils.Core.Helpers
             string accept = "application/json",
             string contentType = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null,
+            Action<HttpClient> httpClientAction = null,
+            Action<HttpRequestMessage> httpRequestMessageAction = null,
             string httpClientName = null)
         {
-            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
+            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, httpClientAction);
 
             var req = new HttpRequestMessage(method, url);
             if (data != null)
@@ -585,6 +591,8 @@ namespace ZqUtils.Core.Helpers
 
             if (!contentType.IsNullOrEmpty() && req.Content != null)
                 req.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType) { CharSet = "utf-8" };
+
+            httpRequestMessageAction?.Invoke(req);
 
             (string result, HttpStatusCode code) result;
             using (var response = await httpClient.SendAsync(req))
@@ -613,7 +621,8 @@ namespace ZqUtils.Core.Helpers
         /// <param name="decompressionMethods">解压缩方式，默认：GZip</param>
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
+        /// <param name="httpRequestMessageAction">HttpRequestMessage自定义委托</param>
         /// <param name="httpClientName">HttpClient注入的名称，此名称用于HttpClientFactory创建HttpClient使用</param>
         /// <returns>返回请求结果和状态结果</returns>
         public static async Task<(T result, HttpStatusCode code)> SendAsync<T>(
@@ -623,14 +632,17 @@ namespace ZqUtils.Core.Helpers
             DecompressionMethods decompressionMethods = DecompressionMethods.GZip,
             string accept = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null,
+            Action<HttpClient> httpClientAction = null,
+            Action<HttpRequestMessage> httpRequestMessageAction = null,
             string httpClientName = null)
         {
-            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
+            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, httpClientAction);
 
             var req = new HttpRequestMessage(method, url);
             if (content != null)
                 req.Content = content;
+
+            httpRequestMessageAction?.Invoke(req);
 
             (T result, HttpStatusCode code) result;
             using (var response = await httpClient.SendAsync(req))
@@ -660,7 +672,8 @@ namespace ZqUtils.Core.Helpers
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="contentType">客户端发送的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
+        /// <param name="httpRequestMessageAction">HttpRequestMessage自定义委托</param>
         /// <param name="httpClientName">HttpClient注入的名称，此名称用于HttpClientFactory创建HttpClient使用</param>
         /// <returns>返回请求结果和状态结果</returns>
         public static async Task<(T result, HttpStatusCode code)> SendAsync<T>(
@@ -671,10 +684,11 @@ namespace ZqUtils.Core.Helpers
             string accept = "application/json",
             string contentType = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null,
+            Action<HttpClient> httpClientAction = null,
+            Action<HttpRequestMessage> httpRequestMessageAction = null,
             string httpClientName = null)
         {
-            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
+            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, httpClientAction);
 
             var req = new HttpRequestMessage(method, url);
             if (data != null)
@@ -682,6 +696,8 @@ namespace ZqUtils.Core.Helpers
 
             if (!contentType.IsNullOrEmpty() && req.Content != null)
                 req.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType) { CharSet = "utf-8" };
+
+            httpRequestMessageAction?.Invoke(req);
 
             (T result, HttpStatusCode code) result;
             using (var response = await httpClient.SendAsync(req))
