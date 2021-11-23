@@ -263,7 +263,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="decompressionMethods">解压缩方式，默认：GZip</param>
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
         /// <param name="httpClientName">HttpClient注入的名称，此名称用于HttpClientFactory创建HttpClient使用</param>
         /// <returns>返回请求结果和状态结果</returns>
         public static async Task<(string result, HttpStatusCode code)> GetAsync(
@@ -272,10 +272,10 @@ namespace ZqUtils.Core.Helpers
             DecompressionMethods decompressionMethods = DecompressionMethods.GZip,
             string accept = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null,
+            Action<HttpClient> httpClientAction = null,
             string httpClientName = null)
         {
-            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
+            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, httpClientAction);
 
             (string result, HttpStatusCode code) result;
             using (var response = await httpClient.GetAsync(url + parameters.ToUrl("?", false, false)))
@@ -303,7 +303,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="decompressionMethods">解压缩方式，默认：GZip</param>
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
         /// <param name="httpClientName">HttpClient注入的名称，此名称用于HttpClientFactory创建HttpClient使用</param>
         /// <returns>返回请求结果和状态结果</returns>
         public static async Task<(T result, HttpStatusCode code)> GetAsync<T>(
@@ -312,10 +312,10 @@ namespace ZqUtils.Core.Helpers
             DecompressionMethods decompressionMethods = DecompressionMethods.GZip,
             string accept = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null,
+            Action<HttpClient> httpClientAction = null,
             string httpClientName = null)
         {
-            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
+            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, httpClientAction);
 
             (T result, HttpStatusCode code) result;
             using (var response = await httpClient.GetAsync(url + parameters.ToUrl("?", false, false)))
@@ -344,7 +344,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="decompressionMethods">解压缩方式，默认：GZip</param>
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
         /// <param name="httpClientName">HttpClient注入的名称，此名称用于HttpClientFactory创建HttpClient使用</param>
         /// <returns>返回请求结果和状态结果</returns>
         public static async Task<(string result, HttpStatusCode code)> PostAsync(
@@ -353,10 +353,10 @@ namespace ZqUtils.Core.Helpers
             DecompressionMethods decompressionMethods = DecompressionMethods.GZip,
             string accept = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null,
+            Action<HttpClient> httpClientAction = null,
             string httpClientName = null)
         {
-            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
+            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, httpClientAction);
 
             (string result, HttpStatusCode code) result;
             using (var response = await httpClient.PostAsync(url, content))
@@ -384,7 +384,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="contentType">客户端发送的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
         /// <param name="httpClientName">HttpClient注入的名称，此名称用于HttpClientFactory创建HttpClient使用</param>
         /// <returns>返回请求结果和状态结果</returns>
         public static async Task<(string result, HttpStatusCode code)> PostAsync(
@@ -394,10 +394,10 @@ namespace ZqUtils.Core.Helpers
             string accept = "application/json",
             string contentType = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null,
+            Action<HttpClient> httpClientAction = null,
             string httpClientName = null)
         {
-            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
+            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, httpClientAction);
 
             var content = new StringContent((data?.GetType() == typeof(string) ? data?.ToString() : data?.ToJson()) ?? "", Encoding.UTF8);
             if (!contentType.IsNullOrEmpty())
@@ -429,7 +429,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="decompressionMethods">解压缩方式，默认：GZip</param>
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
         /// <param name="httpClientName">HttpClient注入的名称，此名称用于HttpClientFactory创建HttpClient使用</param>
         /// <returns>返回请求结果和状态结果</returns>
         public static async Task<(T result, HttpStatusCode code)> PostAsync<T>(
@@ -438,10 +438,10 @@ namespace ZqUtils.Core.Helpers
             DecompressionMethods decompressionMethods = DecompressionMethods.GZip,
             string accept = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null,
+            Action<HttpClient> httpClientAction = null,
             string httpClientName = null)
         {
-            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
+            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, httpClientAction);
 
             (T result, HttpStatusCode code) result;
             using (var response = await httpClient.PostAsync(url, content))
@@ -470,7 +470,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="accept">客户端希望接收的数据类型</param>
         /// <param name="contentType">客户端发送的数据类型</param>
         /// <param name="headers">头部信息</param>
-        /// <param name="delegate">自定义委托</param>
+        /// <param name="httpClientAction">HttpClient自定义委托</param>
         /// <param name="httpClientName">HttpClient注入的名称，此名称用于HttpClientFactory创建HttpClient使用</param>
         /// <returns>返回请求结果和状态结果</returns>
         public static async Task<(T result, HttpStatusCode code)> PostAsync<T>(
@@ -480,10 +480,10 @@ namespace ZqUtils.Core.Helpers
             string accept = "application/json",
             string contentType = "application/json",
             Dictionary<string, string> headers = null,
-            Action<HttpClient> @delegate = null,
+            Action<HttpClient> httpClientAction = null,
             string httpClientName = null)
         {
-            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, @delegate);
+            var httpClient = CreateHttpClient(url, httpClientName, decompressionMethods, accept, headers, httpClientAction);
 
             var content = new StringContent((data?.GetType() == typeof(string) ? data?.ToString() : data?.ToJson()) ?? "", Encoding.UTF8);
             if (!contentType.IsNullOrEmpty())
