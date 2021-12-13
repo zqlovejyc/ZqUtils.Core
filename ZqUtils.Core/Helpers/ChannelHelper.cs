@@ -101,25 +101,32 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public void Subscribe(Action<T> handler, int threadCount = 1)
         {
-            Task.WhenAll(Enumerable
-                .Range(0, threadCount)
-                .Select(_ => Task.Run(async () =>
-                {
-                    try
+            try
+            {
+                Task.WhenAll(Enumerable
+                    .Range(0, threadCount)
+                    .Select(_ => Task.Run(async () =>
                     {
-                        while (await ThreadChannel.Reader.WaitToReadAsync())
+                        try
                         {
-                            if (ThreadChannel.Reader.TryRead(out var message))
+                            while (await ThreadChannel.Reader.WaitToReadAsync())
                             {
-                                handler?.Invoke(message);
+                                if (ThreadChannel.Reader.TryRead(out var message))
+                                {
+                                    handler?.Invoke(message);
+                                }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.Error(ex, $"Subscribe Exception:{ex.Message}");
-                    }
-                })).ToArray());
+                        catch (Exception ex)
+                        {
+                            LogHelper.Error(ex, $"`{handler?.Method}` -> Subscribe Exception:{ex.Message}");
+                        }
+                    })).ToArray());
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error(ex, $"Subscribe(Action<T> handler, int threadCount = 1)");
+            }
         }
 
         /// <summary>
@@ -130,26 +137,33 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public void Subscribe(Func<T, Task> handler, int threadCount = 1)
         {
-            Task.WhenAll(Enumerable
-                .Range(0, threadCount)
-                .Select(_ => Task.Run(async () =>
-                {
-                    try
+            try
+            {
+                Task.WhenAll(Enumerable
+                    .Range(0, threadCount)
+                    .Select(_ => Task.Run(async () =>
                     {
-                        while (await ThreadChannel.Reader.WaitToReadAsync())
+                        try
                         {
-                            if (ThreadChannel.Reader.TryRead(out var message))
+                            while (await ThreadChannel.Reader.WaitToReadAsync())
                             {
-                                if (handler != null)
-                                    await handler(message);
+                                if (ThreadChannel.Reader.TryRead(out var message))
+                                {
+                                    if (handler != null)
+                                        await handler(message);
+                                }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.Error(ex, $"Subscribe Exception:{ex.Message}");
-                    }
-                })).ToArray());
+                        catch (Exception ex)
+                        {
+                            LogHelper.Error(ex, $"`{handler?.Method}` -> Subscribe Exception:{ex.Message}");
+                        }
+                    })).ToArray());
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error(ex, $"Subscribe(Func<T, Task> handler, int threadCount = 1)");
+            }
         }
     }
 }
