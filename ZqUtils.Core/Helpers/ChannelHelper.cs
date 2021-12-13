@@ -20,6 +20,7 @@ using System;
 using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using ZqUtils.Core.Extensions;
 /****************************
 * [Author] 张强
 * [Date] 2021-02-08
@@ -107,19 +108,22 @@ namespace ZqUtils.Core.Helpers
                     .Range(0, threadCount)
                     .Select(_ => Task.Run(async () =>
                     {
-                        try
+                        while (await ThreadChannel.Reader.WaitToReadAsync())
                         {
-                            while (await ThreadChannel.Reader.WaitToReadAsync())
+                            if (ThreadChannel.Reader.TryRead(out var message))
                             {
-                                if (ThreadChannel.Reader.TryRead(out var message))
+                                if (handler != null)
                                 {
-                                    handler?.Invoke(message);
+                                    try
+                                    {
+                                        handler(message);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        LogHelper.Error(ex, $"`{handler.Method}` -> Message({typeof(T).Name}) -> {message.ToJson()} Subscribe Exception:{ex.Message}");
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            LogHelper.Error(ex, $"`{handler?.Method}` -> Subscribe Exception:{ex.Message}");
                         }
                     })).ToArray());
             }
@@ -143,20 +147,22 @@ namespace ZqUtils.Core.Helpers
                     .Range(0, threadCount)
                     .Select(_ => Task.Run(async () =>
                     {
-                        try
+                        while (await ThreadChannel.Reader.WaitToReadAsync())
                         {
-                            while (await ThreadChannel.Reader.WaitToReadAsync())
+                            if (ThreadChannel.Reader.TryRead(out var message))
                             {
-                                if (ThreadChannel.Reader.TryRead(out var message))
+                                if (handler != null)
                                 {
-                                    if (handler != null)
+                                    try
+                                    {
                                         await handler(message);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        LogHelper.Error(ex, $"`{handler.Method}` -> Message({typeof(T).Name}) -> {message.ToJson()} Subscribe Exception:{ex.Message}");
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            LogHelper.Error(ex, $"`{handler?.Method}` -> Subscribe Exception:{ex.Message}");
                         }
                     })).ToArray());
             }
