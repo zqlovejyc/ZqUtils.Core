@@ -43,6 +43,11 @@ namespace ZqUtils.Core.Helpers
         private static readonly ConcurrentDictionary<string, IModel> _channelDic = new();
 
         /// <summary>
+        /// Channel管道缓存
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, ChannelHelper<ChannelMessage>> _channelHelperDic = new();
+
+        /// <summary>
         /// 用于缓存路由键数据
         /// </summary>
         private static readonly ConcurrentDictionary<string, (string exchange, string queue, string routeKey)> _routeDic = new();
@@ -142,16 +147,26 @@ namespace ZqUtils.Core.Helpers
         public IModel GetChannel(string queue = "default")
         {
             IModel channel = null;
-            if (!queue.IsNullOrEmpty())
+
+            if (queue.IsNotNullOrEmpty() && _channelDic.ContainsKey(queue))
+                channel = _channelDic[queue];
+
+            if (queue.IsNotNullOrEmpty() && channel.IsNull())
             {
-                channel = _channelDic.GetOrAdd(queue, x =>
+                lock (_locker)
                 {
-                    channel = _connection.CreateModel();
-                    _channelDic[x] = channel;
-                    return channel;
-                });
+                    channel = _channelDic.GetOrAdd(queue, queue =>
+                    {
+                        var model = _connection.CreateModel();
+                        _channelDic[queue] = model;
+
+                        return model;
+                    });
+                }
             }
+
             channel ??= _connection.CreateModel();
+
             return EnsureOpened(channel);
         }
 
@@ -193,6 +208,48 @@ namespace ZqUtils.Core.Helpers
                 //移除已关闭的管道
                 _channelDic.TryRemove(data.Value.Key, out var model);
                 channel = null;
+            }
+        }
+
+        /// <summary>
+        /// 获取管道工具类
+        /// </summary>
+        /// <param name="queue"></param>
+        /// <returns></returns>
+        public ChannelHelper<ChannelMessage> GetChannelHelper(string queue)
+        {
+            if (queue.IsNullOrEmpty())
+                queue = "Default";
+
+            if (_channelHelperDic.ContainsKey(queue))
+                return _channelHelperDic[queue];
+
+            lock (_locker)
+            {
+                return _channelHelperDic.GetOrAdd(queue, queue =>
+                {
+                    //初始化管道
+                    var channelHelper = new ChannelHelper<ChannelMessage>();
+
+                    //订阅消息
+                    channelHelper.Subscribe(x => PublishRabbitMqMessage(
+                        x.Exchange,
+                        x.Queue,
+                        x.RoutingKey,
+                        x.Body,
+                        x.ExchangeType,
+                        x.Durable,
+                        x.Confirm,
+                        x.Expiration,
+                        x.Priority,
+                        x.QueueArguments,
+                        x.ExchangeArguments,
+                        x.Headers));
+
+                    _channelHelperDic[queue] = channelHelper;
+
+                    return channelHelper;
+                });
             }
         }
         #endregion
@@ -905,50 +962,19 @@ namespace ZqUtils.Core.Helpers
             IDictionary<string, object> exchangeArguments = null,
             IDictionary<string, object> headers = null)
         {
-            //获取管道
-            var channel = GetChannel(queue);
-
-            //判断交换机是否存在
-            if (!IsExchangeExist(channel, exchange))
-                channel = ExchangeDeclare(channel, exchange, exchangeType, durable, arguments: exchangeArguments);
-
-            //判断队列是否存在
-            if (!IsQueueExist(channel, queue))
-                channel = QueueDeclare(channel, queue, durable, arguments: queueArguments);
-
-            //绑定交换机和队列
-            QueueBind(channel, exchange, queue, routingKey);
-
-            //声明消息属性
-            var props = channel.CreateBasicProperties();
-
-            //持久化
-            props.Persistent = durable;
-
-            //单个消息过期时间
-            if (!expiration.IsNullOrEmpty())
-                props.Expiration = expiration;
-
-            //单个消息优先级
-            if (priority >= 0 && priority <= 9)
-                props.Priority = priority.Value;
-
-            //消息头部
-            if (headers != null)
-                props.Headers = headers;
-
-            //是否启用消息发送确认机制
-            if (confirm)
-                channel.ConfirmSelect();
-
-            //发送消息
-            channel.BasicPublish(exchange, routingKey, props, body.SerializeUtf8());
-
-            //消息发送失败处理
-            if (confirm && !channel.WaitForConfirms())
-                return false;
-
-            return true;
+            return Publish(
+                 exchange,
+                 queue,
+                 routingKey,
+                 new[] { body },
+                 exchangeType,
+                 durable,
+                 confirm,
+                 expiration,
+                 priority,
+                 queueArguments,
+                 exchangeArguments,
+                 headers);
         }
 
         /// <summary>
@@ -968,6 +994,54 @@ namespace ZqUtils.Core.Helpers
         /// <param name="headers">消息头部</param>
         /// <returns></returns>
         public bool Publish(
+            string exchange,
+            string queue,
+            string routingKey,
+            IEnumerable<string> body,
+            string exchangeType = ExchangeType.Direct,
+            bool durable = true,
+            bool confirm = false,
+            string expiration = null,
+            byte? priority = null,
+            IDictionary<string, object> queueArguments = null,
+            IDictionary<string, object> exchangeArguments = null,
+            IDictionary<string, object> headers = null)
+        {
+            return GetChannelHelper(queue).Publish(
+               new ChannelMessage
+               {
+                   Exchange = exchange,
+                   Queue = queue,
+                   RoutingKey = routingKey,
+                   Body = body,
+                   ExchangeType = exchangeType,
+                   Durable = durable,
+                   Confirm = confirm,
+                   Expiration = expiration,
+                   Priority = priority,
+                   QueueArguments = queueArguments,
+                   ExchangeArguments = exchangeArguments,
+                   Headers = headers
+               });
+        }
+
+        /// <summary>
+        /// 发布消息到RabbitMq，注意此方法使用IModel线程不安全，建议使用Publish方法，若要使用需要保证单线程调用
+        /// </summary>
+        /// <param name="exchange">交换机名称</param>
+        /// <param name="queue">队列名称</param>
+        /// <param name="routingKey">路由键</param>
+        /// <param name="body">消息内容</param>
+        /// <param name="exchangeType">交换机类型</param>
+        /// <param name="durable">持久化</param>
+        /// <param name="confirm">消息发送确认</param>
+        /// <param name="expiration">单个消息过期时间，单位ms</param>
+        /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
+        /// <param name="queueArguments">队列参数</param>
+        /// <param name="exchangeArguments">交换机参数</param>
+        /// <param name="headers">消息头部</param>
+        /// <returns></returns>
+        public bool PublishRabbitMqMessage(
             string exchange,
             string queue,
             string routingKey,
@@ -1899,5 +1973,71 @@ namespace ZqUtils.Core.Helpers
         /// 创建时间
         /// </summary>
         public DateTime CreateDateTime { get; set; } = DateTime.Now;
+    }
+
+    /// <summary>
+    /// 管道发布消息
+    /// </summary>
+    public class ChannelMessage
+    {
+        /// <summary>
+        /// 交换机名称
+        /// </summary>
+        public string Exchange { get; set; }
+
+        /// <summary>
+        /// 队列名称
+        /// </summary>
+        public string Queue { get; set; }
+
+        /// <summary>
+        /// 路由键
+        /// </summary>
+        public string RoutingKey { get; set; }
+
+        /// <summary>
+        /// 消息内容
+        /// </summary>
+        public IEnumerable<string> Body { get; set; }
+
+        /// <summary>
+        /// 交换机类型
+        /// </summary>
+        public string ExchangeType { get; set; }
+
+        /// <summary>
+        /// 持久化
+        /// </summary>
+        public bool Durable { get; set; }
+
+        /// <summary>
+        /// 消息发送确认
+        /// </summary>
+        public bool Confirm { get; set; }
+
+        /// <summary>
+        /// 单个消息过期时间，单位ms
+        /// </summary>
+        public string Expiration { get; set; }
+
+        /// <summary>
+        /// 单个消息优先级，数值越大优先级越高，取值范围：0-9
+        /// </summary>
+        public byte? Priority { get; set; }
+
+        /// <summary>
+        /// 队列参数
+        /// </summary>
+        public IDictionary<string, object> QueueArguments { get; set; }
+
+        /// <summary>
+        /// 交换机参数
+        /// </summary>
+        public IDictionary<string, object> ExchangeArguments { get; set; }
+
+        /// <summary>
+        /// 消息头部
+        /// </summary>
+        public IDictionary<string, object> Headers { get; set; }
     }
 }
