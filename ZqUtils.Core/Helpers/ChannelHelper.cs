@@ -106,7 +106,7 @@ namespace ZqUtils.Core.Helpers
             {
                 Task.WhenAll(Enumerable
                     .Range(0, threadCount)
-                    .Select(_ => Task.Run(async () =>
+                    .Select(x => Task.Run(async () =>
                     {
                         while (await ThreadChannel.Reader.WaitToReadAsync())
                         {
@@ -145,7 +145,7 @@ namespace ZqUtils.Core.Helpers
             {
                 Task.WhenAll(Enumerable
                     .Range(0, threadCount)
-                    .Select(_ => Task.Run(async () =>
+                    .Select(x => Task.Run(async () =>
                     {
                         while (await ThreadChannel.Reader.WaitToReadAsync())
                         {
