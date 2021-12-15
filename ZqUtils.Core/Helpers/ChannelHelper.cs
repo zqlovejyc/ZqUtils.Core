@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -32,8 +33,18 @@ namespace ZqUtils.Core.Helpers
     /// Channel工具类
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ChannelHelper<T>
+    public class ChannelHelper<T> : IDisposable
     {
+        /// <summary>
+        /// Task集合
+        /// </summary>
+        private readonly List<Task> _tasks = new();
+
+        /// <summary>
+        /// 是否已释放
+        /// </summary>
+        private bool _disposed;
+
         /// <summary>
         /// Channel
         /// </summary>
@@ -104,9 +115,8 @@ namespace ZqUtils.Core.Helpers
         {
             try
             {
-                Task.WhenAll(Enumerable
-                    .Range(0, threadCount)
-                    .Select(x => Task.Run(async () =>
+                var tasks = Enumerable.Range(0, threadCount).Select(x =>
+                    Task.Run(async () =>
                     {
                         while (await ThreadChannel.Reader.WaitToReadAsync())
                         {
@@ -125,7 +135,11 @@ namespace ZqUtils.Core.Helpers
                                 }
                             }
                         }
-                    })).ToArray());
+                    })).ToArray();
+
+                _tasks.AddRangeIfNotContains(tasks);
+
+                Task.WhenAll(tasks);
             }
             catch (Exception ex)
             {
@@ -143,9 +157,8 @@ namespace ZqUtils.Core.Helpers
         {
             try
             {
-                Task.WhenAll(Enumerable
-                    .Range(0, threadCount)
-                    .Select(x => Task.Run(async () =>
+                var tasks = Enumerable.Range(0, threadCount).Select(x =>
+                    Task.Run(async () =>
                     {
                         while (await ThreadChannel.Reader.WaitToReadAsync())
                         {
@@ -164,11 +177,34 @@ namespace ZqUtils.Core.Helpers
                                 }
                             }
                         }
-                    })).ToArray());
+                    })).ToArray();
+
+                _tasks.AddRangeIfNotContains(tasks);
+
+                Task.WhenAll(tasks);
             }
             catch (Exception ex)
             {
                 LogHelper.Error(ex, $"Subscribe(Func<T, Task> handler, int threadCount = 1)");
+            }
+        }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                foreach (var task in _tasks)
+                {
+                    if (!task.IsCompleted)
+                        task.Wait();
+
+                    task.Dispose();
+                }
+
+                _disposed = true;
             }
         }
     }
