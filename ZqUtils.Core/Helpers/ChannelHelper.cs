@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using ZqUtils.Core.Extensions;
@@ -39,6 +40,11 @@ namespace ZqUtils.Core.Helpers
         /// Task集合
         /// </summary>
         private readonly List<Task> _tasks = new();
+
+        /// <summary>
+        /// 取消令牌源
+        /// </summary>
+        private readonly CancellationTokenSource _cts = new();
 
         /// <summary>
         /// 是否已释放
@@ -102,7 +108,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public async Task PublishAsync(T message)
         {
-            await ThreadChannel.Writer.WriteAsync(message);
+            await ThreadChannel.Writer.WriteAsync(message, _cts.Token);
         }
 
         /// <summary>
@@ -118,7 +124,7 @@ namespace ZqUtils.Core.Helpers
                 var tasks = Enumerable.Range(0, threadCount).Select(x =>
                     Task.Run(async () =>
                     {
-                        while (await ThreadChannel.Reader.WaitToReadAsync())
+                        while (await ThreadChannel.Reader.WaitToReadAsync(_cts.Token))
                         {
                             if (ThreadChannel.Reader.TryRead(out var message))
                             {
@@ -135,9 +141,9 @@ namespace ZqUtils.Core.Helpers
                                 }
                             }
                         }
-                    })).ToArray();
+                    }, _cts.Token));
 
-                _tasks.AddRangeIfNotContains(tasks);
+                _tasks.AddRange(tasks);
 
                 Task.WhenAll(tasks);
             }
@@ -160,7 +166,7 @@ namespace ZqUtils.Core.Helpers
                 var tasks = Enumerable.Range(0, threadCount).Select(x =>
                     Task.Run(async () =>
                     {
-                        while (await ThreadChannel.Reader.WaitToReadAsync())
+                        while (await ThreadChannel.Reader.WaitToReadAsync(_cts.Token))
                         {
                             if (ThreadChannel.Reader.TryRead(out var message))
                             {
@@ -177,9 +183,9 @@ namespace ZqUtils.Core.Helpers
                                 }
                             }
                         }
-                    })).ToArray();
+                    }, _cts.Token));
 
-                _tasks.AddRangeIfNotContains(tasks);
+                _tasks.AddRange(tasks);
 
                 Task.WhenAll(tasks);
             }
@@ -196,6 +202,11 @@ namespace ZqUtils.Core.Helpers
         {
             if (!_disposed)
             {
+                _cts.Cancel();
+
+                //延迟等待task取消任务，否则下面task释放会抛异常
+                Thread.Sleep(50);
+
                 foreach (var task in _tasks)
                 {
                     if (!task.IsCompleted)
@@ -203,6 +214,8 @@ namespace ZqUtils.Core.Helpers
 
                     task.Dispose();
                 }
+
+                _cts.Dispose();
 
                 _disposed = true;
             }
