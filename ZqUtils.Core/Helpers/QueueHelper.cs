@@ -116,6 +116,7 @@ namespace ZqUtils.Core.Helpers
 
                 if (!this._dealTask.IsCompleted)
                     this._dealTask.Wait();
+
                 this._dealTask.Dispose();
 
                 this._autoResetEvent.Dispose();
