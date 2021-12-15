@@ -71,13 +71,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="configuration">appsettings配置</param>
         public NatsHelper(IConfiguration configuration)
         {
-            if (_connection != null)
-                return;
-
-            lock (_locker)
+            if (_connection == null)
             {
-                _options = configuration.GetSection("NatsConfig").Get<Options>();
-                _connection = new ConnectionFactory().CreateConnection(_options);
+                lock (_locker)
+                {
+                    if (_connection == null)
+                    {
+                        _options = configuration.GetSection("NatsConfig").Get<Options>();
+                        _connection = new ConnectionFactory().CreateConnection(_options);
+                    }
+                }
             }
         }
 
@@ -87,13 +90,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="connection">NATS连接对象</param>
         public NatsHelper(IConnection connection)
         {
-            if (_connection != null)
-                return;
-
-            lock (_locker)
+            if (_connection == null)
             {
-                _connection = connection;
-                _options = _connection.Opts;
+                lock (_locker)
+                {
+                    if (_connection == null)
+                    {
+                        _connection = connection;
+                        _options = _connection.Opts;
+                    }
+                }
             }
         }
 
@@ -103,13 +109,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="options">NATS连接配置</param>
         public NatsHelper(Options options)
         {
-            if (_connection != null)
-                return;
-
-            lock (_locker)
+            if (_connection == null)
             {
-                _connection = new ConnectionFactory().CreateConnection(options);
-                _options = _connection.Opts;
+                lock (_locker)
+                {
+                    if (_connection == null)
+                    {
+                        _connection = new ConnectionFactory().CreateConnection(options);
+                        _options = _connection.Opts;
+                    }
+                }
             }
         }
 
@@ -119,13 +128,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="url">NATS连接字符串</param>
         public NatsHelper(string url)
         {
-            if (_connection != null)
-                return;
-
-            lock (_locker)
+            if (_connection == null)
             {
-                _connection = new ConnectionFactory().CreateConnection(url);
-                _options = _connection.Opts;
+                lock (_locker)
+                {
+                    if (_connection == null)
+                    {
+                        _connection = new ConnectionFactory().CreateConnection(url);
+                        _options = _connection.Opts;
+                    }
+                }
             }
         }
 
@@ -136,13 +148,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="credentialsPath">证书路径</param>
         public NatsHelper(string url, string credentialsPath)
         {
-            if (_connection != null)
-                return;
-
-            lock (_locker)
+            if (_connection == null)
             {
-                _connection = new ConnectionFactory().CreateConnection(url, credentialsPath);
-                _options = _connection.Opts;
+                lock (_locker)
+                {
+                    if (_connection == null)
+                    {
+                        _connection = new ConnectionFactory().CreateConnection(url, credentialsPath);
+                        _options = _connection.Opts;
+                    }
+                }
             }
         }
 
@@ -154,13 +169,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="privateNkey">私钥Nkey</param>
         public NatsHelper(string url, string jwt, string privateNkey)
         {
-            if (_connection != null)
-                return;
-
-            lock (_locker)
+            if (_connection == null)
             {
-                _connection = new ConnectionFactory().CreateConnection(url, jwt, privateNkey);
-                _options = _connection.Opts;
+                lock (_locker)
+                {
+                    if (_connection == null)
+                    {
+                        _connection = new ConnectionFactory().CreateConnection(url, jwt, privateNkey);
+                        _options = _connection.Opts;
+                    }
+                }
             }
         }
         #endregion
@@ -177,7 +195,8 @@ namespace ZqUtils.Core.Helpers
             {
                 lock (_locker)
                 {
-                    return connection = new ConnectionFactory().CreateConnection(connection?.Opts ?? _options);
+                    if (connection == null || connection.IsClosed())
+                        return connection = new ConnectionFactory().CreateConnection(connection?.Opts ?? _options);
                 }
             }
 

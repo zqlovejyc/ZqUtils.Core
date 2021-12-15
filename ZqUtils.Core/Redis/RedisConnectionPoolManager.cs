@@ -49,10 +49,16 @@ namespace ZqUtils.Core.Redis
             this._redisConfiguration = redisConfiguration ?? throw new ArgumentNullException(nameof(redisConfiguration));
             this._logger = logger ?? NullLogger<RedisConnectionPoolManager>.Instance;
 
-            lock (_lock)
+            if (this._connections.IsNullOrEmpty())
             {
-                this._connections = new IConnectionMultiplexer[redisConfiguration.PoolSize];
-                this.EmitConnections();
+                lock (_lock)
+                {
+                    if (this._connections.IsNullOrEmpty())
+                    {
+                        this._connections = new IConnectionMultiplexer[redisConfiguration.PoolSize];
+                        this.EmitConnections();
+                    }
+                }
             }
         }
 

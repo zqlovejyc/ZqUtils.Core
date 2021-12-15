@@ -76,20 +76,23 @@ namespace ZqUtils.Core.Helpers
         /// </remarks>
         public PulsarHelper(string serviceUrl, Action<PulsarClientBuilder> action = null)
         {
-            if (_client != null)
-                return;
-
-            lock (_locker)
+            if (_client == null)
             {
-                var builder = new PulsarClientBuilder().ServiceUrl(serviceUrl);
+                lock (_locker)
+                {
+                    if (_client == null)
+                    {
+                        var builder = new PulsarClientBuilder().ServiceUrl(serviceUrl);
 
-                action?.Invoke(builder);
+                        action?.Invoke(builder);
 
-                _client = builder
-                    .BuildAsync()
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
+                        _client = builder
+                            .BuildAsync()
+                            .ConfigureAwait(false)
+                            .GetAwaiter()
+                            .GetResult();
+                    }
+                }
             }
         }
         #endregion
