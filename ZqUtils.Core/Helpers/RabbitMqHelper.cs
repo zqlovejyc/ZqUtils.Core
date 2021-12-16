@@ -43,9 +43,9 @@ namespace ZqUtils.Core.Helpers
         private static readonly ConcurrentDictionary<string, IModel> _channelDic = new();
 
         /// <summary>
-        /// Channel管道缓存
+        /// QueueHelper缓存
         /// </summary>
-        private static readonly ConcurrentDictionary<string, ChannelHelper<ChannelMessage>> _channelHelperDic = new();
+        private static readonly ConcurrentDictionary<string, QueueHelper<QueueMessage>> _queueHelperDic = new();
 
         /// <summary>
         /// 用于缓存路由键数据
@@ -220,43 +220,40 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
-        /// 获取管道工具类
+        /// 获取QueueHelper
         /// </summary>
         /// <param name="queue"></param>
         /// <returns></returns>
-        public ChannelHelper<ChannelMessage> GetChannelHelper(string queue)
+        public QueueHelper<QueueMessage> GetQueueHelper(string queue)
         {
             if (queue.IsNullOrEmpty())
-                queue = "Default";
+                queue = "default";
 
-            if (_channelHelperDic.ContainsKey(queue))
-                return _channelHelperDic[queue];
+            if (_queueHelperDic.ContainsKey(queue))
+                return _queueHelperDic[queue];
 
             lock (_locker)
             {
-                return _channelHelperDic.GetOrAdd(queue, queue =>
+                return _queueHelperDic.GetOrAdd(queue, queue =>
                 {
-                    //初始化管道
-                    var channelHelper = new ChannelHelper<ChannelMessage>();
+                    var queueHelper = new QueueHelper<QueueMessage>(x =>
+                        PublishRabbitMqMessage(
+                            x.Exchange,
+                            x.Queue,
+                            x.RoutingKey,
+                            x.Body,
+                            x.ExchangeType,
+                            x.Durable,
+                            x.Confirm,
+                            x.Expiration,
+                            x.Priority,
+                            x.QueueArguments,
+                            x.ExchangeArguments,
+                            x.Headers));
 
-                    //订阅消息
-                    channelHelper.Subscribe(x => PublishRabbitMqMessage(
-                        x.Exchange,
-                        x.Queue,
-                        x.RoutingKey,
-                        x.Body,
-                        x.ExchangeType,
-                        x.Durable,
-                        x.Confirm,
-                        x.Expiration,
-                        x.Priority,
-                        x.QueueArguments,
-                        x.ExchangeArguments,
-                        x.Headers));
+                    _queueHelperDic[queue] = queueHelper;
 
-                    _channelHelperDic[queue] = channelHelper;
-
-                    return channelHelper;
+                    return queueHelper;
                 });
             }
         }
@@ -1027,8 +1024,8 @@ namespace ZqUtils.Core.Helpers
             IDictionary<string, object> exchangeArguments = null,
             IDictionary<string, object> headers = null)
         {
-            return GetChannelHelper(queue).Publish(
-               new ChannelMessage
+            return GetQueueHelper(queue).Enqueue(
+               new QueueMessage
                {
                    Exchange = exchange,
                    Queue = queue,
@@ -1790,14 +1787,14 @@ namespace ZqUtils.Core.Helpers
                 item.Value?.Dispose();
             }
 
-            foreach (var item in _channelHelperDic)
+            foreach (var item in _queueHelperDic)
             {
                 item.Value?.Dispose();
             }
 
             _connection?.Dispose();
             _channelDic.Clear();
-            _channelHelperDic.Clear();
+            _queueHelperDic.Clear();
         }
         #endregion
     }
@@ -2004,7 +2001,7 @@ namespace ZqUtils.Core.Helpers
     /// <summary>
     /// 管道发布消息
     /// </summary>
-    public class ChannelMessage
+    public class QueueMessage
     {
         /// <summary>
         /// 交换机名称
