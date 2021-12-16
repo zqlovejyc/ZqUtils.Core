@@ -1999,7 +1999,7 @@ namespace ZqUtils.Core.Helpers
     }
 
     /// <summary>
-    /// 管道发布消息
+    /// 内存队列消息
     /// </summary>
     public class QueueMessage
     {
