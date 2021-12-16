@@ -36,6 +36,7 @@ namespace ZqUtils.Core.Helpers
     /// <typeparam name="T"></typeparam>
     public class ChannelHelper<T> : IDisposable
     {
+        #region 私有字段
         /// <summary>
         /// Task集合
         /// </summary>
@@ -50,18 +51,47 @@ namespace ZqUtils.Core.Helpers
         /// 是否已释放
         /// </summary>
         private bool _disposed;
+        #endregion
 
+        #region 公有属性
         /// <summary>
         /// Channel
         /// </summary>
         public Channel<T> ThreadChannel { get; private set; }
+        #endregion
 
+        #region 构造函数
+        #region Unbounded
         /// <summary>
         /// 构造函数Unbounded
         /// </summary>
         public ChannelHelper()
         {
             ThreadChannel = Channel.CreateUnbounded<T>();
+        }
+
+        /// <summary>
+        /// 构造函数Unbounded
+        /// </summary>
+        /// <param name="subscriber">订阅处理委托</param>
+        /// <param name="threadCount">线程数量</param>
+        public ChannelHelper(Action<T> subscriber, int threadCount = 1)
+        {
+            ThreadChannel = Channel.CreateUnbounded<T>();
+
+            Subscribe(subscriber, threadCount);
+        }
+
+        /// <summary>
+        /// 构造函数Unbounded
+        /// </summary>
+        /// <param name="subscriber">订阅处理委托</param>
+        /// <param name="threadCount">线程数量</param>
+        public ChannelHelper(Func<T, Task> subscriber, int threadCount = 1)
+        {
+            ThreadChannel = Channel.CreateUnbounded<T>();
+
+            Subscribe(subscriber, threadCount);
         }
 
         /// <summary>
@@ -74,6 +104,34 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
+        /// 构造函数Unbounded
+        /// </summary>
+        /// <param name="options">Unbounded Channel配置</param>
+        /// <param name="subscriber">订阅处理委托</param>
+        /// <param name="threadCount">线程数量</param>
+        public ChannelHelper(UnboundedChannelOptions options, Action<T> subscriber, int threadCount = 1)
+        {
+            ThreadChannel = Channel.CreateUnbounded<T>(options);
+
+            Subscribe(subscriber, threadCount);
+        }
+
+        /// <summary>
+        /// 构造函数Unbounded
+        /// </summary>
+        /// <param name="options">Unbounded Channel配置</param>
+        /// <param name="subscriber">订阅处理委托</param>
+        /// <param name="threadCount">线程数量</param>
+        public ChannelHelper(UnboundedChannelOptions options, Func<T, Task> subscriber, int threadCount = 1)
+        {
+            ThreadChannel = Channel.CreateUnbounded<T>(options);
+
+            Subscribe(subscriber, threadCount);
+        }
+        #endregion
+
+        #region Bounded
+        /// <summary>
         /// 构造函数Bounded
         /// </summary>
         /// <param name="capacity">Channel存储长度</param>
@@ -85,12 +143,67 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 构造函数Bounded
         /// </summary>
+        /// <param name="capacity">Channel存储长度</param>
+        /// <param name="subscriber">订阅处理委托</param>
+        /// <param name="threadCount">线程数量</param>
+        public ChannelHelper(int capacity, Action<T> subscriber, int threadCount = 1)
+        {
+            ThreadChannel = Channel.CreateBounded<T>(capacity);
+
+            Subscribe(subscriber, threadCount);
+        }
+
+        /// <summary>
+        /// 构造函数Bounded
+        /// </summary>
+        /// <param name="capacity">Channel存储长度</param>
+        /// <param name="subscriber">订阅处理委托</param>
+        /// <param name="threadCount">线程数量</param>
+        public ChannelHelper(int capacity, Func<T, Task> subscriber, int threadCount = 1)
+        {
+            ThreadChannel = Channel.CreateBounded<T>(capacity);
+
+            Subscribe(subscriber, threadCount);
+        }
+
+        /// <summary>
+        /// 构造函数Bounded
+        /// </summary>
         /// <param name="options">Bounded Channel配置</param>
         public ChannelHelper(BoundedChannelOptions options)
         {
             ThreadChannel = Channel.CreateBounded<T>(options);
         }
 
+        /// <summary>
+        /// 构造函数Bounded
+        /// </summary>
+        /// <param name="options">Bounded Channel配置</param>
+        /// <param name="subscriber">订阅处理委托</param>
+        /// <param name="threadCount">线程数量</param>
+        public ChannelHelper(BoundedChannelOptions options, Action<T> subscriber, int threadCount = 1)
+        {
+            ThreadChannel = Channel.CreateBounded<T>(options);
+
+            Subscribe(subscriber, threadCount);
+        }
+
+        /// <summary>
+        /// 构造函数Bounded
+        /// </summary>
+        /// <param name="options">Bounded Channel配置</param>
+        /// <param name="subscriber">订阅处理委托</param>
+        /// <param name="threadCount">线程数量</param>
+        public ChannelHelper(BoundedChannelOptions options, Func<T, Task> subscriber, int threadCount = 1)
+        {
+            ThreadChannel = Channel.CreateBounded<T>(options);
+
+            Subscribe(subscriber, threadCount);
+        }
+        #endregion
+        #endregion
+
+        #region 发布消息
         /// <summary>
         /// 发布消息
         /// </summary>
@@ -110,7 +223,9 @@ namespace ZqUtils.Core.Helpers
         {
             await ThreadChannel.Writer.WriteAsync(message, _cts.Token);
         }
+        #endregion
 
+        #region 订阅消息
         /// <summary>
         /// 订阅消息
         /// </summary>
@@ -194,7 +309,9 @@ namespace ZqUtils.Core.Helpers
                 LogHelper.Error(ex, $"Subscribe(Func<T, Task> handler, int threadCount = 1)");
             }
         }
+        #endregion
 
+        #region 释放资源
         /// <summary>
         /// 释放资源
         /// </summary>
@@ -220,5 +337,6 @@ namespace ZqUtils.Core.Helpers
                 _disposed = true;
             }
         }
+        #endregion
     }
 }
