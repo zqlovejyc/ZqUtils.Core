@@ -53,7 +53,7 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// The auto reset event.
         /// </summary>
-        private readonly AutoResetEvent _autoResetEvent = new AutoResetEvent(true);
+        private readonly AutoResetEvent _autoResetEvent = new(true);
         #endregion
 
         #region Public Property
@@ -69,7 +69,7 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         public QueueHelper()
         {
-            this._innerQueue = new ConcurrentQueue<T>();
+            this._innerQueue = new();
             this._dealTask = Task.Run(() => this.DealQueue());
         }
 
@@ -80,7 +80,7 @@ namespace ZqUtils.Core.Helpers
         public QueueHelper(Action<T> DealAction)
         {
             this.DealAction = DealAction;
-            this._innerQueue = new ConcurrentQueue<T>();
+            this._innerQueue = new();
             this._dealTask = Task.Run(() => this.DealQueue());
         }
         #endregion
@@ -111,7 +111,7 @@ namespace ZqUtils.Core.Helpers
             if (!this._endThreadFlag)
             {
                 this._endThreadFlag = true;
-                this._innerQueue.Enqueue(default(T));
+                this._innerQueue.Enqueue(default);
                 this._autoResetEvent.Set();
 
                 if (!this._dealTask.IsCompleted)
