@@ -30,7 +30,11 @@ using System.Drawing.Drawing2D;
 namespace ZqUtils.Core.Helpers
 {
     /// <summary>
-    /// 图片帮助类
+    /// 图片帮助类，仅支持windows平台，若要使用图片处理，建议采用：ImageSharp
+    /// <para>
+    /// 注意：从.net6.0开始System.Drawing.Common不再支持跨平台，详情：
+    /// https://docs.microsoft.com/zh-cn/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only#see-also
+    /// </para>
     /// </summary>
     public class ImageHelper
     {
