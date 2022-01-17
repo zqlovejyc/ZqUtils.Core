@@ -22,7 +22,6 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using ZqUtils.Core.Extensions;
 
 namespace ZqUtils.Core.Redis
@@ -36,7 +35,6 @@ namespace ZqUtils.Core.Redis
         private readonly IConnectionMultiplexer[] _connections;
         private readonly RedisConfiguration _redisConfiguration;
         private readonly ILogger<RedisConnectionPoolManager> _logger;
-        private IntPtr _nativeResource = Marshal.AllocHGlobal(100);
         private bool _disposed;
 
         /// <summary>
@@ -85,13 +83,6 @@ namespace ZqUtils.Core.Redis
                 // free managed resources
                 foreach (var connection in this._connections)
                     connection?.Dispose();
-            }
-
-            // free native resources if there are any.
-            if (_nativeResource != IntPtr.Zero)
-            {
-                Marshal.FreeHGlobal(_nativeResource);
-                _nativeResource = IntPtr.Zero;
             }
 
             _disposed = true;
