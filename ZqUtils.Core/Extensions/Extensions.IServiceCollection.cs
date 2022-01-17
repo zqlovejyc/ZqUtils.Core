@@ -224,7 +224,9 @@ namespace ZqUtils.Core.Extensions
                     ConnectLogger = log,
                     ConnectionString = connectionString,
                     PoolSize = configuration.GetValue<int?>("Redis:PoolSize") ?? 5,
-                    RegisterConnectionEvent = configuration.GetValue<bool?>("Redis:RegisterEvent") ?? true
+                    RegisterConnectionEvent = configuration.GetValue<bool?>("Redis:RegisterEvent") ?? true,
+                    ConnectionSelectionStrategy = configuration.GetValue<ConnectionSelectionStrategy?>("Redis:ConnectionSelectionStrategy")
+                        ?? ConnectionSelectionStrategy.LeastLoaded
                 });
 
                 //注入redis连接池
