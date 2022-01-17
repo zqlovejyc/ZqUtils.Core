@@ -35,7 +35,7 @@ namespace ZqUtils.Core.Redis
         private readonly IConnectionMultiplexer[] _connections;
         private readonly RedisConfiguration _redisConfiguration;
         private readonly ILogger<RedisConnectionPoolManager> _logger;
-        private readonly Random random = new();
+        private readonly Random _random = new();
         private bool _disposed;
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace ZqUtils.Core.Redis
         {
             var connection = _redisConfiguration.ConnectionSelectionStrategy switch
             {
-                ConnectionSelectionStrategy.Random => this._connections[random.Next(0, _redisConfiguration.PoolSize)],
+                ConnectionSelectionStrategy.Random => this._connections[_random.Next(0, _redisConfiguration.PoolSize)],
                 ConnectionSelectionStrategy.LeastLoaded => this._connections.OrderBy(x => x.GetCounters().TotalOutstanding).First(),
                 _ => throw new Exception(nameof(_redisConfiguration.ConnectionSelectionStrategy))
             };
