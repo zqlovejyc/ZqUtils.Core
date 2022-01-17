@@ -102,7 +102,7 @@ namespace ZqUtils.Core.Redis
                 _ => throw new Exception(nameof(_redisConfiguration.ConnectionSelectionStrategy))
             };
 
-            _logger.LogDebug("Using connection {0} with {1} outstanding!", connection.GetHashCode(), connection.GetCounters().TotalOutstanding);
+            _logger.LogDebug("Using redis connection(IConnectionMultiplexer) {0} with {1} outstanding!", connection.GetHashCode(), connection.GetCounters().TotalOutstanding);
 
             return connection;
         }
