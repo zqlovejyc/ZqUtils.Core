@@ -3461,8 +3461,7 @@ namespace ZqUtils.Core.Helpers
 
         #region  发布/订阅
         /// <summary>
-        /// 当作消息代理中间件使用
-        /// 消息组建中,重要的概念便是生产者,消费者,消息中间件
+        /// 发布消息
         /// </summary>
         /// <param name="channel">通道</param>
         /// <param name="message">消息</param>
@@ -3478,8 +3477,7 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
-        /// 当作消息代理中间件使用
-        /// 消息组建中,重要的概念便是生产者,消费者,消息中间件
+        /// 发布消息
         /// </summary>
         /// <param name="channel">通道</param>
         /// <param name="message">消息</param>
@@ -3495,7 +3493,7 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
-        /// 在消费者端得到该消息并输出
+        /// 订阅消息
         /// </summary>
         /// <param name="channelFrom">通道来源</param>
         /// <param name="subscribeFn">订阅处理委托</param>
@@ -3510,7 +3508,7 @@ namespace ZqUtils.Core.Helpers
         }
 
         /// <summary>
-        /// 在消费者端得到该消息并输出
+        /// 订阅消息
         /// </summary>
         /// <param name="channelFrom">通道来源</param>
         /// <param name="subscribeFn">订阅处理委托</param>
