@@ -527,43 +527,62 @@ namespace ZqUtils.Core.Helpers
         #region 同步方法
         #region StringSet
         /// <summary>
-        /// 保存字符串（若key已存在，则覆盖值）
+        /// 保存字符串
         /// </summary>
         /// <param name="key">字符串key</param>
         /// <param name="redisValue">字符串value</param>
         /// <param name="expiry">过期时间</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否保存成功</returns>
-        public bool StringSet(string key, string redisValue, TimeSpan? expiry = null)
+        public bool StringSet(
+            string key,
+            string redisValue,
+            TimeSpan? expiry = null,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.StringSet(key, redisValue, expiry);
+            return Database.StringSet(key, redisValue, expiry, when, flags);
         }
 
         /// <summary>
         /// 保存一组字符串
         /// </summary>
         /// <param name="keyValuePairs">字符串集合</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否保存成功</returns>
-        public bool StringSet(IEnumerable<KeyValuePair<string, string>> keyValuePairs)
+        public bool StringSet(
+            IEnumerable<KeyValuePair<string, string>> keyValuePairs,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             var pairs = keyValuePairs.Select(x => new KeyValuePair<RedisKey, RedisValue>(AddKeyPrefix(x.Key), x.Value));
-            return Database.StringSet(pairs.ToArray());
+            return Database.StringSet(pairs.ToArray(), when, flags);
         }
 
         /// <summary>
-        /// 保存对象为字符串（若key已存在，则覆盖，该对象会被序列化）
+        /// 保存对象为字符串
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">字符串key</param>
         /// <param name="redisValue">字符串value</param>
         /// <param name="expiry">过期时间</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否保存成功</returns>
-        public bool StringSet<T>(string key, T redisValue, TimeSpan? expiry = null)
+        public bool StringSet<T>(
+            string key,
+            T redisValue,
+            TimeSpan? expiry = null,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return StringSet(key, redisValue.ToOrDefault<string>(), expiry);
+                return StringSet(key, redisValue.ToOrDefault<string>(), expiry, when, flags);
 
-            return StringSet(key, redisValue.ToJson(), expiry);
+            return StringSet(key, redisValue.ToJson(), expiry, when, flags);
         }
         #endregion
 
@@ -572,11 +591,14 @@ namespace ZqUtils.Core.Helpers
         /// 获取字符串值
         /// </summary>
         /// <param name="key">字符串key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回字符串值</returns>
-        public string StringGet(string key)
+        public string StringGet(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.StringGet(key);
+            return Database.StringGet(key, flags);
         }
 
         /// <summary>
@@ -584,10 +606,13 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">字符串key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回反序列化后的对象</returns>
-        public T StringGet<T>(string key)
+        public T StringGet<T>(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return StringGet(key).ToObject<T>();
+            return StringGet(key, flags).ToObject<T>();
         }
         #endregion
         #endregion
@@ -595,43 +620,62 @@ namespace ZqUtils.Core.Helpers
         #region 异步方法
         #region StringSetAsync
         /// <summary>
-        /// 保存字符串（若key已存在，则覆盖）
+        /// 保存字符串
         /// </summary>
         /// <param name="key">字符串key</param>
         /// <param name="redisValue">字符串value</param>
         /// <param name="expiry">过期时间</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否保存成功</returns>
-        public async Task<bool> StringSetAsync(string key, string redisValue, TimeSpan? expiry = null)
+        public async Task<bool> StringSetAsync(
+            string key,
+            string redisValue,
+            TimeSpan? expiry = null,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.StringSetAsync(key, redisValue, expiry);
+            return await Database.StringSetAsync(key, redisValue, expiry, when, flags);
         }
 
         /// <summary>
         /// 保存一组字符串
         /// </summary>
         /// <param name="keyValuePairs">字符串集合</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否保存成功</returns>
-        public async Task<bool> StringSetAsync(IEnumerable<KeyValuePair<string, string>> keyValuePairs)
+        public async Task<bool> StringSetAsync(
+            IEnumerable<KeyValuePair<string, string>> keyValuePairs,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             var pairs = keyValuePairs.Select(x => new KeyValuePair<RedisKey, RedisValue>(AddKeyPrefix(x.Key), x.Value));
-            return await Database.StringSetAsync(pairs.ToArray());
+            return await Database.StringSetAsync(pairs.ToArray(), when, flags);
         }
 
         /// <summary>
-        /// 保存对象为字符串（若key已存在，则覆盖，该对象会被序列化）
+        /// 保存对象为字符串
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">字符串key</param>
         /// <param name="redisValue">字符串value</param>
         /// <param name="expiry">过期时间</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否保存成功</returns>
-        public async Task<bool> StringSetAsync<T>(string key, T redisValue, TimeSpan? expiry = null)
+        public async Task<bool> StringSetAsync<T>(
+            string key,
+            T redisValue,
+            TimeSpan? expiry = null,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return await StringSetAsync(key, redisValue.ToOrDefault<string>(), expiry);
+                return await StringSetAsync(key, redisValue.ToOrDefault<string>(), expiry, when, flags);
 
-            return await StringSetAsync(key, redisValue.ToJson(), expiry);
+            return await StringSetAsync(key, redisValue.ToJson(), expiry, when, flags);
         }
         #endregion
 
@@ -640,11 +684,14 @@ namespace ZqUtils.Core.Helpers
         /// 获取字符串值
         /// </summary>
         /// <param name="key">字符串key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回字符串值</returns>
-        public async Task<string> StringGetAsync(string key)
+        public async Task<string> StringGetAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.StringGetAsync(key);
+            return await Database.StringGetAsync(key, flags);
         }
 
         /// <summary>
@@ -652,10 +699,13 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">字符串key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回反序列化后的对象</returns>
-        public async Task<T> StringGetAsync<T>(string key)
+        public async Task<T> StringGetAsync<T>(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return (await StringGetAsync(key)).ToObject<T>();
+            return (await StringGetAsync(key, flags)).ToObject<T>();
         }
         #endregion
         #endregion
@@ -670,11 +720,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
         /// <param name="fieldValue">hash字段value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否保存成功</returns>
-        public bool HashSet(string key, string hashField, string fieldValue)
+        public bool HashSet(
+            string key,
+            string hashField,
+            string fieldValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.HashSet(key, hashField, fieldValue);
+            return Database.HashSet(key, hashField, fieldValue, when, flags);
         }
 
         /// <summary>
@@ -682,11 +739,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="hashFields">hash字段key-value集合</param>
-        public void HashSet(string key, IEnumerable<KeyValuePair<string, string>> hashFields)
+        /// <param name="flags">命令标志</param>
+        public void HashSet(
+            string key,
+            IEnumerable<KeyValuePair<string, string>> hashFields,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             var entries = hashFields.Select(x => new HashEntry(x.Key, x.Value));
-            Database.HashSet(key, entries.ToArray());
+            Database.HashSet(key, entries.ToArray(), flags);
         }
 
         /// <summary>
@@ -696,13 +757,20 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
         /// <param name="fieldValue">hash字段value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否保存成功</returns>
-        public bool HashSet<T>(string key, string hashField, T fieldValue)
+        public bool HashSet<T>(
+            string key,
+            string hashField,
+            T fieldValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return HashSet(key, hashField, fieldValue.ToOrDefault<string>());
+                return HashSet(key, hashField, fieldValue.ToOrDefault<string>(), when, flags);
 
-            return HashSet(key, hashField, fieldValue.ToJson());
+            return HashSet(key, hashField, fieldValue.ToJson(), when, flags);
         }
         #endregion
 
@@ -712,11 +780,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回hash字段值</returns>
-        public string HashGet(string key, string hashField)
+        public string HashGet(
+            string key,
+            string hashField,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.HashGet(key, hashField);
+            return Database.HashGet(key, hashField, flags);
         }
 
         /// <summary>
@@ -725,10 +797,14 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回反序列化后的对象</returns>
-        public T HashGet<T>(string key, string hashField)
+        public T HashGet<T>(
+            string key,
+            string hashField,
+            CommandFlags flags = CommandFlags.None)
         {
-            return HashGet(key, hashField).ToObject<T>();
+            return HashGet(key, hashField, flags).ToObject<T>();
         }
 
         /// <summary>
@@ -736,11 +812,14 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回反序列化后的对象集合</returns>
-        public IEnumerable<T> HashGet<T>(string key)
+        public IEnumerable<T> HashGet<T>(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            var hashFields = HashKeys(key);
-            return HashGet<T>(key, hashFields);
+            var hashFields = HashKeys(key, flags);
+            return HashGet<T>(key, hashFields, flags);
         }
 
         /// <summary>
@@ -749,12 +828,16 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="hashFields">hash字段key集合</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回反序列化后的对象集合</returns>
-        public IEnumerable<T> HashGet<T>(string key, IEnumerable<string> hashFields)
+        public IEnumerable<T> HashGet<T>(
+            string key,
+            IEnumerable<string> hashFields,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             var fields = hashFields.Select(x => (RedisValue)x);
-            return Database.HashGet(key, fields.ToArray()).Select(o => o.ToString().ToObject<T>());
+            return Database.HashGet(key, fields.ToArray(), flags).Select(o => o.ToString().ToObject<T>());
         }
         #endregion
 
@@ -763,11 +846,14 @@ namespace ZqUtils.Core.Helpers
         /// 从hash中移除指定字段
         /// </summary>
         /// <param name="key">redis存储key</param>        
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否删除成功</returns>
-        public long HashDelete(string key)
+        public long HashDelete(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            var hashFields = HashKeys(key);
-            return HashDelete(key, hashFields);
+            var hashFields = HashKeys(key, flags);
+            return HashDelete(key, hashFields, flags);
         }
 
         /// <summary>
@@ -775,11 +861,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否删除成功</returns>
-        public bool HashDelete(string key, string hashField)
+        public bool HashDelete(
+            string key,
+            string hashField,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.HashDelete(key, hashField);
+            return Database.HashDelete(key, hashField, flags);
         }
 
         /// <summary>
@@ -787,13 +877,17 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="hashFields">hash字段key集合</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否删除成功</returns>
-        public long HashDelete(string key, IEnumerable<string> hashFields)
+        public long HashDelete(
+            string key,
+            IEnumerable<string> hashFields,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             var fields = hashFields?.Select(x => (RedisValue)x);
             if (fields.IsNotNullOrEmpty())
-                return Database.HashDelete(key, fields.ToArray());
+                return Database.HashDelete(key, fields.ToArray(), flags);
 
             return 0;
         }
@@ -805,11 +899,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否存在</returns>
-        public bool HashExists(string key, string hashField)
+        public bool HashExists(
+            string key,
+            string hashField,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.HashExists(key, hashField);
+            return Database.HashExists(key, hashField, flags);
         }
         #endregion
 
@@ -818,11 +916,14 @@ namespace ZqUtils.Core.Helpers
         /// 获取hash中指定key的所有字段key
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回hash字段key集合</returns>
-        public IEnumerable<string> HashKeys(string key)
+        public IEnumerable<string> HashKeys(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.HashKeys(key).Select(o => o.ToString());
+            return Database.HashKeys(key, flags).Select(o => o.ToString());
         }
         #endregion
 
@@ -831,11 +932,14 @@ namespace ZqUtils.Core.Helpers
         /// 获取hash中指定key的所有字段value
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回hash字段value集合</returns>
-        public IEnumerable<string> HashValues(string key)
+        public IEnumerable<string> HashValues(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.HashValues(key).Select(o => o.ToString());
+            return Database.HashValues(key, flags).Select(o => o.ToString());
         }
         #endregion
 
@@ -844,9 +948,11 @@ namespace ZqUtils.Core.Helpers
         /// 获取hash长度
         /// </summary>
         /// <param name="key">redis存储key</param>
-        /// <param name="flags">操作命令标识</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public long HashLength(string key, CommandFlags flags = CommandFlags.None)
+        public long HashLength(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             return Database.HashLength(key, flags);
@@ -860,9 +966,13 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="pattern">模式匹配key</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="flags">操作命令标识</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public IEnumerable<HashEntry> HashScan(string key, string pattern, int pageSize, CommandFlags flags)
+        public IEnumerable<HashEntry> HashScan(
+            string key,
+            string pattern,
+            int pageSize,
+            CommandFlags flags)
         {
             key = AddKeyPrefix(key);
             return Database.HashScan(key, pattern, pageSize, flags);
@@ -876,9 +986,15 @@ namespace ZqUtils.Core.Helpers
         /// <param name="pageSize">每页大小</param>
         /// <param name="cursor">起始位置</param>
         /// <param name="pageOffset">起始偏移量</param>
-        /// <param name="flags">操作命令标识</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public IEnumerable<HashEntry> HashScan(string key, string pattern, int pageSize = 250, long cursor = 0L, int pageOffset = 0, CommandFlags flags = CommandFlags.None)
+        public IEnumerable<HashEntry> HashScan(
+            string key,
+            string pattern,
+            int pageSize = 250,
+            long cursor = 0L,
+            int pageOffset = 0,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             return Database.HashScan(key, pattern, pageSize, cursor, pageOffset, flags);
@@ -894,11 +1010,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
         /// <param name="fieldValue">hash字段value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否保存成功</returns>
-        public async Task<bool> HashSetAsync(string key, string hashField, string fieldValue)
+        public async Task<bool> HashSetAsync(
+            string key,
+            string hashField,
+            string fieldValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.HashSetAsync(key, hashField, fieldValue);
+            return await Database.HashSetAsync(key, hashField, fieldValue, when, flags);
         }
 
         /// <summary>
@@ -906,11 +1029,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="hashFields">hash字段key-value集合</param>
-        public async Task HashSetAsync(string key, IEnumerable<KeyValuePair<string, string>> hashFields)
+        /// <param name="flags">命令标志</param>
+        public async Task HashSetAsync(
+            string key,
+            IEnumerable<KeyValuePair<string, string>> hashFields,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             var entries = hashFields.Select(x => new HashEntry(AddKeyPrefix(x.Key), x.Value));
-            await Database.HashSetAsync(key, entries.ToArray());
+            await Database.HashSetAsync(key, entries.ToArray(), flags);
         }
 
         /// <summary>
@@ -919,13 +1046,20 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
         /// <param name="fieldValue">hash字段value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否保存成功</returns>
-        public async Task<bool> HashSetAsync<T>(string key, string hashField, T fieldValue)
+        public async Task<bool> HashSetAsync<T>(
+            string key,
+            string hashField,
+            T fieldValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return await HashSetAsync(key, hashField, fieldValue.ToOrDefault<string>());
+                return await HashSetAsync(key, hashField, fieldValue.ToOrDefault<string>(), when, flags);
 
-            return await HashSetAsync(key, hashField, fieldValue.ToJson());
+            return await HashSetAsync(key, hashField, fieldValue.ToJson(), when, flags);
         }
         #endregion
 
@@ -935,11 +1069,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回hash字段值</returns>
-        public async Task<string> HashGetAsync(string key, string hashField)
+        public async Task<string> HashGetAsync(
+            string key,
+            string hashField,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.HashGetAsync(key, hashField);
+            return await Database.HashGetAsync(key, hashField, flags);
         }
 
         /// <summary>
@@ -948,10 +1086,14 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回反序列化后的对象</returns>
-        public async Task<T> HashGetAsync<T>(string key, string hashField)
+        public async Task<T> HashGetAsync<T>(
+            string key,
+            string hashField,
+            CommandFlags flags = CommandFlags.None)
         {
-            return (await HashGetAsync(key, hashField)).ToObject<T>();
+            return (await HashGetAsync(key, hashField, flags)).ToObject<T>();
         }
 
         /// <summary>
@@ -959,11 +1101,14 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回反序列化后的对象集合</returns>
-        public async Task<IEnumerable<T>> HashGetAsync<T>(string key)
+        public async Task<IEnumerable<T>> HashGetAsync<T>(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            var hashFields = await HashKeysAsync(key);
-            return await HashGetAsync<T>(key, hashFields);
+            var hashFields = await HashKeysAsync(key, flags);
+            return await HashGetAsync<T>(key, hashFields, flags);
         }
 
         /// <summary>
@@ -972,12 +1117,16 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="hashFields">hash字段key集合</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回反序列化后的对象集合</returns>
-        public async Task<IEnumerable<T>> HashGetAsync<T>(string key, IEnumerable<string> hashFields)
+        public async Task<IEnumerable<T>> HashGetAsync<T>(
+            string key,
+            IEnumerable<string> hashFields,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             var fields = hashFields.Select(x => (RedisValue)x);
-            var result = (await Database.HashGetAsync(key, fields.ToArray())).Select(o => o.ToString());
+            var result = (await Database.HashGetAsync(key, fields.ToArray(), flags)).Select(o => o.ToString());
             return result.Select(o => o.ToString().ToObject<T>());
         }
         #endregion
@@ -986,12 +1135,15 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 从hash中移除指定字段
         /// </summary>
-        /// <param name="key">redis存储key</param>        
+        /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否删除成功</returns>
-        public async Task<long> HashDeleteAsync(string key)
+        public async Task<long> HashDeleteAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            var hashFields = await HashKeysAsync(key);
-            return await HashDeleteAsync(key, hashFields);
+            var hashFields = await HashKeysAsync(key, flags);
+            return await HashDeleteAsync(key, hashFields, flags);
         }
 
         /// <summary>
@@ -999,11 +1151,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否删除成功</returns>
-        public async Task<bool> HashDeleteAsync(string key, string hashField)
+        public async Task<bool> HashDeleteAsync(
+            string key,
+            string hashField,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.HashDeleteAsync(key, hashField);
+            return await Database.HashDeleteAsync(key, hashField, flags);
         }
 
         /// <summary>
@@ -1011,13 +1167,17 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="hashFields">hash字段key集合</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否删除成功</returns>
-        public async Task<long> HashDeleteAsync(string key, IEnumerable<string> hashFields)
+        public async Task<long> HashDeleteAsync(
+            string key,
+            IEnumerable<string> hashFields,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             var fields = hashFields?.Select(x => (RedisValue)x);
             if (fields.IsNotNullOrEmpty())
-                return await Database.HashDeleteAsync(key, fields.ToArray());
+                return await Database.HashDeleteAsync(key, fields.ToArray(), flags);
 
             return 0;
         }
@@ -1029,11 +1189,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="hashField">hash字段key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否存在</returns>
-        public async Task<bool> HashExistsAsync(string key, string hashField)
+        public async Task<bool> HashExistsAsync(
+            string key,
+            string hashField,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.HashExistsAsync(key, hashField);
+            return await Database.HashExistsAsync(key, hashField, flags);
         }
         #endregion
 
@@ -1042,11 +1206,14 @@ namespace ZqUtils.Core.Helpers
         /// 获取hash中指定key的所有字段key
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回hash字段key集合</returns>
-        public async Task<IEnumerable<string>> HashKeysAsync(string key)
+        public async Task<IEnumerable<string>> HashKeysAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return (await Database.HashKeysAsync(key)).Select(o => o.ToString());
+            return (await Database.HashKeysAsync(key, flags)).Select(o => o.ToString());
         }
         #endregion
 
@@ -1055,11 +1222,14 @@ namespace ZqUtils.Core.Helpers
         /// 获取hash中指定key的所有字段value
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回hash字段value集合</returns>
-        public async Task<IEnumerable<string>> HashValuesAsync(string key)
+        public async Task<IEnumerable<string>> HashValuesAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return (await Database.HashValuesAsync(key)).Select(o => o.ToString());
+            return (await Database.HashValuesAsync(key, flags)).Select(o => o.ToString());
         }
         #endregion
 
@@ -1068,9 +1238,11 @@ namespace ZqUtils.Core.Helpers
         /// 获取hash长度
         /// </summary>
         /// <param name="key">redis存储key</param>
-        /// <param name="flags">操作命令标识</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public async Task<long> HashLengthAsync(string key, CommandFlags flags = CommandFlags.None)
+        public async Task<long> HashLengthAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             return await Database.HashLengthAsync(key, flags);
@@ -1084,9 +1256,13 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="pattern">模式匹配key</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="flags">操作命令标识</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public IAsyncEnumerable<HashEntry> HashScanAsync(string key, string pattern, int pageSize, CommandFlags flags)
+        public IAsyncEnumerable<HashEntry> HashScanAsync(
+            string key,
+            string pattern,
+            int pageSize,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             return Database.HashScanAsync(key, pattern, pageSize, flags: flags);
@@ -1100,9 +1276,15 @@ namespace ZqUtils.Core.Helpers
         /// <param name="pageSize">每页大小</param>
         /// <param name="cursor">起始位置</param>
         /// <param name="pageOffset">起始偏移量</param>
-        /// <param name="flags">操作命令标识</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public IAsyncEnumerable<HashEntry> HashScanAsync(string key, string pattern, int pageSize = 250, long cursor = 0L, int pageOffset = 0, CommandFlags flags = CommandFlags.None)
+        public IAsyncEnumerable<HashEntry> HashScanAsync(
+            string key,
+            string pattern,
+            int pageSize = 250,
+            long cursor = 0L,
+            int pageOffset = 0,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             return Database.HashScanAsync(key, pattern, pageSize, cursor, pageOffset, flags);
@@ -1119,11 +1301,17 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回插入后列表的长度</returns>
-        public long ListLeftPush(string key, string redisValue)
+        public long ListLeftPush(
+            string key,
+            string redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.ListLeftPush(key, redisValue);
+            return Database.ListLeftPush(key, redisValue, when, flags);
         }
 
         /// <summary>
@@ -1132,24 +1320,33 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回插入后列表的长度</returns>
-        public long ListLeftPush<T>(string key, T redisValue)
+        public long ListLeftPush<T>(
+            string key,
+            T redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return ListLeftPush(key, redisValue.ToOrDefault<string>());
+                return ListLeftPush(key, redisValue.ToOrDefault<string>(), when, flags);
 
-            return ListLeftPush(key, redisValue.ToJson());
+            return ListLeftPush(key, redisValue.ToJson(), when, flags);
         }
 
         /// <summary>
         /// 移除并返回存储在该键列表的第一个元素
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素的值</returns>
-        public string ListLeftPop(string key)
+        public string ListLeftPop(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.ListLeftPop(key);
+            return Database.ListLeftPop(key, flags);
         }
 
         /// <summary>
@@ -1157,10 +1354,13 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素的值</returns>
-        public T ListLeftPop<T>(string key)
+        public T ListLeftPop<T>(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return ListLeftPop(key).ToObject<T>();
+            return ListLeftPop(key, flags).ToObject<T>();
         }
         #endregion
 
@@ -1170,11 +1370,17 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回插入后列表的长度</returns>
-        public long ListRightPush(string key, string redisValue)
+        public long ListRightPush(
+            string key,
+            string redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.ListRightPush(key, redisValue);
+            return Database.ListRightPush(key, redisValue, when, flags);
         }
 
         /// <summary>
@@ -1183,24 +1389,33 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回插入后列表的长度</returns>
-        public long ListRightPush<T>(string key, T redisValue)
+        public long ListRightPush<T>(
+            string key,
+            T redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return ListRightPush(key, redisValue.ToOrDefault<string>());
+                return ListRightPush(key, redisValue.ToOrDefault<string>(), when, flags);
 
-            return ListRightPush(key, redisValue.ToJson());
+            return ListRightPush(key, redisValue.ToJson(), when, flags);
         }
 
         /// <summary>
         /// 移除并返回存储在该键列表的最后一个元素
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素的值</returns>
-        public string ListRightPop(string key)
+        public string ListRightPop(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.ListRightPop(key);
+            return Database.ListRightPop(key, flags);
         }
 
         /// <summary>
@@ -1208,10 +1423,13 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素的值</returns>
-        public T ListRightPop<T>(string key)
+        public T ListRightPop<T>(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return ListRightPop(key).ToObject<T>();
+            return ListRightPop(key, flags).ToObject<T>();
         }
         #endregion
 
@@ -1221,11 +1439,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素的数量</returns>
-        public long ListRemove(string key, string redisValue)
+        public long ListRemove(
+            string key,
+            string redisValue,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.ListRemove(key, redisValue);
+            return Database.ListRemove(key, redisValue, flags: flags);
         }
         #endregion
 
@@ -1234,11 +1456,14 @@ namespace ZqUtils.Core.Helpers
         /// 返回列表上该键的长度，如果不存在，返回 0
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回列表的长度</returns>
-        public long ListLength(string key)
+        public long ListLength(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.ListLength(key);
+            return Database.ListLength(key, flags);
         }
         #endregion
 
@@ -1249,11 +1474,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始索引位置</param>
         /// <param name="stop">结束索引位置</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围内的元素集合</returns>
-        public IEnumerable<string> ListRange(string key, long start = 0, long stop = -1)
+        public IEnumerable<string> ListRange(
+            string key,
+            long start = 0,
+            long stop = -1,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.ListRange(key, start, stop).Select(o => o.ToString());
+            return Database.ListRange(key, start, stop, flags).Select(o => o.ToString());
         }
         #endregion
 
@@ -1263,10 +1493,16 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回入队后队列的长度</returns>
-        public long EnqueueItemOnList(string key, string redisValue)
+        public long EnqueueItemOnList(
+            string key,
+            string redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
-            return ListRightPush(key, redisValue);
+            return ListRightPush(key, redisValue, when, flags);
         }
 
         /// <summary>
@@ -1275,20 +1511,29 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回入队后队列的长度</returns>
-        public long EnqueueItemOnList<T>(string key, T redisValue)
+        public long EnqueueItemOnList<T>(
+            string key,
+            T redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
-            return ListRightPush(key, redisValue);
+            return ListRightPush(key, redisValue, when, flags);
         }
 
         /// <summary>
         /// 队列出队
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回出队元素的值</returns>
-        public string DequeueItemFromList(string key)
+        public string DequeueItemFromList(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return ListLeftPop(key);
+            return ListLeftPop(key, flags);
         }
 
         /// <summary>
@@ -1296,20 +1541,26 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回出队元素的值</returns>
-        public T DequeueItemFromList<T>(string key)
+        public T DequeueItemFromList<T>(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return ListLeftPop<T>(key);
+            return ListLeftPop<T>(key, flags);
         }
 
         /// <summary>
         /// 获取队列长度
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回队列的长度</returns>
-        public long GetQueueLength(string key)
+        public long GetQueueLength(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return ListLength(key);
+            return ListLength(key, flags);
         }
         #endregion
         #endregion
@@ -1321,11 +1572,17 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回插入后列表的长度</returns>
-        public async Task<long> ListLeftPushAsync(string key, string redisValue)
+        public async Task<long> ListLeftPushAsync(
+            string key,
+            string redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.ListLeftPushAsync(key, redisValue);
+            return await Database.ListLeftPushAsync(key, redisValue, when, flags);
         }
 
         /// <summary>
@@ -1334,24 +1591,33 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回插入后列表的长度</returns>
-        public async Task<long> ListLeftPushAsync<T>(string key, T redisValue)
+        public async Task<long> ListLeftPushAsync<T>(
+            string key,
+            T redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return await ListLeftPushAsync(key, redisValue.ToOrDefault<string>());
+                return await ListLeftPushAsync(key, redisValue.ToOrDefault<string>(), when, flags);
 
-            return await ListLeftPushAsync(key, redisValue.ToJson());
+            return await ListLeftPushAsync(key, redisValue.ToJson(), when, flags);
         }
 
         /// <summary>
         /// 移除并返回存储在该键列表的第一个元素
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素的值</returns>
-        public async Task<string> ListLeftPopAsync(string key)
+        public async Task<string> ListLeftPopAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.ListLeftPopAsync(key);
+            return await Database.ListLeftPopAsync(key, flags);
         }
 
         /// <summary>
@@ -1359,10 +1625,13 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素的值</returns>
-        public async Task<T> ListLeftPopAsync<T>(string key)
+        public async Task<T> ListLeftPopAsync<T>(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return (await ListLeftPopAsync(key)).ToObject<T>();
+            return (await ListLeftPopAsync(key, flags)).ToObject<T>();
         }
         #endregion
 
@@ -1372,11 +1641,17 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回插入后列表的长度</returns>
-        public async Task<long> ListRightPushAsync(string key, string redisValue)
+        public async Task<long> ListRightPushAsync(
+            string key,
+            string redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.ListRightPushAsync(key, redisValue);
+            return await Database.ListRightPushAsync(key, redisValue, when, flags);
         }
 
         /// <summary>
@@ -1385,24 +1660,33 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回插入后列表的长度</returns>
-        public async Task<long> ListRightPushAsync<T>(string key, T redisValue)
+        public async Task<long> ListRightPushAsync<T>(
+            string key,
+            T redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return await ListRightPushAsync(key, redisValue.ToOrDefault<string>());
+                return await ListRightPushAsync(key, redisValue.ToOrDefault<string>(), when, flags);
 
-            return await ListRightPushAsync(key, redisValue.ToJson());
+            return await ListRightPushAsync(key, redisValue.ToJson(), when, flags);
         }
 
         /// <summary>
         /// 移除并返回存储在该键列表的最后一个元素
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素的值</returns>
-        public async Task<string> ListRightPopAsync(string key)
+        public async Task<string> ListRightPopAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.ListRightPopAsync(key);
+            return await Database.ListRightPopAsync(key, flags);
         }
 
         /// <summary>
@@ -1410,10 +1694,13 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素的值</returns>
-        public async Task<T> ListRightPopAsync<T>(string key)
+        public async Task<T> ListRightPopAsync<T>(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return (await ListRightPopAsync(key)).ToObject<T>();
+            return (await ListRightPopAsync(key, flags)).ToObject<T>();
         }
         #endregion
 
@@ -1423,11 +1710,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素的数量</returns>
-        public async Task<long> ListRemoveAsync(string key, string redisValue)
+        public async Task<long> ListRemoveAsync(
+            string key,
+            string redisValue,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.ListRemoveAsync(key, redisValue);
+            return await Database.ListRemoveAsync(key, redisValue, flags: flags);
         }
         #endregion
 
@@ -1436,11 +1727,14 @@ namespace ZqUtils.Core.Helpers
         /// 返回列表上该键的长度，如果不存在，返回 0
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回列表的长度</returns>
-        public async Task<long> ListLengthAsync(string key)
+        public async Task<long> ListLengthAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.ListLengthAsync(key);
+            return await Database.ListLengthAsync(key, flags);
         }
         #endregion
 
@@ -1451,11 +1745,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始索引位置</param>
         /// <param name="stop">结束索引位置</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围内的元素集合</returns>
-        public async Task<IEnumerable<string>> ListRangeAsync(string key, long start = 0, long stop = -1)
+        public async Task<IEnumerable<string>> ListRangeAsync(
+            string key,
+            long start = 0,
+            long stop = -1,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            var query = await Database.ListRangeAsync(key, start, stop);
+            var query = await Database.ListRangeAsync(key, start, stop, flags);
             return query.Select(x => x.ToString());
         }
         #endregion
@@ -1466,10 +1765,16 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回入队后队列的长度</returns>
-        public async Task<long> EnqueueItemOnListAsync(string key, string redisValue)
+        public async Task<long> EnqueueItemOnListAsync(
+            string key,
+            string redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
-            return await ListRightPushAsync(key, redisValue);
+            return await ListRightPushAsync(key, redisValue, when, flags);
         }
 
         /// <summary>
@@ -1478,20 +1783,29 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="redisValue">redis存储value</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回入队后队列的长度</returns>
-        public async Task<long> EnqueueItemOnListAsync<T>(string key, T redisValue)
+        public async Task<long> EnqueueItemOnListAsync<T>(
+            string key,
+            T redisValue,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
-            return await ListRightPushAsync(key, redisValue);
+            return await ListRightPushAsync(key, redisValue, when, flags);
         }
 
         /// <summary>
         /// 队列出队
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回出队元素的值</returns>
-        public async Task<string> DequeueItemFromListAsync(string key)
+        public async Task<string> DequeueItemFromListAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return await ListLeftPopAsync(key);
+            return await ListLeftPopAsync(key, flags);
         }
 
         /// <summary>
@@ -1499,20 +1813,26 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回出队元素的值</returns>
-        public async Task<T> DequeueItemFromListAsync<T>(string key)
+        public async Task<T> DequeueItemFromListAsync<T>(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return await ListLeftPopAsync<T>(key);
+            return await ListLeftPopAsync<T>(key, flags);
         }
 
         /// <summary>
         /// 获取队列长度
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回队列的长度</returns>
-        public async Task<long> GetQueueLengthAsync(string key)
+        public async Task<long> GetQueueLengthAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
-            return await ListLengthAsync(key);
+            return await ListLengthAsync(key, flags);
         }
         #endregion
         #endregion
@@ -1527,11 +1847,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="score">score</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>若值已存在则返回false且score被更新，否则添加成功返回true</returns>
-        public bool SortedSetAdd(string key, string member, double score)
+        public bool SortedSetAdd(
+            string key,
+            string member,
+            double score,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetAdd(key, member, score);
+            return Database.SortedSetAdd(key, member, score, when, flags);
         }
 
         /// <summary>
@@ -1541,13 +1868,20 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="score">score</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>若值已存在则返回false且score被更新，否则添加成功返回true</returns>
-        public bool SortedSetAdd<T>(string key, T member, double score)
+        public bool SortedSetAdd<T>(
+            string key,
+            T member,
+            double score,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return SortedSetAdd(key, member.ToOrDefault<string>(), score);
+                return SortedSetAdd(key, member.ToOrDefault<string>(), score, when, flags);
 
-            return SortedSetAdd(key, member.ToJson(), score);
+            return SortedSetAdd(key, member.ToJson(), score, when, flags);
         }
         #endregion
 
@@ -1557,11 +1891,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否移除成功</returns>
-        public bool SortedSetRemove(string key, string member)
+        public bool SortedSetRemove(
+            string key,
+            string member,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetRemove(key, member);
+            return Database.SortedSetRemove(key, member, flags);
         }
 
         /// <summary>
@@ -1570,13 +1908,17 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否移除成功</returns>
-        public bool SortedSetRemove<T>(string key, T member)
+        public bool SortedSetRemove<T>(
+            string key,
+            T member,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return SortedSetRemove(key, member.ToOrDefault<string>());
+                return SortedSetRemove(key, member.ToOrDefault<string>(), flags);
 
-            return SortedSetRemove(key, member.ToJson());
+            return SortedSetRemove(key, member.ToJson(), flags);
         }
 
         /// <summary>
@@ -1585,11 +1927,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始索引位置</param>
         /// <param name="stop">结束索引位置</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素数量</returns>
-        public long SortedSetRemoveRangeByRank(string key, long start, long stop)
+        public long SortedSetRemoveRangeByRank(
+            string key,
+            long start,
+            long stop,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetRemoveRangeByRank(key, start, stop);
+            return Database.SortedSetRemoveRangeByRank(key, start, stop, flags);
         }
 
         /// <summary>
@@ -1598,11 +1945,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始score</param>
         /// <param name="stop">结束score</param>
+        /// <param name="exclude">要排除的开始和停止中的哪一个</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素数量</returns>
-        public long SortedSetRemoveRangeByScore(string key, double start, double stop)
+        public long SortedSetRemoveRangeByScore(
+            string key,
+            double start,
+            double stop,
+            Exclude exclude = Exclude.None,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetRemoveRangeByScore(key, start, stop);
+            return Database.SortedSetRemoveRangeByScore(key, start, stop, exclude, flags);
         }
 
         /// <summary>
@@ -1611,11 +1965,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="min">value最小值</param>
         /// <param name="max">value最大值</param>
+        /// <param name="exclude">要排除的最小只和最大值中的哪一个</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素数量</returns>
-        public long SortedSetRemoveRangeByValue(string key, string min, string max)
+        public long SortedSetRemoveRangeByValue(
+            string key,
+            string min,
+            string max,
+            Exclude exclude = Exclude.None,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetRemoveRangeByValue(key, min, max);
+            return Database.SortedSetRemoveRangeByValue(key, min, max, exclude, flags);
         }
         #endregion
 
@@ -1626,11 +1987,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="value">增量值</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回新的score</returns>
-        public double SortedSetIncrement(string key, string member, double value = 1)
+        public double SortedSetIncrement(
+            string key,
+            string member,
+            double value = 1,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetIncrement(key, member, value);
+            return Database.SortedSetIncrement(key, member, value, flags);
         }
 
         /// <summary>
@@ -1640,15 +2006,20 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="value">增量值</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回新的score</returns>
-        public double SortedSetIncrement<T>(string key, T member, double value = 1)
+        public double SortedSetIncrement<T>(
+            string key,
+            T member,
+            double value = 1,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
 
             if (typeof(T) == typeof(string))
-                return Database.SortedSetIncrement(key, member.ToOrDefault<string>(), value);
+                return Database.SortedSetIncrement(key, member.ToOrDefault<string>(), value, flags);
 
-            return Database.SortedSetIncrement(key, member.ToJson(), value);
+            return Database.SortedSetIncrement(key, member.ToJson(), value, flags);
         }
         #endregion
 
@@ -1659,11 +2030,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="value">递减值</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回新的score</returns>
-        public double SortedSetDecrement(string key, string member, double value)
+        public double SortedSetDecrement(
+            string key,
+            string member,
+            double value,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetDecrement(key, member, value);
+            return Database.SortedSetDecrement(key, member, value, flags);
         }
 
         /// <summary>
@@ -1673,15 +2049,20 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="value">递减值</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回新的score</returns>
-        public double SortedSetDecrement<T>(string key, T member, double value)
+        public double SortedSetDecrement<T>(
+            string key,
+            T member,
+            double value,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
 
             if (typeof(T) == typeof(string))
-                return Database.SortedSetDecrement(key, member.ToOrDefault<string>(), value);
+                return Database.SortedSetDecrement(key, member.ToOrDefault<string>(), value, flags);
 
-            return Database.SortedSetDecrement(key, member.ToJson(), value);
+            return Database.SortedSetDecrement(key, member.ToJson(), value, flags);
         }
         #endregion
 
@@ -1690,11 +2071,14 @@ namespace ZqUtils.Core.Helpers
         /// 获取有序集合的长度
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回有序集合的长度</returns>
-        public long SortedSetLength(string key)
+        public long SortedSetLength(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetLength(key);
+            return Database.SortedSetLength(key, flags: flags);
         }
         #endregion
 
@@ -1705,11 +2089,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回索引位置</returns>
-        public long? SortedSetRank(string key, string member, Order order = Order.Ascending)
+        public long? SortedSetRank(
+            string key,
+            string member,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetRank(key, member, order);
+            return Database.SortedSetRank(key, member, order, flags);
         }
 
         /// <summary>
@@ -1719,15 +2108,20 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回索引位置</returns>
-        public long? SortedSetRank<T>(string key, T member, Order order = Order.Ascending)
+        public long? SortedSetRank<T>(
+            string key,
+            T member,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
 
             if (typeof(T) == typeof(string))
-                return Database.SortedSetRank(key, member.ToOrDefault<string>(), order);
+                return Database.SortedSetRank(key, member.ToOrDefault<string>(), order, flags);
 
-            return Database.SortedSetRank(key, member.ToJson(), order);
+            return Database.SortedSetRank(key, member.ToJson(), order, flags);
         }
         #endregion
 
@@ -1737,11 +2131,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="memebr">redis存储value</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定元素的score</returns>
-        public double? SortedSetScore(string key, string memebr)
+        public double? SortedSetScore(
+            string key,
+            string memebr,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetScore(key, memebr);
+            return Database.SortedSetScore(key, memebr, flags);
         }
 
         /// <summary>
@@ -1750,15 +2148,19 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="memebr">redis存储value</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定元素的score</returns>
-        public double? SortedSetScore<T>(string key, T memebr)
+        public double? SortedSetScore<T>(
+            string key,
+            T memebr,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
 
             if (typeof(T) == typeof(string))
-                return Database.SortedSetScore(key, memebr.ToOrDefault<string>());
+                return Database.SortedSetScore(key, memebr.ToOrDefault<string>(), flags);
 
-            return Database.SortedSetScore(key, memebr.ToJson());
+            return Database.SortedSetScore(key, memebr.ToJson(), flags);
         }
         #endregion
 
@@ -1769,12 +2171,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始索引</param>
         /// <param name="stop">结束索引</param>
-        /// <param name="order">排序方式</param>        
+        /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public IEnumerable<string> SortedSetRangeByRank(string key, long start = 0, long stop = -1, Order order = Order.Ascending)
+        public IEnumerable<string> SortedSetRangeByRank(
+            string key,
+            long start = 0,
+            long stop = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetRangeByRank(key, start, stop, order).Select(x => x.ToString());
+            return Database.SortedSetRangeByRank(key, start, stop, order, flags).Select(x => x.ToString());
         }
 
         /// <summary>
@@ -1784,11 +2192,17 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始索引</param>
         /// <param name="stop">结束索引</param>
-        /// <param name="order">排序方式</param>        
+        /// <param name="order">排序方式</param>     
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public IEnumerable<T> SortedSetRangeByRank<T>(string key, long start = 0, long stop = -1, Order order = Order.Ascending)
+        public IEnumerable<T> SortedSetRangeByRank<T>(
+            string key,
+            long start = 0,
+            long stop = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
-            return SortedSetRangeByRank(key, start, stop, order).Select(o => o.ToObject<T>());
+            return SortedSetRangeByRank(key, start, stop, order, flags).Select(o => o.ToObject<T>());
         }
 
         /// <summary>
@@ -1798,11 +2212,17 @@ namespace ZqUtils.Core.Helpers
         /// <param name="start">开始索引</param>
         /// <param name="stop">结束索引</param>
         /// <param name="order">排序方式</param>        
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value-score</returns>
-        public Dictionary<string, double> SortedSetRangeByRankWithScores(string key, long start = 0, long stop = -1, Order order = Order.Ascending)
+        public Dictionary<string, double> SortedSetRangeByRankWithScores(
+            string key,
+            long start = 0,
+            long stop = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            var result = Database.SortedSetRangeByRankWithScores(key, start, stop, order);
+            var result = Database.SortedSetRangeByRankWithScores(key, start, stop, order, flags);
             return result.Select(x => new { x.Score, Value = x.Element.ToString() }).ToDictionary(x => x.Value, x => x.Score);
         }
 
@@ -1813,11 +2233,17 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始索引</param>
         /// <param name="stop">结束索引</param>
-        /// <param name="order">排序方式</param>        
+        /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value-score</returns>
-        public Dictionary<T, double> SortedSetRangeByRankWithScores<T>(string key, long start = 0, long stop = -1, Order order = Order.Ascending)
+        public Dictionary<T, double> SortedSetRangeByRankWithScores<T>(
+            string key,
+            long start = 0,
+            long stop = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
-            return SortedSetRangeByRankWithScores(key, start, stop, order).ToDictionary(o => o.Key.ToObject<T>(), o => o.Value);
+            return SortedSetRangeByRankWithScores(key, start, stop, order, flags).ToDictionary(o => o.Key.ToObject<T>(), o => o.Value);
         }
 
         /// <summary>
@@ -1829,11 +2255,19 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public IEnumerable<string> SortedSetRangeByScore(string key, double start = double.NegativeInfinity, double stop = double.PositiveInfinity, long skip = 0, long take = -1, Order order = Order.Ascending)
+        public IEnumerable<string> SortedSetRangeByScore(
+            string key,
+            double start = double.NegativeInfinity,
+            double stop = double.PositiveInfinity,
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetRangeByScore(key, start, stop, order: order, skip: skip, take: take).Select(o => o.ToString());
+            return Database.SortedSetRangeByScore(key, start, stop, order: order, skip: skip, take: take, flags: flags).Select(o => o.ToString());
         }
 
         /// <summary>
@@ -1846,10 +2280,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public IEnumerable<T> SortedSetRangeByScore<T>(string key, double start = double.NegativeInfinity, double stop = double.PositiveInfinity, long skip = 0, long take = -1, Order order = Order.Ascending)
+        public IEnumerable<T> SortedSetRangeByScore<T>(
+            string key,
+            double start = double.NegativeInfinity,
+            double stop = double.PositiveInfinity,
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
-            return SortedSetRangeByScore(key, start, stop, skip, take, order).Select(o => o.ToObject<T>());
+            return SortedSetRangeByScore(key, start, stop, skip, take, order, flags).Select(o => o.ToObject<T>());
         }
 
         /// <summary>
@@ -1861,11 +2303,19 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value-score</returns>
-        public Dictionary<string, double> SortedSetRangeByScoreWithScores(string key, double start = double.NegativeInfinity, double stop = double.PositiveInfinity, long skip = 0, long take = -1, Order order = Order.Ascending)
+        public Dictionary<string, double> SortedSetRangeByScoreWithScores(
+            string key,
+            double start = double.NegativeInfinity,
+            double stop = double.PositiveInfinity,
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            var result = Database.SortedSetRangeByScoreWithScores(key, start, stop, order: order, skip: skip, take: take);
+            var result = Database.SortedSetRangeByScoreWithScores(key, start, stop, order: order, skip: skip, take: take, flags: flags);
             return result.Select(x => new { x.Score, Value = x.Element.ToString() }).ToDictionary(x => x.Value, x => x.Score);
         }
 
@@ -1879,10 +2329,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value-score</returns>
-        public Dictionary<T, double> SortedSetRangeByScoreWithScores<T>(string key, double start = double.NegativeInfinity, double stop = double.PositiveInfinity, long skip = 0, long take = -1, Order order = Order.Ascending)
+        public Dictionary<T, double> SortedSetRangeByScoreWithScores<T>(
+            string key,
+            double start = double.NegativeInfinity,
+            double stop = double.PositiveInfinity,
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
-            return SortedSetRangeByScoreWithScores(key, start, stop, skip, take, order).ToDictionary(o => o.Key.ToObject<T>(), o => o.Value);
+            return SortedSetRangeByScoreWithScores(key, start, stop, skip, take, order, flags).ToDictionary(o => o.Key.ToObject<T>(), o => o.Value);
         }
 
         /// <summary>
@@ -1894,11 +2352,19 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public IEnumerable<string> SortedSetRangeByValue(string key, RedisValue min = default(RedisValue), RedisValue max = default(RedisValue), long skip = 0, long take = -1, Order order = Order.Ascending)
+        public IEnumerable<string> SortedSetRangeByValue(
+            string key,
+            RedisValue min = default(RedisValue),
+            RedisValue max = default(RedisValue),
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.SortedSetRangeByValue(key, min, max, order: order, skip: skip, take: take).Select(o => o.ToString());
+            return Database.SortedSetRangeByValue(key, min, max, order: order, skip: skip, take: take, flags: flags).Select(o => o.ToString());
         }
 
         /// <summary>
@@ -1911,10 +2377,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public IEnumerable<T> SortedSetRangeByValue<T>(string key, RedisValue min = default(RedisValue), RedisValue max = default(RedisValue), long skip = 0, long take = -1, Order order = Order.Ascending)
+        public IEnumerable<T> SortedSetRangeByValue<T>(
+            string key,
+            RedisValue min = default(RedisValue),
+            RedisValue max = default(RedisValue),
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
-            return SortedSetRangeByValue(key, min, max, skip, take, order).Select(o => o.ToObject<T>());
+            return SortedSetRangeByValue(key, min, max, skip, take, order, flags).Select(o => o.ToObject<T>());
         }
         #endregion
         #endregion
@@ -1927,11 +2401,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="score">score</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>若值已存在则返回false且score被更新，否则添加成功返回true</returns>
-        public async Task<bool> SortedSetAddAsync(string key, string member, double score)
+        public async Task<bool> SortedSetAddAsync(
+            string key,
+            string member,
+            double score,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.SortedSetAddAsync(key, member, score);
+            return await Database.SortedSetAddAsync(key, member, score, when, flags);
         }
 
         /// <summary>
@@ -1941,13 +2422,20 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="score">score</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>若值已存在则返回false且score被更新，否则添加成功返回true</returns>
-        public async Task<bool> SortedSetAddAsync<T>(string key, T member, double score)
+        public async Task<bool> SortedSetAddAsync<T>(
+            string key,
+            T member,
+            double score,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return await SortedSetAddAsync(key, member.ToOrDefault<string>(), score);
+                return await SortedSetAddAsync(key, member.ToOrDefault<string>(), score, when, flags);
 
-            return await SortedSetAddAsync(key, member.ToJson(), score);
+            return await SortedSetAddAsync(key, member.ToJson(), score, when, flags);
         }
         #endregion
 
@@ -1957,11 +2445,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否移除成功</returns>
-        public async Task<bool> SortedSetRemoveAsync(string key, string member)
+        public async Task<bool> SortedSetRemoveAsync(
+            string key,
+            string member,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.SortedSetRemoveAsync(key, member);
+            return await Database.SortedSetRemoveAsync(key, member, flags);
         }
 
         /// <summary>
@@ -1970,13 +2462,17 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否移除成功</returns>
-        public async Task<bool> SortedSetRemoveAsync<T>(string key, T member)
+        public async Task<bool> SortedSetRemoveAsync<T>(
+            string key,
+            T member,
+            CommandFlags flags = CommandFlags.None)
         {
             if (typeof(T) == typeof(string))
-                return await SortedSetRemoveAsync(key, member.ToOrDefault<string>());
+                return await SortedSetRemoveAsync(key, member.ToOrDefault<string>(), flags);
 
-            return await SortedSetRemoveAsync(key, member.ToJson());
+            return await SortedSetRemoveAsync(key, member.ToJson(), flags);
         }
 
         /// <summary>
@@ -1985,11 +2481,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始索引位置</param>
         /// <param name="stop">结束索引位置</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素数量</returns>
-        public async Task<long> SortedSetRemoveRangeByRankAsync(string key, long start, long stop)
+        public async Task<long> SortedSetRemoveRangeByRankAsync(
+            string key,
+            long start,
+            long stop,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.SortedSetRemoveRangeByRankAsync(key, start, stop);
+            return await Database.SortedSetRemoveRangeByRankAsync(key, start, stop, flags);
         }
 
         /// <summary>
@@ -1998,11 +2499,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始score</param>
         /// <param name="stop">结束score</param>
+        /// <param name="exclude">要排除的开始和停止中的哪一个</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素数量</returns>
-        public async Task<long> SortedSetRemoveRangeByScoreAsync(string key, double start, double stop)
+        public async Task<long> SortedSetRemoveRangeByScoreAsync(
+            string key,
+            double start,
+            double stop,
+            Exclude exclude = Exclude.None,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.SortedSetRemoveRangeByScoreAsync(key, start, stop);
+            return await Database.SortedSetRemoveRangeByScoreAsync(key, start, stop, exclude, flags);
         }
 
         /// <summary>
@@ -2011,11 +2519,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="min">value最小值</param>
         /// <param name="max">value最大值</param>
+        /// <param name="exclude">要排除的最小值和最大值中的哪一个</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回移除元素数量</returns>
-        public async Task<long> SortedSetRemoveRangeByValueAsync(string key, string min, string max)
+        public async Task<long> SortedSetRemoveRangeByValueAsync(
+            string key,
+            string min,
+            string max,
+            Exclude exclude = Exclude.None,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.SortedSetRemoveRangeByValueAsync(key, min, max);
+            return await Database.SortedSetRemoveRangeByValueAsync(key, min, max, exclude, flags);
         }
         #endregion
 
@@ -2026,11 +2541,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="value">增量值</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回新的score</returns>
-        public async Task<double> SortedSetIncrementAsync(string key, string member, double value = 1)
+        public async Task<double> SortedSetIncrementAsync(
+            string key,
+            string member,
+            double value = 1,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.SortedSetIncrementAsync(key, member, value);
+            return await Database.SortedSetIncrementAsync(key, member, value, flags);
         }
 
         /// <summary>
@@ -2040,15 +2560,20 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="value">增量值</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回新的score</returns>
-        public async Task<double> SortedSetIncrementAsync<T>(string key, T member, double value = 1)
+        public async Task<double> SortedSetIncrementAsync<T>(
+            string key,
+            T member,
+            double value = 1,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
 
             if (typeof(T) == typeof(string))
-                return await Database.SortedSetIncrementAsync(key, member.ToOrDefault<string>(), value);
+                return await Database.SortedSetIncrementAsync(key, member.ToOrDefault<string>(), value, flags);
 
-            return await Database.SortedSetIncrementAsync(key, member.ToJson(), value);
+            return await Database.SortedSetIncrementAsync(key, member.ToJson(), value, flags);
         }
         #endregion
 
@@ -2059,11 +2584,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="value">递减值</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回新的score</returns>
-        public async Task<double> SortedSetDecrementAsync(string key, string member, double value)
+        public async Task<double> SortedSetDecrementAsync(
+            string key,
+            string member,
+            double value,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.SortedSetDecrementAsync(key, member, value);
+            return await Database.SortedSetDecrementAsync(key, member, value, flags);
         }
 
         /// <summary>
@@ -2073,15 +2603,20 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="value">递减值</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回新的score</returns>
-        public async Task<double> SortedSetDecrementAsync<T>(string key, T member, double value)
+        public async Task<double> SortedSetDecrementAsync<T>(
+            string key,
+            T member,
+            double value,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
 
             if (typeof(T) == typeof(string))
-                return await Database.SortedSetDecrementAsync(key, member.ToOrDefault<string>(), value);
+                return await Database.SortedSetDecrementAsync(key, member.ToOrDefault<string>(), value, flags);
 
-            return await Database.SortedSetDecrementAsync(key, member.ToJson(), value);
+            return await Database.SortedSetDecrementAsync(key, member.ToJson(), value, flags);
         }
         #endregion
 
@@ -2090,11 +2625,14 @@ namespace ZqUtils.Core.Helpers
         /// 获取有序集合的长度
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回有序集合的长度</returns>
-        public async Task<long> SortedSetLengthAsync(string key)
+        public async Task<long> SortedSetLengthAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.SortedSetLengthAsync(key);
+            return await Database.SortedSetLengthAsync(key, flags: flags);
         }
         #endregion
 
@@ -2105,11 +2643,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回索引位置</returns>
-        public async Task<long?> SortedSetRankAsync(string key, string member, Order order = Order.Ascending)
+        public async Task<long?> SortedSetRankAsync(
+            string key,
+            string member,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.SortedSetRankAsync(key, member, order);
+            return await Database.SortedSetRankAsync(key, member, order, flags);
         }
 
         /// <summary>
@@ -2119,15 +2662,20 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="member">redis存储value</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回索引位置</returns>
-        public async Task<long?> SortedSetRankAsync<T>(string key, T member, Order order = Order.Ascending)
+        public async Task<long?> SortedSetRankAsync<T>(
+            string key,
+            T member,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
 
             if (typeof(T) == typeof(string))
-                return await Database.SortedSetRankAsync(key, member.ToOrDefault<string>(), order);
+                return await Database.SortedSetRankAsync(key, member.ToOrDefault<string>(), order, flags);
 
-            return await Database.SortedSetRankAsync(key, member.ToJson(), order);
+            return await Database.SortedSetRankAsync(key, member.ToJson(), order, flags);
         }
         #endregion
 
@@ -2137,11 +2685,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="memebr">redis存储value</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定元素的score</returns>
-        public async Task<double?> SortedSetScoreAsync(string key, string memebr)
+        public async Task<double?> SortedSetScoreAsync(
+            string key,
+            string memebr,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.SortedSetScoreAsync(key, memebr);
+            return await Database.SortedSetScoreAsync(key, memebr, flags);
         }
 
         /// <summary>
@@ -2150,15 +2702,19 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="key">redis存储key</param>
         /// <param name="memebr">redis存储value</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定元素的score</returns>
-        public async Task<double?> SortedSetScoreAsync<T>(string key, T memebr)
+        public async Task<double?> SortedSetScoreAsync<T>(
+            string key,
+            T memebr,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
 
             if (typeof(T) == typeof(string))
-                return await Database.SortedSetScoreAsync(key, memebr.ToOrDefault<string>());
+                return await Database.SortedSetScoreAsync(key, memebr.ToOrDefault<string>(), flags);
 
-            return await Database.SortedSetScoreAsync(key, memebr.ToJson());
+            return await Database.SortedSetScoreAsync(key, memebr.ToJson(), flags);
         }
         #endregion
 
@@ -2170,11 +2726,17 @@ namespace ZqUtils.Core.Helpers
         /// <param name="start">开始索引</param>
         /// <param name="stop">结束索引</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public async Task<IEnumerable<string>> SortedSetRangeByRankAsync(string key, long start = 0, long stop = -1, Order order = Order.Ascending)
+        public async Task<IEnumerable<string>> SortedSetRangeByRankAsync(
+            string key,
+            long start = 0,
+            long stop = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return (await Database.SortedSetRangeByRankAsync(key, start, stop, order)).Select(o => o.ToString());
+            return (await Database.SortedSetRangeByRankAsync(key, start, stop, order, flags)).Select(o => o.ToString());
         }
 
         /// <summary>
@@ -2185,10 +2747,16 @@ namespace ZqUtils.Core.Helpers
         /// <param name="start">开始索引</param>
         /// <param name="stop">结束索引</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public async Task<IEnumerable<T>> SortedSetRangeByRankAsync<T>(string key, long start = 0, long stop = -1, Order order = Order.Ascending)
+        public async Task<IEnumerable<T>> SortedSetRangeByRankAsync<T>(
+            string key,
+            long start = 0,
+            long stop = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
-            return (await SortedSetRangeByRankAsync(key, start, stop, order)).Select(o => o.ToObject<T>());
+            return (await SortedSetRangeByRankAsync(key, start, stop, order, flags)).Select(o => o.ToObject<T>());
         }
 
         /// <summary>
@@ -2197,12 +2765,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始索引</param>
         /// <param name="stop">结束索引</param>
-        /// <param name="order">排序方式</param>        
+        /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value-score</returns>
-        public async Task<Dictionary<string, double>> SortedSetRangeByRankWithScoresAsync(string key, long start = 0, long stop = -1, Order order = Order.Ascending)
+        public async Task<Dictionary<string, double>> SortedSetRangeByRankWithScoresAsync(
+            string key,
+            long start = 0,
+            long stop = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            var result = await Database.SortedSetRangeByRankWithScoresAsync(key, start, stop, order);
+            var result = await Database.SortedSetRangeByRankWithScoresAsync(key, start, stop, order, flags);
             return result.Select(x => new { x.Score, Value = x.Element.ToString() }).ToDictionary(x => x.Value, x => x.Score);
         }
 
@@ -2213,11 +2787,17 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">redis存储key</param>
         /// <param name="start">开始索引</param>
         /// <param name="stop">结束索引</param>
-        /// <param name="order">排序方式</param>        
+        /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value-score</returns>
-        public async Task<Dictionary<T, double>> SortedSetRangeByRankWithScoresAsync<T>(string key, long start = 0, long stop = -1, Order order = Order.Ascending)
+        public async Task<Dictionary<T, double>> SortedSetRangeByRankWithScoresAsync<T>(
+            string key,
+            long start = 0,
+            long stop = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
-            return (await SortedSetRangeByRankWithScoresAsync(key, start, stop, order)).ToDictionary(o => o.Key.ToObject<T>(), o => o.Value);
+            return (await SortedSetRangeByRankWithScoresAsync(key, start, stop, order, flags)).ToDictionary(o => o.Key.ToObject<T>(), o => o.Value);
         }
 
         /// <summary>
@@ -2229,11 +2809,19 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public async Task<IEnumerable<string>> SortedSetRangeByScoreAsync(string key, double start = double.NegativeInfinity, double stop = double.PositiveInfinity, long skip = 0, long take = -1, Order order = Order.Ascending)
+        public async Task<IEnumerable<string>> SortedSetRangeByScoreAsync(
+            string key,
+            double start = double.NegativeInfinity,
+            double stop = double.PositiveInfinity,
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return (await Database.SortedSetRangeByScoreAsync(key, start, stop, order: order, skip: skip, take: take)).Select(o => o.ToString());
+            return (await Database.SortedSetRangeByScoreAsync(key, start, stop, order: order, skip: skip, take: take, flags: flags)).Select(o => o.ToString());
         }
 
         /// <summary>
@@ -2246,10 +2834,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public async Task<IEnumerable<T>> SortedSetRangeByScoreAsync<T>(string key, double start = double.NegativeInfinity, double stop = double.PositiveInfinity, long skip = 0, long take = -1, Order order = Order.Ascending)
+        public async Task<IEnumerable<T>> SortedSetRangeByScoreAsync<T>(
+            string key,
+            double start = double.NegativeInfinity,
+            double stop = double.PositiveInfinity,
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
-            return (await SortedSetRangeByScoreAsync(key, start, stop, skip, take, order)).Select(o => o.ToObject<T>());
+            return (await SortedSetRangeByScoreAsync(key, start, stop, skip, take, order, flags)).Select(o => o.ToObject<T>());
         }
 
         /// <summary>
@@ -2261,11 +2857,19 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value-score</returns>
-        public async Task<Dictionary<string, double>> SortedSetRangeByScoreWithScoresAsync(string key, double start = double.NegativeInfinity, double stop = double.PositiveInfinity, long skip = 0, long take = -1, Order order = Order.Ascending)
+        public async Task<Dictionary<string, double>> SortedSetRangeByScoreWithScoresAsync(
+            string key,
+            double start = double.NegativeInfinity,
+            double stop = double.PositiveInfinity,
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            var result = await Database.SortedSetRangeByScoreWithScoresAsync(key, start, stop, order: order, skip: skip, take: take);
+            var result = await Database.SortedSetRangeByScoreWithScoresAsync(key, start, stop, order: order, skip: skip, take: take, flags: flags);
             return result.Select(x => new { x.Score, Value = x.Element.ToString() }).ToDictionary(x => x.Value, x => x.Score);
         }
 
@@ -2279,10 +2883,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value-score</returns>
-        public async Task<Dictionary<T, double>> SortedSetRangeByScoreWithScoresAsync<T>(string key, double start = double.NegativeInfinity, double stop = double.PositiveInfinity, long skip = 0, long take = -1, Order order = Order.Ascending)
+        public async Task<Dictionary<T, double>> SortedSetRangeByScoreWithScoresAsync<T>(
+            string key,
+            double start = double.NegativeInfinity,
+            double stop = double.PositiveInfinity,
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
-            return (await SortedSetRangeByScoreWithScoresAsync(key, start, stop, skip, take, order)).ToDictionary(o => o.Key.ToObject<T>(), o => o.Value);
+            return (await SortedSetRangeByScoreWithScoresAsync(key, start, stop, skip, take, order, flags)).ToDictionary(o => o.Key.ToObject<T>(), o => o.Value);
         }
 
         /// <summary>
@@ -2294,11 +2906,19 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public async Task<IEnumerable<string>> SortedSetRangeByValueAsync(string key, RedisValue min = default(RedisValue), RedisValue max = default(RedisValue), long skip = 0, long take = -1, Order order = Order.Ascending)
+        public async Task<IEnumerable<string>> SortedSetRangeByValueAsync(
+            string key,
+            RedisValue min = default(RedisValue),
+            RedisValue max = default(RedisValue),
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return (await Database.SortedSetRangeByValueAsync(key, min, max, order: order, skip: skip, take: take)).Select(o => o.ToString());
+            return (await Database.SortedSetRangeByValueAsync(key, min, max, order: order, skip: skip, take: take, flags: flags)).Select(o => o.ToString());
         }
 
         /// <summary>
@@ -2311,10 +2931,18 @@ namespace ZqUtils.Core.Helpers
         /// <param name="skip">跳过元素数量</param>
         /// <param name="take">拿取元素数量</param>
         /// <param name="order">排序方式</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回指定范围的元素value</returns>
-        public async Task<IEnumerable<T>> SortedSetRangeByValueAsync<T>(string key, RedisValue min = default(RedisValue), RedisValue max = default(RedisValue), long skip = 0, long take = -1, Order order = Order.Ascending)
+        public async Task<IEnumerable<T>> SortedSetRangeByValueAsync<T>(
+            string key,
+            RedisValue min = default(RedisValue),
+            RedisValue max = default(RedisValue),
+            long skip = 0,
+            long take = -1,
+            Order order = Order.Ascending,
+            CommandFlags flags = CommandFlags.None)
         {
-            return (await SortedSetRangeByValueAsync(key, min, max, skip, take, order)).Select(o => o.ToObject<T>());
+            return (await SortedSetRangeByValueAsync(key, min, max, skip, take, order, flags)).Select(o => o.ToObject<T>());
         }
         #endregion
         #endregion
@@ -2329,8 +2957,13 @@ namespace ZqUtils.Core.Helpers
         /// <param name="pattern"></param>
         /// <param name="database"></param>
         /// <param name="configuredOnly"></param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public List<string> Keys(string pattern, int database = 0, bool configuredOnly = false)
+        public List<string> Keys(
+            string pattern,
+            int database = 0,
+            bool configuredOnly = false,
+            CommandFlags flags = CommandFlags.None)
         {
             var result = new List<string>();
             var points = RedisConnection.GetEndPoints(configuredOnly);
@@ -2339,7 +2972,7 @@ namespace ZqUtils.Core.Helpers
                 foreach (var point in points)
                 {
                     var server = RedisConnection.GetServer(point);
-                    var keys = server.Keys(database: database, pattern: pattern);
+                    var keys = server.Keys(database: database, pattern: pattern, flags: flags);
                     result.AddRangeIfNotContains(keys.Select(x => (string)x).ToArray());
                 }
             }
@@ -2353,23 +2986,29 @@ namespace ZqUtils.Core.Helpers
         /// 移除指定key
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否移除成功</returns>
-        public bool KeyDelete(string key)
+        public bool KeyDelete(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.KeyDelete(key);
+            return Database.KeyDelete(key, flags);
         }
 
         /// <summary>
         /// 移除指定key
         /// </summary>
         /// <param name="redisKeys">redis存储key集合</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否移除成功</returns>
-        public long KeyDelete(IEnumerable<string> redisKeys)
+        public long KeyDelete(
+            IEnumerable<string> redisKeys,
+            CommandFlags flags = CommandFlags.None)
         {
             var keys = redisKeys?.Select(x => (RedisKey)AddKeyPrefix(x));
             if (keys.IsNotNullOrEmpty())
-                return Database.KeyDelete(keys.ToArray());
+                return Database.KeyDelete(keys.ToArray(), flags);
 
             return 0;
         }
@@ -2380,8 +3019,13 @@ namespace ZqUtils.Core.Helpers
         /// <param name="pattern">匹配模式</param>
         /// <param name="database">数据库</param>
         /// <param name="configuredOnly">配置</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否移除成功</returns>
-        public long KeyDeleteByPattern(string pattern, int database = 0, bool configuredOnly = false)
+        public long KeyDeleteByPattern(
+            string pattern,
+            int database = 0,
+            bool configuredOnly = false,
+            CommandFlags flags = CommandFlags.None)
         {
             var result = 0L;
             var points = RedisConnection.GetEndPoints(configuredOnly);
@@ -2392,10 +3036,10 @@ namespace ZqUtils.Core.Helpers
                 foreach (var point in points)
                 {
                     var server = RedisConnection.GetServer(point);
-                    var keys = server.Keys(database: database, pattern: pattern);
+                    var keys = server.Keys(database: database, pattern: pattern, flags: flags);
 
                     if (keys.IsNotNullOrEmpty())
-                        result += db.KeyDelete(keys.ToArray());
+                        result += db.KeyDelete(keys.ToArray(), flags);
                 }
             }
             return result;
@@ -2407,11 +3051,14 @@ namespace ZqUtils.Core.Helpers
         /// 判断key是否存在
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否存在</returns>
-        public bool KeyExists(string key)
+        public bool KeyExists(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.KeyExists(key);
+            return Database.KeyExists(key, flags);
         }
         #endregion
 
@@ -2421,11 +3068,17 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储旧key</param>
         /// <param name="redisNewKey">redis存储新key</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回重命名是否成功</returns>
-        public bool KeyRename(string key, string redisNewKey)
+        public bool KeyRename(
+            string key,
+            string redisNewKey,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.KeyRename(key, redisNewKey);
+            return Database.KeyRename(key, redisNewKey, when, flags);
         }
         #endregion
 
@@ -2435,11 +3088,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="expiry">过期时间</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否设置成功</returns>
-        public bool KeyExpire(string key, TimeSpan? expiry)
+        public bool KeyExpire(
+            string key,
+            TimeSpan? expiry,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.KeyExpire(key, expiry);
+            return Database.KeyExpire(key, expiry, flags);
         }
         #endregion
 
@@ -2447,12 +3104,15 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 获取key过期时间
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public TimeSpan? KeyTtl(string key)
+        public TimeSpan? KeyTtl(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return Database.KeyTimeToLive(key);
+            return Database.KeyTimeToLive(key, flags);
         }
         #endregion
         #endregion
@@ -2462,11 +3122,16 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 模式匹配获取key
         /// </summary>
-        /// <param name="pattern"></param>
-        /// <param name="database"></param>
-        /// <param name="configuredOnly"></param>
+        /// <param name="pattern">匹配模式</param>
+        /// <param name="database">数据库</param>
+        /// <param name="configuredOnly">是否仅返回显式配置的端点</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public async Task<List<string>> KeysAsync(string pattern, int database = 0, bool configuredOnly = false)
+        public async Task<List<string>> KeysAsync(
+            string pattern,
+            int database = 0,
+            bool configuredOnly = false,
+            CommandFlags flags = CommandFlags.None)
         {
             var result = new List<string>();
             var points = RedisConnection.GetEndPoints(configuredOnly);
@@ -2475,7 +3140,7 @@ namespace ZqUtils.Core.Helpers
                 foreach (var point in points)
                 {
                     var server = RedisConnection.GetServer(point);
-                    var keys = server.KeysAsync(database: database, pattern: pattern);
+                    var keys = server.KeysAsync(database: database, pattern: pattern, flags: flags);
                     await foreach (var key in keys)
                     {
                         result.AddIfNotContains(key);
@@ -2492,23 +3157,29 @@ namespace ZqUtils.Core.Helpers
         /// 移除指定key
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否移除成功</returns>
-        public async Task<bool> KeyDeleteAsync(string key)
+        public async Task<bool> KeyDeleteAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.KeyDeleteAsync(key);
+            return await Database.KeyDeleteAsync(key, flags);
         }
 
         /// <summary>
         /// 移除指定key
         /// </summary>
         /// <param name="redisKeys">redis存储key集合</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否移除成功</returns>
-        public async Task<long> KeyDeleteAsync(IEnumerable<string> redisKeys)
+        public async Task<long> KeyDeleteAsync(
+            IEnumerable<string> redisKeys,
+            CommandFlags flags = CommandFlags.None)
         {
             var keys = redisKeys.Select(x => (RedisKey)AddKeyPrefix(x));
             if (keys.IsNotNullOrEmpty())
-                return await Database.KeyDeleteAsync(keys.ToArray());
+                return await Database.KeyDeleteAsync(keys.ToArray(), flags);
 
             return 0;
         }
@@ -2518,9 +3189,14 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="pattern">匹配模式</param>
         /// <param name="database">数据库</param>
-        /// <param name="configuredOnly">配置</param>
+        /// <param name="configuredOnly">是否仅返回显式配置的端点</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否移除成功</returns>
-        public async Task<long> KeyDeleteByPatternAsync(string pattern, int database = 0, bool configuredOnly = false)
+        public async Task<long> KeyDeleteByPatternAsync(
+            string pattern,
+            int database = 0,
+            bool configuredOnly = false,
+            CommandFlags flags = CommandFlags.None)
         {
             var result = 0L;
             var points = RedisConnection.GetEndPoints(configuredOnly);
@@ -2531,7 +3207,7 @@ namespace ZqUtils.Core.Helpers
                 foreach (var point in points)
                 {
                     var server = RedisConnection.GetServer(point);
-                    var keys = server.KeysAsync(database: database, pattern: pattern);
+                    var keys = server.KeysAsync(database: database, pattern: pattern, flags: flags);
                     var keyDeletes = new List<RedisKey>();
                     await foreach (var key in keys)
                     {
@@ -2539,7 +3215,7 @@ namespace ZqUtils.Core.Helpers
                     }
 
                     if (keyDeletes.IsNotNullOrEmpty())
-                        result += await db.KeyDeleteAsync(keyDeletes.ToArray());
+                        result += await db.KeyDeleteAsync(keyDeletes.ToArray(), flags);
                 }
             }
 
@@ -2552,11 +3228,14 @@ namespace ZqUtils.Core.Helpers
         /// 判断key是否存在
         /// </summary>
         /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否存在</returns>
-        public async Task<bool> KeyExistsAsync(string key)
+        public async Task<bool> KeyExistsAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.KeyExistsAsync(key);
+            return await Database.KeyExistsAsync(key, flags);
         }
         #endregion
 
@@ -2566,11 +3245,17 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储旧key</param>
         /// <param name="redisNewKey">redis存储新key</param>
+        /// <param name="when">操作条件</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回重命名是否成功</returns>
-        public async Task<bool> KeyRenameAsync(string key, string redisNewKey)
+        public async Task<bool> KeyRenameAsync(
+            string key,
+            string redisNewKey,
+            When when = When.Always,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.KeyRenameAsync(key, redisNewKey);
+            return await Database.KeyRenameAsync(key, redisNewKey, when, flags);
         }
         #endregion
 
@@ -2580,11 +3265,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">redis存储key</param>
         /// <param name="expiry">过期时间</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回是否设置成功</returns>
-        public async Task<bool> KeyExpireAsync(string key, TimeSpan? expiry)
+        public async Task<bool> KeyExpireAsync(
+            string key,
+            TimeSpan? expiry,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.KeyExpireAsync(key, expiry);
+            return await Database.KeyExpireAsync(key, expiry, flags);
         }
         #endregion
 
@@ -2592,12 +3281,15 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 获取key过期时间
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">redis存储key</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public async Task<TimeSpan?> KeyTtlAsync(string key)
+        public async Task<TimeSpan?> KeyTtlAsync(
+            string key,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
-            return await Database.KeyTimeToLiveAsync(key);
+            return await Database.KeyTimeToLiveAsync(key, flags);
         }
         #endregion
         #endregion
@@ -2636,10 +3328,15 @@ namespace ZqUtils.Core.Helpers
         /// <param name="host">主机地址</param>
         /// <param name="port">端口号</param>
         /// <param name="database">数据库</param>
-        public void Clear(string host, int port, int database)
+        /// <param name="flags">命令标志</param>
+        public void Clear(
+            string host,
+            int port,
+            int database,
+            CommandFlags flags = CommandFlags.None)
         {
             var server = RedisConnection.GetServer(host, port);
-            server.FlushDatabase(database);
+            server.FlushDatabase(database, flags);
         }
         #endregion
 
@@ -2675,10 +3372,15 @@ namespace ZqUtils.Core.Helpers
         /// <param name="host">主机地址</param>
         /// <param name="port">端口号</param>
         /// <param name="database">数据库</param>
-        public async Task ClearAsync(string host, int port, int database)
+        /// <param name="flags">命令标志</param>
+        public async Task ClearAsync(
+            string host,
+            int port,
+            int database,
+            CommandFlags flags = CommandFlags.None)
         {
             var server = RedisConnection.GetServer(host, port);
-            await server.FlushDatabaseAsync(database);
+            await server.FlushDatabaseAsync(database, flags);
         }
         #endregion
         #endregion
@@ -2691,9 +3393,13 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">键</param>
         /// <param name="value">值</param>
         /// <param name="expiry">过期时间</param>
-        /// <param name="flags">标识</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public bool LockTake(string key, string value, TimeSpan expiry, CommandFlags flags = CommandFlags.None)
+        public bool LockTake(
+            string key,
+            string value,
+            TimeSpan expiry,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             return Database.LockTake(key, value, expiry, flags);
@@ -2704,9 +3410,12 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">键</param>
         /// <param name="value">值</param>
-        /// <param name="flags">标识</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public bool LockRelease(string key, string value, CommandFlags flags = CommandFlags.None)
+        public bool LockRelease(
+            string key,
+            string value,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             return Database.LockRelease(key, value, flags);
@@ -2720,9 +3429,13 @@ namespace ZqUtils.Core.Helpers
         /// <param name="key">键</param>
         /// <param name="value">值</param>
         /// <param name="expiry">过期时间</param>
-        /// <param name="flags">标识</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public async Task<bool> LockTakeAsync(string key, string value, TimeSpan expiry, CommandFlags flags = CommandFlags.None)
+        public async Task<bool> LockTakeAsync(
+            string key,
+            string value,
+            TimeSpan expiry,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             return await Database.LockTakeAsync(key, value, expiry, flags);
@@ -2733,9 +3446,12 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="key">键</param>
         /// <param name="value">值</param>
-        /// <param name="flags">标识</param>
+        /// <param name="flags">命令标志</param>
         /// <returns></returns>
-        public async Task<bool> LockReleaseAsync(string key, string value, CommandFlags flags = CommandFlags.None)
+        public async Task<bool> LockReleaseAsync(
+            string key,
+            string value,
+            CommandFlags flags = CommandFlags.None)
         {
             key = AddKeyPrefix(key);
             return await Database.LockReleaseAsync(key, value, flags);
@@ -2750,11 +3466,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="channel">通道</param>
         /// <param name="message">消息</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回收到消息的客户端数量</returns>
-        public long Publish(string channel, string message)
+        public long Publish(
+            string channel,
+            string message,
+            CommandFlags flags = CommandFlags.None)
         {
             var sub = RedisConnection.GetSubscriber();
-            return sub.Publish(channel, message);
+            return sub.Publish(channel, message, flags);
         }
 
         /// <summary>
@@ -2763,11 +3483,15 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="channel">通道</param>
         /// <param name="message">消息</param>
+        /// <param name="flags">命令标志</param>
         /// <returns>返回收到消息的客户端数量</returns>
-        public async Task<long> PublishAsync(string channel, string message)
+        public async Task<long> PublishAsync(
+            string channel,
+            string message,
+            CommandFlags flags = CommandFlags.None)
         {
             var sub = RedisConnection.GetSubscriber();
-            return await sub.PublishAsync(channel, message);
+            return await sub.PublishAsync(channel, message, flags);
         }
 
         /// <summary>
@@ -2775,10 +3499,14 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="channelFrom">通道来源</param>
         /// <param name="subscribeFn">订阅处理委托</param>
-        public void Subscribe(string channelFrom, Action<RedisValue> subscribeFn)
+        /// <param name="flags">命令标志</param>
+        public void Subscribe(
+            string channelFrom,
+            Action<RedisValue> subscribeFn,
+            CommandFlags flags = CommandFlags.None)
         {
             var sub = RedisConnection.GetSubscriber();
-            sub.Subscribe(channelFrom, (channel, message) => subscribeFn?.Invoke(message));
+            sub.Subscribe(channelFrom, (channel, message) => subscribeFn?.Invoke(message), flags);
         }
 
         /// <summary>
@@ -2786,10 +3514,14 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <param name="channelFrom">通道来源</param>
         /// <param name="subscribeFn">订阅处理委托</param>
-        public async Task SubscribeAsync(string channelFrom, Action<RedisValue> subscribeFn)
+        /// <param name="flags">命令标志</param>
+        public async Task SubscribeAsync(
+            string channelFrom,
+            Action<RedisValue> subscribeFn,
+            CommandFlags flags = CommandFlags.None)
         {
             var sub = RedisConnection.GetSubscriber();
-            await sub.SubscribeAsync(channelFrom, (channel, message) => subscribeFn?.Invoke(message));
+            await sub.SubscribeAsync(channelFrom, (channel, message) => subscribeFn?.Invoke(message), flags);
         }
         #endregion
         #endregion
