@@ -154,6 +154,7 @@ namespace ZqUtils.Core.Redis
                 if (this._redisConfiguration.ConnectionString.IsNotNullOrEmpty())
                     connection = ConnectionMultiplexer.Connect(
                         this._redisConfiguration.ConnectionString,
+                        this._redisConfiguration.Configure,
                         this._redisConfiguration.ConnectLogger);
 
                 if (this._redisConfiguration.ConfigurationOptions != null)

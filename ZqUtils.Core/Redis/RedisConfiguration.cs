@@ -48,6 +48,17 @@ namespace ZqUtils.Core.Redis
         /// </summary>
         public Action<IConnectionMultiplexer> Action { get; set; }
 
+        /// Gets or sets the Redis configuration options,only used when `ConnectionString` is not null.
+        /// </summary>
+        /// <remarks>
+        ///     <code>
+        ///         var conn = ConnectionMultiplexer.Connect(
+        ///             redisConnectionString.ConnectionString, 
+        ///             options => options.SocketManager = SocketManager.ThreadPool);
+        ///     </code>
+        /// </remarks>
+        public Action<ConfigurationOptions> Configure { get; set; }
+
         /// <summary>
         /// Gets or sets redis `ConnectionMultiplexer.Connect` log parameter
         /// </summary>
