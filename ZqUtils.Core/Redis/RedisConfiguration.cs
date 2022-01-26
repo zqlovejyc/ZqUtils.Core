@@ -48,6 +48,7 @@ namespace ZqUtils.Core.Redis
         /// </summary>
         public Action<IConnectionMultiplexer> Action { get; set; }
 
+        /// <summary>
         /// Gets or sets the Redis configuration options,only used when `ConnectionString` is not null.
         /// </summary>
         /// <remarks>
