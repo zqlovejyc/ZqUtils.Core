@@ -185,6 +185,7 @@ namespace ZqUtils.Core.Extensions
         /// <param name="log">记录redis连接日志</param>
         /// <param name="useConnectionPool">是否使用连接池，若为null，则读取配置Redis:UseConnectionPool，若两者均为null，则默认为true</param>
         /// <param name="redisConfiguration">redis连接池配置</param>
+        /// <param name="configure">redis连接配置自定义委托</param>
         /// <returns></returns>
         public static IServiceCollection AddStackExchangeRedis(
             this IServiceCollection @this,
@@ -192,7 +193,8 @@ namespace ZqUtils.Core.Extensions
             Action<IConnectionMultiplexer> action = null,
             TextWriter log = null,
             bool? useConnectionPool = null,
-            RedisConfiguration redisConfiguration = null)
+            RedisConfiguration redisConfiguration = null,
+            Action<ConfigurationOptions> configure = null)
         {
             //判断是否禁用Redis
             if (configuration.GetValue<bool?>("Redis:Enabled") == false)
@@ -222,6 +224,7 @@ namespace ZqUtils.Core.Extensions
                 {
                     Action = action,
                     ConnectLogger = log,
+                    Configure = configure,
                     ConnectionString = connectionString,
                     PoolSize = configuration.GetValue<int?>("Redis:PoolSize") ?? 5,
                     RegisterConnectionEvent = configuration.GetValue<bool?>("Redis:RegisterEvent") ?? true,
