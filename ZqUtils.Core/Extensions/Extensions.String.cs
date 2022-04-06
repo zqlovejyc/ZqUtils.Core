@@ -1073,26 +1073,49 @@ namespace ZqUtils.Core.Extensions
         }
 
         /// <summary>
-        /// 判断是否包含目标字符串，区分大小写
+        /// 判断是否包含目标字符串，区分大小写，任意一个满足即可
         /// </summary>
         /// <param name="this">源字符串</param>
         /// <param name="strs">目标字符串数组"</param>
         /// <returns></returns>
         public static bool Contains(this string @this, params string[] strs)
         {
+            return @this.Contains(MatchType.Any, strs);
+        }
+
+        /// <summary>
+        /// 判断是否包含目标字符串，区分大小写
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="type">匹配类型</param>
+        /// <param name="strs">目标字符串数组"</param>
+        /// <returns></returns>
+        public static bool Contains(this string @this, MatchType type, params string[] strs)
+        {
             if (@this.IsNullOrEmpty())
                 return false;
 
-            if (strs.IsNotNullOrEmpty())
+            if (strs.IsNullOrEmpty())
+                return false;
+
+            foreach (var item in strs)
             {
-                foreach (var item in strs)
+                if (type == MatchType.Any)
                 {
                     if (item != null && @this.Contains(item))
                         return true;
                 }
+                else
+                {
+                    if (item == null || !@this.Contains(item))
+                        return false;
+                }
             }
 
-            return false;
+            if (type == MatchType.Any)
+                return false;
+
+            return true;
         }
 
         /// <summary>
@@ -1108,26 +1131,49 @@ namespace ZqUtils.Core.Extensions
         }
 
         /// <summary>
-        /// 忽略大小写的字符串包含比较，判断是否以任意一个待比较字符串是否包含
+        /// 忽略大小写的字符串包含比较，任意一个满足即可
         /// </summary>
-        /// <param name="this"></param>
-        /// <param name="strs"></param>
+        /// <param name="this">源字符串</param>
+        /// <param name="strs">目标字符串数组</param>
         /// <returns></returns>
         public static bool ContainsIgnoreCase(this string @this, params string[] strs)
+        {
+            return @this.ContainsIgnoreCase(MatchType.Any, strs);
+        }
+
+        /// <summary>
+        /// 忽略大小写的字符串包含比较
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="type">匹配类型</param>
+        /// <param name="strs">目标字符串数组</param>
+        /// <returns></returns>
+        public static bool ContainsIgnoreCase(this string @this, MatchType type, params string[] strs)
         {
             if (@this.IsNullOrEmpty())
                 return false;
 
-            if (strs.IsNotNullOrEmpty())
+            if (strs.IsNullOrEmpty())
+                return false;
+
+            foreach (var item in strs)
             {
-                foreach (var item in strs)
+                if (type == MatchType.Any)
                 {
                     if (item.IsNotNull() && @this.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
                         return true;
                 }
+                else
+                {
+                    if (item.IsNull() || @this.IndexOf(item, StringComparison.OrdinalIgnoreCase) < 0)
+                        return false;
+                }
             }
 
-            return false;
+            if (type == MatchType.Any)
+                return false;
+
+            return true;
         }
 
         /// <summary>
@@ -1210,14 +1256,38 @@ namespace ZqUtils.Core.Extensions
         }
 
         /// <summary>
-        /// 忽略大小写的字符串不包含比较，判断是否均不包含待比较字符串，等价于 &lt;=&gt; !@this.ContainsIgnoreCase(...)
+        /// 判断是否不包含目标字符串，区分大小写，等价于 &lt;=&gt; !@this.Contains(...)
         /// </summary>
-        /// <param name="this"></param>
-        /// <param name="strs"></param>
+        /// <param name="this">源字符串</param>
+        /// <param name="type">匹配类型</param>
+        /// <param name="strs">目标字符串数组"</param>
+        /// <returns></returns>
+        public static bool NotContains(this string @this, MatchType type, params string[] strs)
+        {
+            return !@this.Contains(type, strs);
+        }
+
+        /// <summary>
+        /// 忽略大小写的字符串不包含比较，等价于 &lt;=&gt; !@this.ContainsIgnoreCase(...)
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="strs">目标字符串数组</param>
         /// <returns></returns>
         public static bool NotContainsIgnoreCase(this string @this, params string[] strs)
         {
             return !@this.ContainsIgnoreCase(strs);
+        }
+
+        /// <summary>
+        /// 忽略大小写的字符串不包含比较，等价于 &lt;=&gt; !@this.ContainsIgnoreCase(...)
+        /// </summary>
+        /// <param name="this">源字符串</param>
+        /// <param name="type">匹配类型</param>
+        /// <param name="strs">目标字符串数组</param>
+        /// <returns></returns>
+        public static bool NotContainsIgnoreCase(this string @this, MatchType type, params string[] strs)
+        {
+            return !@this.ContainsIgnoreCase(type, strs);
         }
         #endregion
 
@@ -2070,5 +2140,21 @@ namespace ZqUtils.Core.Extensions
             return CmdHelper.Execute(startInfo, new[] { @this });
         }
         #endregion
+    }
+
+    /// <summary>
+    /// 匹配类型
+    /// </summary>
+    public enum MatchType
+    {
+        /// <summary>
+        /// 任意一个
+        /// </summary>
+        Any = 0,
+
+        /// <summary>
+        /// 全部匹配
+        /// </summary>
+        All = 1
     }
 }
