@@ -235,9 +235,7 @@ namespace ZqUtils.Core.Helpers
                 if (_singleConnection != null && _singleConnection.IsConnected)
                     return _singleConnection;
 
-                _singleConnection = ConnectionMultiplexer.Connect(redisConnectionString, log);
-
-                _singleConnection.IncludeDetailInExceptions = true;
+                _singleConnection = ConnectionMultiplexer.Connect(redisConnectionString, x => x.IncludeDetailInExceptions = true, log);
 
                 action?.Invoke(_singleConnection);
 
@@ -267,9 +265,9 @@ namespace ZqUtils.Core.Helpers
                 if (_singleConnection != null && _singleConnection.IsConnected)
                     return _singleConnection;
 
-                _singleConnection = ConnectionMultiplexer.Connect(configurationOptions, log);
+                configurationOptions.IncludeDetailInExceptions = true;
 
-                _singleConnection.IncludeDetailInExceptions = true;
+                _singleConnection = ConnectionMultiplexer.Connect(configurationOptions, log);
 
                 action?.Invoke(_singleConnection);
 
@@ -327,9 +325,7 @@ namespace ZqUtils.Core.Helpers
                 if (_singleConnection != null && _singleConnection.IsConnected)
                     return _singleConnection;
 
-                _singleConnection = await ConnectionMultiplexer.ConnectAsync(redisConnectionString, log);
-
-                _singleConnection.IncludeDetailInExceptions = true;
+                _singleConnection = await ConnectionMultiplexer.ConnectAsync(redisConnectionString, x => x.IncludeDetailInExceptions = true, log);
 
                 action?.Invoke(_singleConnection);
 
@@ -370,8 +366,6 @@ namespace ZqUtils.Core.Helpers
                     return _singleConnection;
 
                 _singleConnection = await ConnectionMultiplexer.ConnectAsync(configurationOptions, log);
-
-                _singleConnection.IncludeDetailInExceptions = true;
 
                 action?.Invoke(_singleConnection);
 

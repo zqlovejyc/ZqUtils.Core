@@ -182,8 +182,6 @@ namespace ZqUtils.Core.Redis
                         (s, e) => _logger.LogError($"Redis(hash:{hashCode}) error: {e.Message}");
                 }
 
-                connection.IncludeDetailInExceptions = true;
-
                 this._redisConfiguration.Action?.Invoke(connection);
 
                 this._connections[i] = connection;

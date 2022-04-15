@@ -15,7 +15,7 @@
     <PackageReference Include="CrystalQuartz.AspNetCore" Version="6.8.1" />
     <PackageReference Include="Exceptionless.AspNetCore" Version="4.6.2" />
     <PackageReference Include="Quartz.Plugins.TimeZoneConverter" Version="3.4.0" />
-	<PackageReference Include="System.Text.Json" Version="6.0.2" />
+	<PackageReference Include="System.Text.Json" Version="6.0.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -962,21 +962,11 @@ namespace ZqUtils.Core.Helpers
                                 var imageValue = sheet.Cells[row, col].Value;
                                 if (imageValue != null && imageValue is byte[] imgeBytes)
                                 {
-                                    //加载图片
-                                    using var originImage = Image.FromStream(new MemoryStream(imgeBytes));
-
-                                    //转换图片格式为png，修复jpg在linux下无法导出的问题
-                                    using var pngStream = new MemoryStream();
-                                    originImage.Save(pngStream, ImageFormat.Png);
-
-                                    //重新加载图片
-                                    using var image = Image.FromStream(pngStream);
+                                    //添加图片
+                                    var pic = sheet.Drawings.AddPicture($"image_{DateTime.Now.Ticks}", new MemoryStream(imgeBytes), OfficeOpenXml.Drawing.ePictureType.Png);
 
                                     //设置行高
-                                    sheet.Row(row).Height = image.Height;
-
-                                    //添加图片
-                                    var pic = sheet.Drawings.AddPicture($"image_{DateTime.Now.Ticks}", image);
+                                    sheet.Row(row).Height = pic.Image.Bounds.Height;
 
                                     //设定图片位置
                                     pic.SetPosition(row - 1, rowOffsetPixels, col - 1, columnOffsetPixels);
