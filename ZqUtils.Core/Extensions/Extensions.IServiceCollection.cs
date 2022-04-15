@@ -224,7 +224,7 @@ namespace ZqUtils.Core.Extensions
                 {
                     Action = action,
                     ConnectLogger = log,
-                    Configure = configure,
+                    Configure = configure ?? (x => x.IncludeDetailInExceptions = true),
                     ConnectionString = connectionString,
                     PoolSize = configuration.GetValue<int?>("Redis:PoolSize") ?? 5,
                     RegisterConnectionEvent = configuration.GetValue<bool?>("Redis:RegisterEvent") ?? true,
