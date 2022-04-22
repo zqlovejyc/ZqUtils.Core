@@ -336,7 +336,7 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static byte[] EPPlusExportExcelToBytes<T>(IEnumerable<T> list, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1) where T : class, new()
         {
-            if (list?.Count() > 0)
+            if (list.IsNotNullOrEmpty())
             {
                 using var package = new ExcelPackage();
 
@@ -358,7 +358,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="styles">导出样式</param>
         public static byte[] EPPlusExportExcelToBytes<T>(IEnumerable<T> list, string[] columnName, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1) where T : class, new()
         {
-            if (list?.Count() > 0)
+            if (list.IsNotNullOrEmpty())
             {
                 using var package = new ExcelPackage();
                 using var sheet = package.Workbook.Worksheets.Add("Sheet1");
@@ -391,7 +391,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">sheet自定义处理委托</param>
         public static byte[] EPPlusExportExcelToBytes<T>(ExcelHeaderCell headerCell, IEnumerable<T> list, Action<ExcelWorksheet> action = null) where T : class, new()
         {
-            if (list?.Count() > 0)
+            if (list.IsNotNullOrEmpty())
             {
                 using var package = new ExcelPackage();
                 using var sheet = package.Workbook.Worksheets.Add("Sheet1");
@@ -744,7 +744,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="styles">导出样式</param>
         public static void EPPlusExportExcelToFile<T>(IEnumerable<T> list, string savePath, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1) where T : class, new()
         {
-            if (list?.Count() > 0)
+            if (list.IsNotNullOrEmpty())
             {
                 using var package = new ExcelPackage(new FileInfo(savePath));
 
@@ -765,7 +765,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="styles">导出样式</param>
         public static void EPPlusExportExcelToFile<T>(IEnumerable<T> list, string savePath, string[] columnName, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1) where T : class, new()
         {
-            if (list?.Count() > 0)
+            if (list.IsNotNullOrEmpty())
             {
                 using var package = new ExcelPackage(new FileInfo(savePath));
                 using var sheet = package.Workbook.Worksheets.Add("Sheet1");
@@ -796,7 +796,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">sheet自定义处理委托</param>
         public static void EPPlusExportExcelToFile<T>(ExcelHeaderCell headerCell, IEnumerable<T> list, string savePath, Action<ExcelWorksheet> action = null) where T : class, new()
         {
-            if (list?.Count() > 0)
+            if (list.IsNotNullOrEmpty())
             {
                 using var package = new ExcelPackage(new FileInfo(savePath));
                 using var sheet = package.Workbook.Worksheets.Add("Sheet1");
