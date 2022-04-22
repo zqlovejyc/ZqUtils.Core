@@ -44,8 +44,15 @@ namespace ZqUtils.Core.Helpers
         public static Assembly[] GetAssemblies(string path = null, Func<string, bool> filter = null)
         {
             var files = Directory
-                            .GetFiles(path ?? AppContext.BaseDirectory, "*.dll")
-                            .Select(x => x.Substring(@"\").Substring(@"/").Replace(".dll", ""));
+                            .GetFiles(path ?? AppContext.BaseDirectory, "*.*")
+                            .Where(x =>
+                                x.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ||
+                                x.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                            .Select(x => x
+                                .Substring(Path.DirectorySeparatorChar.ToString())
+                                .Replace(".dll", "")
+                                .Replace(".exe", ""))
+                            .Distinct();
 
             //判断筛选条件是否为空
             if (filter != null)
@@ -79,8 +86,10 @@ namespace ZqUtils.Core.Helpers
         public static IEnumerable<string> GetAssemblyFiles(string folderPath, SearchOption searchOption)
         {
             return Directory
-                .EnumerateFiles(folderPath, "*.*", searchOption)
-                .Where(s => s.EndsWith(".dll") || s.EndsWith(".exe"));
+               .EnumerateFiles(folderPath, "*.*", searchOption)
+               .Where(s =>
+                   s.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ||
+                   s.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
