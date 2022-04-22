@@ -239,20 +239,18 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static byte[] EPPlusExportExcelToBytes(DataTable table, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1)
         {
-            if (table?.Rows.Count > 0)
-            {
-                using var package = new ExcelPackage();
-                using var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? "Sheet1" : table.TableName);
-                sheet.Cells["A1"].LoadFromDataTable(table, true, styles);
-                //单元格自动适应大小
-                sheet.Cells.AutoFitColumns();
-                //单独设置单元格
-                action?.Invoke(sheet);
+            if (table?.Rows == null || table.Rows.Count == 0)
+                return null;
 
-                return package.GetAsByteArray();
-            }
+            using var package = new ExcelPackage();
+            using var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? "Sheet1" : table.TableName);
+            sheet.Cells["A1"].LoadFromDataTable(table, true, styles);
+            //单元格自动适应大小
+            sheet.Cells.AutoFitColumns();
+            //单独设置单元格
+            action?.Invoke(sheet);
 
-            return null;
+            return package.GetAsByteArray();
         }
 
         /// <summary>
@@ -265,33 +263,31 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static byte[] EPPlusExportExcelToBytes(ExcelHeaderCell headerCell, DataTable table, Action<ExcelWorksheet> action = null)
         {
-            if (table?.Rows.Count > 0)
-            {
-                using var package = new ExcelPackage();
-                using var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? "Sheet1" : table.TableName);
-                //设置边框样式
-                sheet.Cells.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                //水平居中
-                sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                //垂直居中
-                sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                //单元格自动适应大小
-                sheet.Cells.AutoFitColumns();
-                //构建表头
-                BuildExcelHeader(null, null, headerCell, sheet);
-                //加载数据
-                var firstCell = headerCell.ChildHeaderCells.FirstOrDefault();
-                sheet.Cells[firstCell.ToRow + 1, firstCell.ToCol].LoadFromDataTable(table, false);
-                //单独设置单元格
-                action?.Invoke(sheet);
+            if (table?.Rows == null || table.Rows.Count == 0)
+                return null;
 
-                return package.GetAsByteArray();
-            }
+            using var package = new ExcelPackage();
+            using var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? "Sheet1" : table.TableName);
+            //设置边框样式
+            sheet.Cells.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            //水平居中
+            sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            //垂直居中
+            sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            //单元格自动适应大小
+            sheet.Cells.AutoFitColumns();
+            //构建表头
+            BuildExcelHeader(null, null, headerCell, sheet);
+            //加载数据
+            var firstCell = headerCell.ChildHeaderCells.FirstOrDefault();
+            sheet.Cells[firstCell.ToRow + 1, firstCell.ToCol].LoadFromDataTable(table, false);
+            //单独设置单元格
+            action?.Invoke(sheet);
 
-            return null;
+            return package.GetAsByteArray();
         }
 
         /// <summary>
@@ -303,27 +299,25 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static byte[] EPPlusExportExcelToBytes(DataSet dataSet, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1)
         {
-            if (dataSet?.Tables.Count > 0)
-            {
-                using var package = new ExcelPackage();
-                for (var i = 0; i < dataSet.Tables.Count; i++)
-                {
-                    var table = dataSet.Tables[i];
-                    if (table != null && table.Rows.Count > 0)
-                    {
-                        var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? $"Sheet{i + 1}" : table.TableName);
-                        sheet.Cells["A1"].LoadFromDataTable(table, true, styles);
-                        //单元格自动适应大小
-                        sheet.Cells.AutoFitColumns();
-                        //单独设置单元格
-                        action?.Invoke(sheet);
-                    }
-                }
+            if (dataSet?.Tables == null || dataSet.Tables.Count == 0)
+                return null;
 
-                return package.GetAsByteArray();
+            using var package = new ExcelPackage();
+            for (var i = 0; i < dataSet.Tables.Count; i++)
+            {
+                var table = dataSet.Tables[i];
+                if (table != null && table.Rows.Count > 0)
+                {
+                    var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? $"Sheet{i + 1}" : table.TableName);
+                    sheet.Cells["A1"].LoadFromDataTable(table, true, styles);
+                    //单元格自动适应大小
+                    sheet.Cells.AutoFitColumns();
+                    //单独设置单元格
+                    action?.Invoke(sheet);
+                }
             }
 
-            return null;
+            return package.GetAsByteArray();
         }
 
         /// <summary>
@@ -336,16 +330,14 @@ namespace ZqUtils.Core.Helpers
         /// <returns></returns>
         public static byte[] EPPlusExportExcelToBytes<T>(IEnumerable<T> list, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1) where T : class, new()
         {
-            if (list.IsNotNullOrEmpty())
-            {
-                using var package = new ExcelPackage();
+            if (list.IsNullOrEmpty())
+                return null;
 
-                ExcelCellFormat(list, action, styles, package);
+            using var package = new ExcelPackage();
 
-                return package.GetAsByteArray();
-            }
+            ExcelCellFormat(list, action, styles, package);
 
-            return null;
+            return package.GetAsByteArray();
         }
 
         /// <summary>
@@ -358,28 +350,26 @@ namespace ZqUtils.Core.Helpers
         /// <param name="styles">导出样式</param>
         public static byte[] EPPlusExportExcelToBytes<T>(IEnumerable<T> list, string[] columnName, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1) where T : class, new()
         {
-            if (list.IsNotNullOrEmpty())
+            if (list.IsNullOrEmpty())
+                return null;
+
+            using var package = new ExcelPackage();
+            using var sheet = package.Workbook.Worksheets.Add("Sheet1");
+            sheet.Cells["A1"].LoadFromCollection(list, true, styles);
+            //设置Excel头部标题
+            if (columnName?.Length > 0)
             {
-                using var package = new ExcelPackage();
-                using var sheet = package.Workbook.Worksheets.Add("Sheet1");
-                sheet.Cells["A1"].LoadFromCollection(list, true, styles);
-                //设置Excel头部标题
-                if (columnName?.Length > 0)
+                for (var i = 0; i < columnName.Length; i++)
                 {
-                    for (var i = 0; i < columnName.Length; i++)
-                    {
-                        sheet.Cells[1, i + 1].Value = columnName[i];
-                    }
+                    sheet.Cells[1, i + 1].Value = columnName[i];
                 }
-                //单元格自动适应大小
-                sheet.Cells.AutoFitColumns();
-                //单独设置单元格
-                action?.Invoke(sheet);
-
-                return package.GetAsByteArray();
             }
+            //单元格自动适应大小
+            sheet.Cells.AutoFitColumns();
+            //单独设置单元格
+            action?.Invoke(sheet);
 
-            return null;
+            return package.GetAsByteArray();
         }
 
         /// <summary>
@@ -391,33 +381,31 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">sheet自定义处理委托</param>
         public static byte[] EPPlusExportExcelToBytes<T>(ExcelHeaderCell headerCell, IEnumerable<T> list, Action<ExcelWorksheet> action = null) where T : class, new()
         {
-            if (list.IsNotNullOrEmpty())
-            {
-                using var package = new ExcelPackage();
-                using var sheet = package.Workbook.Worksheets.Add("Sheet1");
-                //设置边框样式
-                sheet.Cells.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                //水平居中
-                sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                //垂直居中
-                sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                //单元格自动适应大小
-                sheet.Cells.AutoFitColumns();
-                //构建表头
-                BuildExcelHeader(null, null, headerCell, sheet);
-                //加载数据
-                var firstCell = headerCell.ChildHeaderCells.FirstOrDefault();
-                sheet.Cells[firstCell.ToRow + 1, firstCell.ToCol].LoadFromCollection(list, false);
-                //单独设置单元格
-                action?.Invoke(sheet);
+            if (list.IsNullOrEmpty())
+                return null;
 
-                return package.GetAsByteArray();
-            }
+            using var package = new ExcelPackage();
+            using var sheet = package.Workbook.Worksheets.Add("Sheet1");
+            //设置边框样式
+            sheet.Cells.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            //水平居中
+            sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            //垂直居中
+            sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            //单元格自动适应大小
+            sheet.Cells.AutoFitColumns();
+            //构建表头
+            BuildExcelHeader(null, null, headerCell, sheet);
+            //加载数据
+            var firstCell = headerCell.ChildHeaderCells.FirstOrDefault();
+            sheet.Cells[firstCell.ToRow + 1, firstCell.ToCol].LoadFromCollection(list, false);
+            //单独设置单元格
+            action?.Invoke(sheet);
 
-            return null;
+            return package.GetAsByteArray();
         }
         #endregion
 
@@ -657,17 +645,17 @@ namespace ZqUtils.Core.Helpers
         /// <param name="styles">导出样式</param>
         public static void EPPlusExportExcelToFile(DataTable table, string savePath, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1)
         {
-            if (table?.Rows.Count > 0)
-            {
-                using var package = new ExcelPackage(new FileInfo(savePath));
-                using var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? "Sheet1" : table.TableName);
-                sheet.Cells["A1"].LoadFromDataTable(table, true, styles);
-                //单元格自动适应大小
-                sheet.Cells.AutoFitColumns();
-                //单独设置单元格
-                action?.Invoke(sheet);
-                package.Save();
-            }
+            if (table?.Rows == null || table.Rows.Count == 0)
+                return;
+
+            using var package = new ExcelPackage(new FileInfo(savePath));
+            using var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? "Sheet1" : table.TableName);
+            sheet.Cells["A1"].LoadFromDataTable(table, true, styles);
+            //单元格自动适应大小
+            sheet.Cells.AutoFitColumns();
+            //单独设置单元格
+            action?.Invoke(sheet);
+            package.Save();
         }
 
         /// <summary>
@@ -679,30 +667,30 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">sheet自定义处理委托</param>
         public static void EPPlusExportExcelToFile(ExcelHeaderCell headerCell, DataTable table, string savePath, Action<ExcelWorksheet> action = null)
         {
-            if (table?.Rows.Count > 0)
-            {
-                using var package = new ExcelPackage(new FileInfo(savePath));
-                using var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? "Sheet1" : table.TableName);
-                //设置边框样式
-                sheet.Cells.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                //水平居中
-                sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                //垂直居中
-                sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                //单元格自动适应大小
-                sheet.Cells.AutoFitColumns();
-                //构建表头
-                BuildExcelHeader(null, null, headerCell, sheet);
-                //加载数据
-                var firstCell = headerCell.ChildHeaderCells.FirstOrDefault();
-                sheet.Cells[firstCell.ToRow + 1, firstCell.ToCol].LoadFromDataTable(table, false);
-                //单独设置单元格
-                action?.Invoke(sheet);
-                package.Save();
-            }
+            if (table?.Rows == null || table.Rows.Count == 0)
+                return;
+
+            using var package = new ExcelPackage(new FileInfo(savePath));
+            using var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? "Sheet1" : table.TableName);
+            //设置边框样式
+            sheet.Cells.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            //水平居中
+            sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            //垂直居中
+            sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            //单元格自动适应大小
+            sheet.Cells.AutoFitColumns();
+            //构建表头
+            BuildExcelHeader(null, null, headerCell, sheet);
+            //加载数据
+            var firstCell = headerCell.ChildHeaderCells.FirstOrDefault();
+            sheet.Cells[firstCell.ToRow + 1, firstCell.ToCol].LoadFromDataTable(table, false);
+            //单独设置单元格
+            action?.Invoke(sheet);
+            package.Save();
         }
 
         /// <summary>
@@ -714,24 +702,24 @@ namespace ZqUtils.Core.Helpers
         /// <param name="styles">导出样式</param>
         public static void EPPlusExportExcelToFile(DataSet dataSet, string savePath, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1)
         {
-            if (dataSet?.Tables.Count > 0)
+            if (dataSet?.Tables == null || dataSet.Tables.Count == 0)
+                return;
+
+            using var package = new ExcelPackage(new FileInfo(savePath));
+            for (var i = 0; i < dataSet.Tables.Count; i++)
             {
-                using var package = new ExcelPackage(new FileInfo(savePath));
-                for (var i = 0; i < dataSet.Tables.Count; i++)
+                var table = dataSet.Tables[i];
+                if (table != null && table.Rows.Count > 0)
                 {
-                    var table = dataSet.Tables[i];
-                    if (table != null && table.Rows.Count > 0)
-                    {
-                        var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? $"Sheet{i + 1}" : table.TableName);
-                        sheet.Cells["A1"].LoadFromDataTable(table, true, styles);
-                        //单元格自动适应大小
-                        sheet.Cells.AutoFitColumns();
-                        //单独设置单元格
-                        action?.Invoke(sheet);
-                    }
+                    var sheet = package.Workbook.Worksheets.Add(table.TableName.IsNullOrEmpty() ? $"Sheet{i + 1}" : table.TableName);
+                    sheet.Cells["A1"].LoadFromDataTable(table, true, styles);
+                    //单元格自动适应大小
+                    sheet.Cells.AutoFitColumns();
+                    //单独设置单元格
+                    action?.Invoke(sheet);
                 }
-                package.Save();
             }
+            package.Save();
         }
 
         /// <summary>
@@ -744,14 +732,14 @@ namespace ZqUtils.Core.Helpers
         /// <param name="styles">导出样式</param>
         public static void EPPlusExportExcelToFile<T>(IEnumerable<T> list, string savePath, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1) where T : class, new()
         {
-            if (list.IsNotNullOrEmpty())
-            {
-                using var package = new ExcelPackage(new FileInfo(savePath));
+            if (list.IsNullOrEmpty())
+                return;
 
-                ExcelCellFormat(list, action, styles, package);
+            using var package = new ExcelPackage(new FileInfo(savePath));
 
-                package.Save();
-            }
+            ExcelCellFormat(list, action, styles, package);
+
+            package.Save();
         }
 
         /// <summary>
@@ -765,25 +753,25 @@ namespace ZqUtils.Core.Helpers
         /// <param name="styles">导出样式</param>
         public static void EPPlusExportExcelToFile<T>(IEnumerable<T> list, string savePath, string[] columnName, Action<ExcelWorksheet> action = null, TableStyles? styles = TableStyles.Light1) where T : class, new()
         {
-            if (list.IsNotNullOrEmpty())
+            if (list.IsNullOrEmpty())
+                return;
+
+            using var package = new ExcelPackage(new FileInfo(savePath));
+            using var sheet = package.Workbook.Worksheets.Add("Sheet1");
+            sheet.Cells["A1"].LoadFromCollection(list, true, styles);
+            //设置Excel头部标题
+            if (columnName?.Length > 0)
             {
-                using var package = new ExcelPackage(new FileInfo(savePath));
-                using var sheet = package.Workbook.Worksheets.Add("Sheet1");
-                sheet.Cells["A1"].LoadFromCollection(list, true, styles);
-                //设置Excel头部标题
-                if (columnName?.Length > 0)
+                for (var i = 0; i < columnName.Length; i++)
                 {
-                    for (var i = 0; i < columnName.Length; i++)
-                    {
-                        sheet.Cells[1, i + 1].Value = columnName[i];
-                    }
+                    sheet.Cells[1, i + 1].Value = columnName[i];
                 }
-                //单元格自动适应大小
-                sheet.Cells.AutoFitColumns();
-                //单独设置单元格
-                action?.Invoke(sheet);
-                package.Save();
             }
+            //单元格自动适应大小
+            sheet.Cells.AutoFitColumns();
+            //单独设置单元格
+            action?.Invoke(sheet);
+            package.Save();
         }
 
         /// <summary>
@@ -796,30 +784,30 @@ namespace ZqUtils.Core.Helpers
         /// <param name="action">sheet自定义处理委托</param>
         public static void EPPlusExportExcelToFile<T>(ExcelHeaderCell headerCell, IEnumerable<T> list, string savePath, Action<ExcelWorksheet> action = null) where T : class, new()
         {
-            if (list.IsNotNullOrEmpty())
-            {
-                using var package = new ExcelPackage(new FileInfo(savePath));
-                using var sheet = package.Workbook.Worksheets.Add("Sheet1");
-                //设置边框样式
-                sheet.Cells.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                sheet.Cells.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                //水平居中
-                sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
-                //垂直居中
-                sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                //单元格自动适应大小
-                sheet.Cells.AutoFitColumns();
-                //构建表头
-                BuildExcelHeader(null, null, headerCell, sheet);
-                //加载数据
-                var firstCell = headerCell.ChildHeaderCells.FirstOrDefault();
-                sheet.Cells[firstCell.ToRow + 1, firstCell.ToCol].LoadFromCollection(list, false);
-                //单独设置单元格
-                action?.Invoke(sheet);
-                package.Save();
-            }
+            if (list.IsNullOrEmpty())
+                return;
+
+            using var package = new ExcelPackage(new FileInfo(savePath));
+            using var sheet = package.Workbook.Worksheets.Add("Sheet1");
+            //设置边框样式
+            sheet.Cells.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            sheet.Cells.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            //水平居中
+            sheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            //垂直居中
+            sheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            //单元格自动适应大小
+            sheet.Cells.AutoFitColumns();
+            //构建表头
+            BuildExcelHeader(null, null, headerCell, sheet);
+            //加载数据
+            var firstCell = headerCell.ChildHeaderCells.FirstOrDefault();
+            sheet.Cells[firstCell.ToRow + 1, firstCell.ToCol].LoadFromCollection(list, false);
+            //单独设置单元格
+            action?.Invoke(sheet);
+            package.Save();
         }
         #endregion
 
