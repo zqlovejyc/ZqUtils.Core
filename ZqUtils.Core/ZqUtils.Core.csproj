@@ -67,7 +67,7 @@
         <PackageReference Include="DistributedLock.Redis" Version="1.0.1" />
         <PackageReference Include="DnsClient" Version="1.6.0" />
         <PackageReference Include="EPPlus" Version="6.0.3" />
-        <PackageReference Include="FreeRedis" Version="0.5.0" />
+        <PackageReference Include="FreeRedis" Version="0.5.1" />
         <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
         <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
         <PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
