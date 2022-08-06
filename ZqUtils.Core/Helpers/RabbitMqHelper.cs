@@ -186,6 +186,7 @@ namespace ZqUtils.Core.Helpers
         public IModel EnsureOpened(IModel channel)
         {
             channel ??= GetChannel();
+
             if (channel.IsClosed)
             {
                 var data = _channelDic.Where(x => x.Value == channel)?.FirstOrDefault();
@@ -193,6 +194,7 @@ namespace ZqUtils.Core.Helpers
                 {
                     //移除已关闭的管道
                     _channelDic.TryRemove(data.Value.Key, out var model);
+
                     //重新获取管道
                     channel = GetChannel(data.Value.Key);
                 }
@@ -201,6 +203,7 @@ namespace ZqUtils.Core.Helpers
                     channel = GetChannel();
                 }
             }
+
             return channel;
         }
 
@@ -247,6 +250,7 @@ namespace ZqUtils.Core.Helpers
                             x.Confirm,
                             x.Expiration,
                             x.Priority,
+                            x.AutoCreate,
                             x.QueueArguments,
                             x.ExchangeArguments,
                             x.Headers));
@@ -754,19 +758,21 @@ namespace ZqUtils.Core.Helpers
         /// <param name="confirm">消息发送确认</param>
         /// <param name="expiration">单个消息过期时间，单位ms</param>
         /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <returns></returns>
         public bool Publish<T>(
             T command,
             bool confirm = false,
             string expiration = null,
-            byte? priority = null)
+            byte? priority = null,
+            bool autoCreate = true)
             where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
                 throw new ArgumentException("RabbitMqAttribute Is Null!");
 
-            return Publish(attribute, command, confirm, expiration, priority);
+            return Publish(attribute, command, confirm, expiration, priority, autoCreate);
         }
 
         /// <summary>
@@ -777,13 +783,15 @@ namespace ZqUtils.Core.Helpers
         /// <param name="confirm">消息发送确认</param>
         /// <param name="expiration">单个消息过期时间，单位ms</param>
         /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <returns></returns>
         public bool Publish<T>(
             RabbitMqAttribute attribute,
             T command,
             bool confirm = false,
             string expiration = null,
-            byte? priority = null)
+            byte? priority = null,
+            bool autoCreate = true)
             where T : class
         {
             //消息内容
@@ -843,6 +851,7 @@ namespace ZqUtils.Core.Helpers
                 confirm,
                 expiration,
                 priority,
+                autoCreate,
                 arguments,
                 null,
                 attribute.Header?.ToObject<Dictionary<string, object>>());
@@ -855,19 +864,21 @@ namespace ZqUtils.Core.Helpers
         /// <param name="confirm">消息发送确认</param>
         /// <param name="expiration">单个消息过期时间，单位ms</param>
         /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <returns></returns>
         public bool Publish<T>(
             IEnumerable<T> command,
             bool confirm = false,
             string expiration = null,
-            byte? priority = null)
+            byte? priority = null,
+            bool autoCreate = true)
             where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
                 throw new ArgumentException("RabbitMqAttribute Is Null!");
 
-            return Publish(attribute, command, confirm, expiration, priority);
+            return Publish(attribute, command, confirm, expiration, priority, autoCreate);
         }
 
         /// <summary>
@@ -878,13 +889,15 @@ namespace ZqUtils.Core.Helpers
         /// <param name="confirm">消息发送确认</param>
         /// <param name="expiration">单个消息过期时间，单位ms</param>
         /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <returns></returns>
         public bool Publish<T>(
             RabbitMqAttribute attribute,
             IEnumerable<T> command,
             bool confirm = false,
             string expiration = null,
-            byte? priority = null)
+            byte? priority = null,
+            bool autoCreate = true)
             where T : class
         {
             //消息内容
@@ -944,6 +957,7 @@ namespace ZqUtils.Core.Helpers
                 confirm,
                 expiration,
                 priority,
+                autoCreate,
                 arguments,
                 null,
                 attribute.Header?.ToObject<Dictionary<string, object>>());
@@ -961,6 +975,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="confirm">消息发送确认</param>
         /// <param name="expiration">单个消息过期时间，单位ms</param>
         /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <param name="queueArguments">队列参数</param>
         /// <param name="exchangeArguments">交换机参数</param>
         /// <param name="headers">消息头部</param>
@@ -975,23 +990,25 @@ namespace ZqUtils.Core.Helpers
             bool confirm = false,
             string expiration = null,
             byte? priority = null,
+            bool autoCreate = true,
             IDictionary<string, object> queueArguments = null,
             IDictionary<string, object> exchangeArguments = null,
             IDictionary<string, object> headers = null)
         {
             return Publish(
-                 exchange,
-                 queue,
-                 routingKey,
-                 new[] { body },
-                 exchangeType,
-                 durable,
-                 confirm,
-                 expiration,
-                 priority,
-                 queueArguments,
-                 exchangeArguments,
-                 headers);
+                exchange,
+                queue,
+                routingKey,
+                new[] { body },
+                exchangeType,
+                durable,
+                confirm,
+                expiration,
+                priority,
+                autoCreate,
+                queueArguments,
+                exchangeArguments,
+                headers);
         }
 
         /// <summary>
@@ -1006,6 +1023,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="confirm">消息发送确认</param>
         /// <param name="expiration">单个消息过期时间，单位ms</param>
         /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <param name="queueArguments">队列参数</param>
         /// <param name="exchangeArguments">交换机参数</param>
         /// <param name="headers">消息头部</param>
@@ -1020,26 +1038,28 @@ namespace ZqUtils.Core.Helpers
             bool confirm = false,
             string expiration = null,
             byte? priority = null,
+            bool autoCreate = true,
             IDictionary<string, object> queueArguments = null,
             IDictionary<string, object> exchangeArguments = null,
             IDictionary<string, object> headers = null)
         {
             return GetQueueHelper(queue).Enqueue(
-               new QueueMessage
-               {
-                   Exchange = exchange,
-                   Queue = queue,
-                   RoutingKey = routingKey,
-                   Body = body,
-                   ExchangeType = exchangeType,
-                   Durable = durable,
-                   Confirm = confirm,
-                   Expiration = expiration,
-                   Priority = priority,
-                   QueueArguments = queueArguments,
-                   ExchangeArguments = exchangeArguments,
-                   Headers = headers
-               });
+                new QueueMessage
+                {
+                    Exchange = exchange,
+                    Queue = queue,
+                    RoutingKey = routingKey,
+                    Body = body,
+                    ExchangeType = exchangeType,
+                    Durable = durable,
+                    Confirm = confirm,
+                    Expiration = expiration,
+                    Priority = priority,
+                    QueueArguments = queueArguments,
+                    ExchangeArguments = exchangeArguments,
+                    Headers = headers,
+                    AutoCreate = autoCreate
+                });
         }
 
         /// <summary>
@@ -1054,6 +1074,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="confirm">消息发送确认</param>
         /// <param name="expiration">单个消息过期时间，单位ms</param>
         /// <param name="priority">单个消息优先级，数值越大优先级越高，取值范围：0-9</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <param name="queueArguments">队列参数</param>
         /// <param name="exchangeArguments">交换机参数</param>
         /// <param name="headers">消息头部</param>
@@ -1068,6 +1089,7 @@ namespace ZqUtils.Core.Helpers
             bool confirm = false,
             string expiration = null,
             byte? priority = null,
+            bool autoCreate = true,
             IDictionary<string, object> queueArguments = null,
             IDictionary<string, object> exchangeArguments = null,
             IDictionary<string, object> headers = null)
@@ -1075,16 +1097,20 @@ namespace ZqUtils.Core.Helpers
             //获取管道
             var channel = GetChannel(queue);
 
-            //判断交换机是否存在
-            if (!IsExchangeExist(channel, exchange))
-                channel = ExchangeDeclare(channel, exchange, exchangeType, durable, arguments: exchangeArguments);
+            //是否自动检测并创建
+            if (autoCreate)
+            {
+                //判断交换机是否存在
+                if (!IsExchangeExist(channel, exchange))
+                    channel = ExchangeDeclare(channel, exchange, exchangeType, durable, arguments: exchangeArguments);
 
-            //判断队列是否存在
-            if (!IsQueueExist(channel, queue))
-                channel = QueueDeclare(channel, queue, durable, arguments: queueArguments);
+                //判断队列是否存在
+                if (!IsQueueExist(channel, queue))
+                    channel = QueueDeclare(channel, queue, durable, arguments: queueArguments);
 
-            //绑定交换机和队列
-            QueueBind(channel, exchange, queue, routingKey);
+                //绑定交换机和队列
+                QueueBind(channel, exchange, queue, routingKey);
+            }
 
             //声明消息属性
             var props = channel.CreateBasicProperties();
@@ -1169,12 +1195,14 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="subscriber">消费处理委托</param>
         /// <param name="handler">异常处理委托</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <param name="registered">注册事件</param>
         /// <param name="unregistered">取消注册事件</param>
         /// <param name="shutdown">关闭事件</param>
         public void Subscribe<T>(
             Func<T, BasicDeliverEventArgs, bool> subscriber,
             Action<string, int, Exception> handler,
+            bool autoCreate = true,
             EventHandler<ConsumerEventArgs> registered = null,
             EventHandler<ConsumerEventArgs> unregistered = null,
             EventHandler<ShutdownEventArgs> shutdown = null)
@@ -1184,7 +1212,7 @@ namespace ZqUtils.Core.Helpers
             if (attribute == null)
                 throw new ArgumentException("RabbitMqAttribute Is Null!");
 
-            Subscribe(attribute, subscriber, handler, registered, unregistered, shutdown);
+            Subscribe(attribute, subscriber, handler, autoCreate, registered, unregistered, shutdown);
         }
 
         /// <summary>
@@ -1194,6 +1222,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="attribute">RabbitMq特性配置</param>
         /// <param name="subscriber">消费处理委托</param>
         /// <param name="handler">异常处理委托</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <param name="registered">注册事件</param>
         /// <param name="unregistered">取消注册事件</param>
         /// <param name="shutdown">关闭事件</param>
@@ -1201,6 +1230,7 @@ namespace ZqUtils.Core.Helpers
             RabbitMqAttribute attribute,
             Func<T, BasicDeliverEventArgs, bool> subscriber,
             Action<string, int, Exception> handler,
+            bool autoCreate = true,
             EventHandler<ConsumerEventArgs> registered = null,
             EventHandler<ConsumerEventArgs> unregistered = null,
             EventHandler<ShutdownEventArgs> shutdown = null)
@@ -1262,6 +1292,7 @@ namespace ZqUtils.Core.Helpers
                 attribute.ExchangeType,
                 attribute.Durable,
                 attribute.ConsumerCount,
+                autoCreate,
                 arguments,
                 registered: registered,
                 unregistered: unregistered,
@@ -1274,12 +1305,14 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="subscriber">消费处理委托</param>
         /// <param name="handler">异常处理委托</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <param name="registered">注册事件</param>
         /// <param name="unregistered">取消注册事件</param>
         /// <param name="shutdown">关闭事件</param>
         public void Subscribe<T>(
             Func<T, BasicDeliverEventArgs, Task<bool>> subscriber,
             Func<string, int, Exception, Task> handler,
+            bool autoCreate = true,
             EventHandler<ConsumerEventArgs> registered = null,
             EventHandler<ConsumerEventArgs> unregistered = null,
             EventHandler<ShutdownEventArgs> shutdown = null)
@@ -1289,7 +1322,7 @@ namespace ZqUtils.Core.Helpers
             if (attribute == null)
                 throw new ArgumentException("RabbitMqAttribute Is Null!");
 
-            Subscribe(attribute, subscriber, handler, registered, unregistered, shutdown);
+            Subscribe(attribute, subscriber, handler, autoCreate, registered, unregistered, shutdown);
         }
 
         /// <summary>
@@ -1299,6 +1332,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="attribute">RabbitMq特性配置</param>
         /// <param name="subscriber">消费处理委托</param>
         /// <param name="handler">异常处理委托</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <param name="registered">注册事件</param>
         /// <param name="unregistered">取消注册事件</param>
         /// <param name="shutdown">关闭事件</param>
@@ -1306,6 +1340,7 @@ namespace ZqUtils.Core.Helpers
             RabbitMqAttribute attribute,
             Func<T, BasicDeliverEventArgs, Task<bool>> subscriber,
             Func<string, int, Exception, Task> handler,
+            bool autoCreate = true,
             EventHandler<ConsumerEventArgs> registered = null,
             EventHandler<ConsumerEventArgs> unregistered = null,
             EventHandler<ShutdownEventArgs> shutdown = null)
@@ -1367,6 +1402,7 @@ namespace ZqUtils.Core.Helpers
                 attribute.ExchangeType,
                 attribute.Durable,
                 attribute.ConsumerCount,
+                autoCreate,
                 arguments,
                 registered: registered,
                 unregistered: unregistered,
@@ -1388,6 +1424,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="exchangeType">交换机类型</param>
         /// <param name="durable">持久化</param>
         /// <param name="consumerCount">消费者数量</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <param name="queueArguments">队列参数</param>
         /// <param name="exchangeArguments">交换机参数</param>
         /// <param name="registered">注册事件</param>
@@ -1405,6 +1442,7 @@ namespace ZqUtils.Core.Helpers
             string exchangeType = ExchangeType.Direct,
             bool durable = true,
             int consumerCount = 1,
+            bool autoCreate = true,
             IDictionary<string, object> queueArguments = null,
             IDictionary<string, object> exchangeArguments = null,
             EventHandler<ConsumerEventArgs> registered = null,
@@ -1415,16 +1453,20 @@ namespace ZqUtils.Core.Helpers
             //获取管道
             var channel = GetChannel(queue);
 
-            //判断交换机是否存在
-            if (!IsExchangeExist(channel, exchange))
-                channel = ExchangeDeclare(channel, exchange, exchangeType, durable, arguments: exchangeArguments);
+            //是否自动检测并创建
+            if (autoCreate)
+            {
+                //判断交换机是否存在
+                if (!IsExchangeExist(channel, exchange))
+                    channel = ExchangeDeclare(channel, exchange, exchangeType, durable, arguments: exchangeArguments);
 
-            //判断队列是否存在
-            if (!IsQueueExist(channel, queue))
-                channel = QueueDeclare(channel, queue, durable, arguments: queueArguments);
+                //判断队列是否存在
+                if (!IsQueueExist(channel, queue))
+                    channel = QueueDeclare(channel, queue, durable, arguments: queueArguments);
 
-            //绑定交换机和队列
-            QueueBind(channel, exchange, queue, routingKey);
+                //绑定交换机和队列
+                QueueBind(channel, exchange, queue, routingKey);
+            }
 
             //设置每次预取数量
             channel.BasicQos(0, prefetchCount, false);
@@ -1515,6 +1557,7 @@ namespace ZqUtils.Core.Helpers
         /// <param name="exchangeType">交换机类型</param>
         /// <param name="durable">持久化</param>
         /// <param name="consumerCount">消费者数量</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         /// <param name="queueArguments">队列参数</param>
         /// <param name="exchangeArguments">交换机参数</param>
         /// <param name="registered">注册事件</param>
@@ -1532,6 +1575,7 @@ namespace ZqUtils.Core.Helpers
             string exchangeType = ExchangeType.Direct,
             bool durable = true,
             int consumerCount = 1,
+            bool autoCreate = true,
             IDictionary<string, object> queueArguments = null,
             IDictionary<string, object> exchangeArguments = null,
             EventHandler<ConsumerEventArgs> registered = null,
@@ -1542,16 +1586,20 @@ namespace ZqUtils.Core.Helpers
             //获取管道
             var channel = GetChannel(queue);
 
-            //判断交换机是否存在
-            if (!IsExchangeExist(channel, exchange))
-                channel = ExchangeDeclare(channel, exchange, exchangeType, durable, arguments: exchangeArguments);
+            //是否自动检测并创建
+            if (autoCreate)
+            {
+                //判断交换机是否存在
+                if (!IsExchangeExist(channel, exchange))
+                    channel = ExchangeDeclare(channel, exchange, exchangeType, durable, arguments: exchangeArguments);
 
-            //判断队列是否存在
-            if (!IsQueueExist(channel, queue))
-                channel = QueueDeclare(channel, queue, durable, arguments: queueArguments);
+                //判断队列是否存在
+                if (!IsQueueExist(channel, queue))
+                    channel = QueueDeclare(channel, queue, durable, arguments: queueArguments);
 
-            //绑定交换机和队列
-            QueueBind(channel, exchange, queue, routingKey);
+                //绑定交换机和队列
+                QueueBind(channel, exchange, queue, routingKey);
+            }
 
             //设置每次预取数量
             channel.BasicQos(0, prefetchCount, false);
@@ -1638,15 +1686,17 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler">消费处理委托</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         public void Pull<T>(
-            Action<T, BasicGetResult> handler)
+            Action<T, BasicGetResult> handler,
+            bool autoCreate = true)
             where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
                 throw new ArgumentException("RabbitMqAttribute Is Null!");
 
-            Pull(attribute.Exchange, attribute.Queue, attribute.RoutingKey, handler);
+            Pull(attribute.Exchange, attribute.Queue, attribute.RoutingKey, handler, autoCreate);
         }
 
         /// <summary>
@@ -1657,26 +1707,32 @@ namespace ZqUtils.Core.Helpers
         /// <param name="queue">队列名称</param>
         /// <param name="routingKey">路由键</param>
         /// <param name="handler">消费处理委托</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         public void Pull<T>(
             string exchange,
             string queue,
             string routingKey,
-            Action<T, BasicGetResult> handler)
+            Action<T, BasicGetResult> handler,
+            bool autoCreate)
             where T : class
         {
             //获取管道
             var channel = GetChannel(queue);
 
-            //判断交换机是否存在
-            if (!IsExchangeExist(channel, exchange))
-                channel = ExchangeDeclare(channel, exchange);
+            //是否自动检测并创建
+            if (autoCreate)
+            {
+                //判断交换机是否存在
+                if (!IsExchangeExist(channel, exchange))
+                    channel = ExchangeDeclare(channel, exchange);
 
-            //判断队列是否存在
-            if (!IsQueueExist(channel, queue))
-                channel = QueueDeclare(channel, queue);
+                //判断队列是否存在
+                if (!IsQueueExist(channel, queue))
+                    channel = QueueDeclare(channel, queue);
 
-            //绑定交换机和队列
-            QueueBind(channel, exchange, queue, routingKey);
+                //绑定交换机和队列
+                QueueBind(channel, exchange, queue, routingKey);
+            }
 
             var result = channel.BasicGet(queue, false);
             if (result == null)
@@ -1702,15 +1758,17 @@ namespace ZqUtils.Core.Helpers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="handler">消费处理委托</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         public async Task PullAsync<T>(
-            Func<T, BasicGetResult, Task> handler)
+            Func<T, BasicGetResult, Task> handler,
+            bool autoCreate = true)
             where T : class
         {
             var attribute = typeof(T).GetAttribute<RabbitMqAttribute>();
             if (attribute == null)
                 throw new ArgumentException("RabbitMqAttribute Is Null!");
 
-            await PullAsync(attribute.Exchange, attribute.Queue, attribute.RoutingKey, handler);
+            await PullAsync(attribute.Exchange, attribute.Queue, attribute.RoutingKey, handler, autoCreate);
         }
 
         /// <summary>
@@ -1721,26 +1779,32 @@ namespace ZqUtils.Core.Helpers
         /// <param name="queue">队列名称</param>
         /// <param name="routingKey">路由键</param>
         /// <param name="handler">消费处理委托</param>
+        /// <param name="autoCreate">是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系</param>
         public async Task PullAsync<T>(
             string exchange,
             string queue,
             string routingKey,
-            Func<T, BasicGetResult, Task> handler)
+            Func<T, BasicGetResult, Task> handler,
+            bool autoCreate = true)
             where T : class
         {
             //获取管道
             var channel = GetChannel(queue);
 
-            //判断交换机是否存在
-            if (!IsExchangeExist(channel, exchange))
-                channel = ExchangeDeclare(channel, exchange);
+            //是否自动检测并创建
+            if (autoCreate)
+            {
+                //判断交换机是否存在
+                if (!IsExchangeExist(channel, exchange))
+                    channel = ExchangeDeclare(channel, exchange);
 
-            //判断队列是否存在
-            if (!IsQueueExist(channel, queue))
-                channel = QueueDeclare(channel, queue);
+                //判断队列是否存在
+                if (!IsQueueExist(channel, queue))
+                    channel = QueueDeclare(channel, queue);
 
-            //绑定交换机和队列
-            QueueBind(channel, exchange, queue, routingKey);
+                //绑定交换机和队列
+                QueueBind(channel, exchange, queue, routingKey);
+            }
 
             var result = channel.BasicGet(queue, false);
             if (result == null)
@@ -2062,5 +2126,10 @@ namespace ZqUtils.Core.Helpers
         /// 消息头部
         /// </summary>
         public IDictionary<string, object> Headers { get; set; }
+
+        /// <summary>
+        /// 是否自动检测交换机和队列是否存在，不存在则自动创建并建立绑定关系
+        /// </summary>
+        public bool AutoCreate { get; set; }
     }
 }
