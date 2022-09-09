@@ -16,7 +16,6 @@
  */
 #endregion
 
-using FastMember;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,6 +26,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using ZqUtils.Core.FastMember;
 /****************************
 * [Author] 张强
 * [Date] 2018-05-15

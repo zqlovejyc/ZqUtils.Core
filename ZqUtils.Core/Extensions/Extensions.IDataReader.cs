@@ -16,12 +16,12 @@
  */
 #endregion
 
-using FastMember;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Linq;
+using ZqUtils.Core.FastMember;
 /****************************
 * [Author] 张强
 * [Date] 2018-05-03
