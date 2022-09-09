@@ -57,5 +57,12 @@ namespace ZqUtils.Core.Helpers
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static List<T> EmptyList<T>() => new();
+
+        /// <summary>
+        /// 空HashSet
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static HashSet<T> EmptyHashSet<T>() => new();
     }
 }
