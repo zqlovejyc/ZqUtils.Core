@@ -248,7 +248,7 @@ namespace ZqUtils.Core.Extensions
         public static string Join(this IEnumerable @this, string separator = ",")
         {
             var sb = new StringBuilder();
-            if (@this != null)
+            if (@this is not null)
             {
                 foreach (var item in @this)
                 {
@@ -268,9 +268,10 @@ namespace ZqUtils.Core.Extensions
         public static string Join<T>(this IEnumerable<T> value, string separator = ",", Func<T, string> func = null)
         {
             var sb = new StringBuilder();
-            if (value != null)
+            if (value is not null)
             {
-                if (func == null) func = obj => "{0}".F(obj);
+                func ??= obj => "{0}".F(obj);
+
                 foreach (var item in value)
                 {
                     sb.Separate(separator).Append(func(item));
