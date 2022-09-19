@@ -425,16 +425,10 @@ namespace ZqUtils.Core.Helpers
         /// <returns>返回MongodbHelper实例</returns>
         public MongodbHelper GetInstance(string databaseName)
         {
-            if (!_pool.ContainsKey(databaseName))
-            {
-                var objectPool = new Lazy<ObjectPoolHelper<MongodbHelper>>(() => new ObjectPoolHelper<MongodbHelper>(() => new MongodbHelper(databaseName)));
-                _pool.GetOrAdd(Database.ToString(), objectPool);
-                return objectPool.Value.GetObject();
-            }
-            else
-            {
-                return _pool[databaseName].Value.GetObject();
-            }
+            var pool = _pool.GetOrAdd(Database.ToString(),
+                key => new Lazy<ObjectPoolHelper<MongodbHelper>>(() => new ObjectPoolHelper<MongodbHelper>(() => new MongodbHelper(databaseName)))).Value;
+
+            return pool.GetObject();
         }
         #endregion
 
