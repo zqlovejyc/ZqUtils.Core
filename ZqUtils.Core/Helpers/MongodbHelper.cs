@@ -45,7 +45,7 @@ namespace ZqUtils.Core.Helpers
         /// <summary>
         /// 对象池
         /// </summary>
-        private static readonly ConcurrentDictionary<string, Lazy<ObjectPoolHelper<MongodbHelper>>> _pool = new ConcurrentDictionary<string, Lazy<ObjectPoolHelper<MongodbHelper>>>();
+        private static readonly ConcurrentDictionary<string, Lazy<ObjectPoolHelper<MongodbHelper>>> _pool = new();
 
         /// <summary>
         /// 链接字符串
