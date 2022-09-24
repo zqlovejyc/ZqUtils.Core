@@ -1808,9 +1808,6 @@ namespace ZqUtils.Core.Extensions
             maxValue = @this.ElementAt(0);
             var length = @this.Count();
 
-            if (length == 1)
-                return index;
-
             for (var i = 1; i < length; i++)
             {
                 var tempValue = @this.ElementAt(i);
@@ -1849,9 +1846,6 @@ namespace ZqUtils.Core.Extensions
 
             var index = 0;
             maxValue = @this.ElementAt(0);
-
-            if (@this.Count == 1)
-                return index;
 
             for (var i = 1; i < @this.Count; i++)
             {
@@ -1895,9 +1889,6 @@ namespace ZqUtils.Core.Extensions
             minValue = @this.ElementAt(0);
             var length = @this.Count();
 
-            if (length == 1)
-                return index;
-
             for (var i = 1; i < length; i++)
             {
                 var tempValue = @this.ElementAt(i);
@@ -1936,9 +1927,6 @@ namespace ZqUtils.Core.Extensions
 
             var index = 0;
             minValue = @this.ElementAt(0);
-
-            if (@this.Count == 1)
-                return index;
 
             for (var i = 1; i < @this.Count; i++)
             {
