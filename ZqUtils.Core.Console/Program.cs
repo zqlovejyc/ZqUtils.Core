@@ -245,6 +245,38 @@ namespace ZqUtils.Core.Console
 
             SysConsole.WriteLine($"计数结果：{Counters.GetOrCreateValue(cwt).Value},{counterMap[key].Value},数量：{count}");
         }
+
+        public void Test2()
+        {
+            var key = "11";
+            var counterMap = new ConcurrentDictionary<string, Lazy<AtomicCounter>>(StringComparer.OrdinalIgnoreCase);
+            var count = 0;
+            Parallel.For(0, 1000, x =>
+            {
+                counterMap.GetOrAdd(key, key =>
+                    new Lazy<AtomicCounter>(() => new AtomicCounter())).Value.Increment();
+
+                Interlocked.Increment(ref count);
+            });
+
+            Parallel.For(0, 1000, x =>
+            {
+                counterMap.GetOrAdd(key, key =>
+                    new Lazy<AtomicCounter>(() => new AtomicCounter())).Value.Increment();
+
+                Interlocked.Increment(ref count);
+            });
+
+            Parallel.For(0, 1000, x =>
+            {
+                counterMap.GetOrAdd(key, key =>
+                   new Lazy<AtomicCounter>(() => new AtomicCounter())).Value.Increment();
+
+                Interlocked.Increment(ref count);
+            });
+
+            SysConsole.WriteLine($"计数结果：{counterMap[key].Value.Value},数量：{count}");
+        }
     }
 
     /// <summary>
@@ -268,6 +300,8 @@ namespace ZqUtils.Core.Console
             SysConsole.WriteLine(wr.Target == null);
             //Counters内由于key释放掉了，值也自动释放掉了，所以count为0
             SysConsole.WriteLine(counters.Count());
+
+            counterTest.Test2();
             SysConsole.ReadLine();
             #endregion
 
