@@ -216,31 +216,34 @@ namespace ZqUtils.Core.Console
         public static readonly ConditionalWeakTable<dynamic, AtomicCounter> Counters = new();
         public void Test(dynamic cwt)
         {
-            var counterMap = new ConcurrentDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            var count = 0;
             var key = "11";
+            var counterMap = new ConcurrentDictionary<string, AtomicCounter>(StringComparer.OrdinalIgnoreCase);
+            var count = 0;
             Parallel.For(0, 1000, x =>
             {
                 var counter = Counters.GetOrCreateValue(cwt);
-                counterMap[key] = counter.Increment();
+                counter.Increment();
+                counterMap[key] = counter;
                 Interlocked.Increment(ref count);
             });
 
             Parallel.For(0, 1000, x =>
             {
                 var counter = Counters.GetOrCreateValue(cwt);
-                counterMap[key] = counter.Increment();
+                counter.Increment();
+                counterMap[key] = counter;
                 Interlocked.Increment(ref count);
             });
 
             Parallel.For(0, 1000, x =>
             {
                 var counter = Counters.GetOrCreateValue(cwt);
-                counterMap[key] = counter.Increment();
+                counter.Increment();
+                counterMap[key] = counter;
                 Interlocked.Increment(ref count);
             });
 
-            SysConsole.WriteLine($"计数结果：{counterMap[key]},数量：{count},Counters数量：{Counters.Count()}");
+            SysConsole.WriteLine($"计数结果：{Counters.GetOrCreateValue(cwt).Value},{counterMap[key].Value},数量：{count}");
         }
     }
 
