@@ -10,7 +10,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using ZqUtils.Core.Extensions;
 using ZqUtils.Core.Helpers;
@@ -169,12 +171,102 @@ namespace ZqUtils.Core.Console
     }
 
     /// <summary>
+    /// 原子计数器
+    /// </summary>
+    public sealed class AtomicCounter
+    {
+        private int _value;
+
+        /// <summary>
+        /// Gets the current value of the counter.
+        /// </summary>
+        public int Value
+        {
+            get => Volatile.Read(ref _value);
+            set => Volatile.Write(ref _value, value);
+        }
+
+        /// <summary>
+        /// Atomically increments the counter value by 1.
+        /// </summary>
+        public int Increment()
+        {
+            return Interlocked.Increment(ref _value);
+        }
+
+        /// <summary>
+        /// Atomically decrements the counter value by 1.
+        /// </summary>
+        public int Decrement()
+        {
+            return Interlocked.Decrement(ref _value);
+        }
+
+        /// <summary>
+        /// Atomically resets the counter value to 0.
+        /// </summary>
+        public void Reset()
+        {
+            Interlocked.Exchange(ref _value, 0);
+        }
+    }
+
+    public class AtomicCounterTest
+    {
+        public static readonly ConditionalWeakTable<AtomicCounterTest, AtomicCounter> Counters = new();
+        public void Test()
+        {
+            var key = "11";
+            var counterMap = new ConcurrentDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var count = 0;
+            Parallel.For(0, 1000, x =>
+            {
+                var counter = Counters.GetOrCreateValue(this);
+                counterMap[key] = counter.Increment();
+                Interlocked.Increment(ref count);
+            });
+
+            Parallel.For(0, 1000, x =>
+            {
+                var counter = Counters.GetOrCreateValue(this);
+                counterMap[key] = counter.Increment();
+                Interlocked.Increment(ref count);
+            });
+
+            Parallel.For(0, 1000, x =>
+            {
+                var counter = Counters.GetOrCreateValue(this);
+                counterMap[key] = counter.Increment();
+                Interlocked.Increment(ref count);
+            });
+
+            SysConsole.WriteLine($"计数结果：{counterMap[key]},数量：{count},Counters数量：{Counters.Count()}");
+        }
+    }
+
+    /// <summary>
     /// Program
     /// </summary>
     public class Program
     {
         public static async Task Main(string[] args)
         {
+            #region ConditionalWeakTable
+            var counterTest = new AtomicCounterTest();
+            counterTest.Test();
+            var counters = AtomicCounterTest.Counters;
+
+            //测试下面代码必须在Release模式执行
+            var wr = new WeakReference(counterTest);
+            counterTest = null;
+            GC.Collect();
+
+            SysConsole.WriteLine(wr.Target == null);
+            //Counters内由于key释放掉了，值也自动释放掉了，所以count为0
+            SysConsole.WriteLine(counters.Count());
+            SysConsole.ReadLine();
+            #endregion
+
             #region Channel
             //初始化Channel
             var channel = new ChannelHelper<string>();
