@@ -213,29 +213,29 @@ namespace ZqUtils.Core.Console
 
     public class AtomicCounterTest
     {
-        public static readonly ConditionalWeakTable<AtomicCounterTest, AtomicCounter> Counters = new();
-        public void Test()
+        public static readonly ConditionalWeakTable<dynamic, AtomicCounter> Counters = new();
+        public void Test(dynamic cwt)
         {
-            var key = "11";
             var counterMap = new ConcurrentDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             var count = 0;
+            var key = "11";
             Parallel.For(0, 1000, x =>
             {
-                var counter = Counters.GetOrCreateValue(this);
+                var counter = Counters.GetOrCreateValue(cwt);
                 counterMap[key] = counter.Increment();
                 Interlocked.Increment(ref count);
             });
 
             Parallel.For(0, 1000, x =>
             {
-                var counter = Counters.GetOrCreateValue(this);
+                var counter = Counters.GetOrCreateValue(cwt);
                 counterMap[key] = counter.Increment();
                 Interlocked.Increment(ref count);
             });
 
             Parallel.For(0, 1000, x =>
             {
-                var counter = Counters.GetOrCreateValue(this);
+                var counter = Counters.GetOrCreateValue(cwt);
                 counterMap[key] = counter.Increment();
                 Interlocked.Increment(ref count);
             });
@@ -252,13 +252,14 @@ namespace ZqUtils.Core.Console
         public static async Task Main(string[] args)
         {
             #region ConditionalWeakTable
+            var key = new { key = "11" };
             var counterTest = new AtomicCounterTest();
-            counterTest.Test();
+            counterTest.Test(key);
             var counters = AtomicCounterTest.Counters;
 
             //测试下面代码必须在Release模式执行
-            var wr = new WeakReference(counterTest);
-            counterTest = null;
+            var wr = new WeakReference(key);
+            key = null;
             GC.Collect();
 
             SysConsole.WriteLine(wr.Target == null);
