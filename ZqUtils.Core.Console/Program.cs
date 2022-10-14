@@ -213,37 +213,31 @@ namespace ZqUtils.Core.Console
 
     public class AtomicCounterTest
     {
-        public static readonly ConditionalWeakTable<dynamic, AtomicCounter> Counters = new();
-        public void Test(dynamic cwt)
+        public static readonly ConditionalWeakTable<AtomicCounterTest, AtomicCounter> Counters = new();
+        public void Test()
         {
             var key = "11";
             var counterMap = new ConcurrentDictionary<string, AtomicCounter>(StringComparer.OrdinalIgnoreCase);
             var count = 0;
             Parallel.For(0, 1000, x =>
             {
-                var counter = Counters.GetOrCreateValue(cwt);
-                counter.Increment();
-                counterMap[key] = counter;
+                (counterMap[key] = Counters.GetOrCreateValue(this)).Increment();
                 Interlocked.Increment(ref count);
             });
 
             Parallel.For(0, 1000, x =>
             {
-                var counter = Counters.GetOrCreateValue(cwt);
-                counter.Increment();
-                counterMap[key] = counter;
+                (counterMap[key] = Counters.GetOrCreateValue(this)).Increment();
                 Interlocked.Increment(ref count);
             });
 
             Parallel.For(0, 1000, x =>
             {
-                var counter = Counters.GetOrCreateValue(cwt);
-                counter.Increment();
-                counterMap[key] = counter;
+                (counterMap[key] = Counters.GetOrCreateValue(this)).Increment();
                 Interlocked.Increment(ref count);
             });
 
-            SysConsole.WriteLine($"计数结果：{Counters.GetOrCreateValue(cwt).Value},{counterMap[key].Value},数量：{count}");
+            SysConsole.WriteLine($"计数结果：{Counters.GetOrCreateValue(this).Value},{counterMap[key].Value},数量：{count}");
         }
 
         public void Test2()
@@ -287,21 +281,21 @@ namespace ZqUtils.Core.Console
         public static async Task Main(string[] args)
         {
             #region ConditionalWeakTable
-            var key = new { key = "11" };
             var counterTest = new AtomicCounterTest();
-            counterTest.Test(key);
-            var counters = AtomicCounterTest.Counters;
+
+            counterTest.Test();
+
+            counterTest.Test2();
 
             //测试下面代码必须在Release模式执行
-            var wr = new WeakReference(key);
-            key = null;
+            var counters = AtomicCounterTest.Counters;
+            var wr = new WeakReference(counterTest);
+            counterTest = null;
             GC.Collect();
 
             SysConsole.WriteLine(wr.Target == null);
             //Counters内由于key释放掉了，值也自动释放掉了，所以count为0
             SysConsole.WriteLine(counters.Count());
-
-            counterTest.Test2();
             SysConsole.ReadLine();
             #endregion
 
