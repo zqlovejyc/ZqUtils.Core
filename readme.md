@@ -15,7 +15,7 @@
 
 <div align="center">
 
-.NET Standard 2.0、.NET Standard 2.1、.NET 5、.NET 6 版本工具类
+.NET Standard 2.0、.NET Standard 2.1、.NET 5、.NET 6、.NET 7 版本工具类
 
 </div>
 
