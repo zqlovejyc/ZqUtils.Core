@@ -46,6 +46,7 @@
 		<DocumentationFile>bin\Release\netstandard2.1\ZqUtils.Core.xml</DocumentationFile>
 		<DocumentationFile>bin\Release\net5.0\ZqUtils.Core.xml</DocumentationFile>
 		<DocumentationFile>bin\Release\net6.0\ZqUtils.Core.xml</DocumentationFile>
+		<DocumentationFile>bin\Release\net7.0\ZqUtils.Core.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
