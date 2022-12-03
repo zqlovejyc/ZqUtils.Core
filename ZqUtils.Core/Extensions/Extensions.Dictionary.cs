@@ -999,5 +999,30 @@ namespace ZqUtils.Core.Extensions
             return @this.Keys.Any(k => k.EqualIgnoreCase(key));
         }
         #endregion
+
+        #region AddRange
+        /// <summary>
+        /// AddRange
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="values"></param>
+        /// <param name="replaceExisted"></param>
+        /// <returns></returns>
+        public static IDictionary<TKey, TValue> AddRange<TKey, TValue>(this IDictionary<TKey, TValue> @this, IEnumerable<KeyValuePair<TKey, TValue>> values, bool replaceExisted = true)
+        {
+            if (@this == null || values.IsNullOrEmpty())
+                return @this;
+
+            foreach (var item in values)
+            {
+                if (replaceExisted || !@this.ContainsKey(item.Key))
+                    @this[item.Key] = item.Value;
+            }
+
+            return @this;
+        }
+        #endregion
     }
 }
