@@ -96,7 +96,7 @@
         <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
         <PackageReference Include="NATS.Client" Version="0.14.8" />
         <PackageReference Include="NEST" Version="7.17.4" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
         <PackageReference Include="NLog" Version="5.0.4" />
         <PackageReference Include="OneOf" Version="3.0.223" />
         <PackageReference Include="Polly" Version="7.2.3" />
